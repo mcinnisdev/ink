@@ -13,6 +13,20 @@ export interface FileChangedEvent {
   type: "add" | "change" | "unlink";
 }
 
+export interface EleventyStatusEvent {
+  status: "stopped" | "installing" | "starting" | "running" | "error";
+  port?: number;
+  error?: string;
+}
+
+export interface MediaFile {
+  name: string;
+  path: string;
+  relativePath: string;
+  size: number;
+  modified: number;
+}
+
 export interface InkAPI {
   project: {
     create: (config: {
@@ -50,6 +64,21 @@ export interface InkAPI {
     watchStop: () => Promise<void>;
     onChanged: (callback: (event: FileChangedEvent) => void) => () => void;
   };
+  eleventy: {
+    start: (projectPath: string) => Promise<{ port: number }>;
+    stop: () => Promise<void>;
+    status: () => Promise<{ status: string; port: number | null }>;
+    build: (projectPath: string) => Promise<{ success: boolean; output: string }>;
+    onStatus: (callback: (event: EleventyStatusEvent) => void) => () => void;
+  };
+  shell: {
+    openExternal: (url: string) => Promise<void>;
+  };
+  media: {
+    list: (mediaDir: string) => Promise<MediaFile[]>;
+    upload: (destDir: string) => Promise<string[] | null>;
+    delete: (filePath: string) => Promise<void>;
+  };
 }
 
 const api: InkAPI = {
@@ -74,6 +103,28 @@ const api: InkAPI = {
         ipcRenderer.removeListener("file:changed", handler);
       };
     },
+  },
+  eleventy: {
+    start: (projectPath) => ipcRenderer.invoke("eleventy:start", projectPath),
+    stop: () => ipcRenderer.invoke("eleventy:stop"),
+    status: () => ipcRenderer.invoke("eleventy:status"),
+    build: (projectPath) => ipcRenderer.invoke("eleventy:build", projectPath),
+    onStatus: (callback) => {
+      const handler = (_event: unknown, data: EleventyStatusEvent) =>
+        callback(data);
+      ipcRenderer.on("eleventy:status", handler);
+      return () => {
+        ipcRenderer.removeListener("eleventy:status", handler);
+      };
+    },
+  },
+  shell: {
+    openExternal: (url) => ipcRenderer.invoke("shell:openExternal", url),
+  },
+  media: {
+    list: (mediaDir) => ipcRenderer.invoke("media:list", mediaDir),
+    upload: (destDir) => ipcRenderer.invoke("media:upload", destDir),
+    delete: (filePath) => ipcRenderer.invoke("media:delete", filePath),
   },
 };
 

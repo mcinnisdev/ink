@@ -1,8 +1,11 @@
 import { useEffect } from "react";
 import { useProjectStore } from "../../stores/project";
 import { useEditorStore } from "../../stores/editor";
+import { useUIStore } from "../../stores/ui";
+import { useEleventyStore } from "../../stores/eleventy";
 import FileExplorer from "./FileExplorer";
 import EditorPanel from "./EditorPanel";
+import PreviewPane from "./PreviewPane";
 
 export default function ContentView() {
   const projectPath = useProjectStore((s) => s.current?.path);
@@ -11,6 +14,11 @@ export default function ContentView() {
   const closeAllTabs = useEditorStore((s) => s.closeAllTabs);
   const saveFile = useEditorStore((s) => s.saveFile);
   const activeTabPath = useEditorStore((s) => s.activeTabPath);
+  const previewVisible = useUIStore((s) => s.previewVisible);
+  const eleventyStatus = useEleventyStore((s) => s.status);
+  const startEleventy = useEleventyStore((s) => s.start);
+  const stopEleventy = useEleventyStore((s) => s.stop);
+  const setEleventyStatus = useEleventyStore((s) => s.setStatus);
 
   // Load file tree and start watcher when project opens
   useEffect(() => {
@@ -32,6 +40,33 @@ export default function ContentView() {
       unsub();
       window.ink.file.watchStop();
       closeAllTabs();
+    };
+  }, [projectPath]);
+
+  // Listen for eleventy status push events from main process
+  useEffect(() => {
+    const unsub = window.ink.eleventy.onStatus((event) => {
+      setEleventyStatus(event.status, event.port, event.error);
+    });
+    return unsub;
+  }, [setEleventyStatus]);
+
+  // Start/stop Eleventy when preview toggled
+  useEffect(() => {
+    if (previewVisible && projectPath && eleventyStatus === "stopped") {
+      startEleventy(projectPath);
+    }
+    if (!previewVisible && eleventyStatus !== "stopped") {
+      stopEleventy();
+    }
+  }, [previewVisible, projectPath]);
+
+  // Stop Eleventy when project closes
+  useEffect(() => {
+    return () => {
+      if (useEleventyStore.getState().status !== "stopped") {
+        useEleventyStore.getState().stop();
+      }
     };
   }, [projectPath]);
 
@@ -58,6 +93,7 @@ export default function ContentView() {
     <div className="flex h-full">
       <FileExplorer />
       <EditorPanel />
+      {previewVisible && <PreviewPane />}
     </div>
   );
 }

@@ -1,21 +1,40 @@
+import {
+  FileText,
+  Image,
+  Palette,
+  Globe,
+  Sparkles,
+  Settings,
+  type LucideIcon,
+} from "lucide-react";
 import { useUIStore } from "../../stores/ui";
 import { useProjectStore } from "../../stores/project";
 
-const navItems = [
-  { id: "content" as const, label: "Content", icon: "M" },
-  { id: "media" as const, label: "Media", icon: "I" },
-  { id: "theme" as const, label: "Theme", icon: "T" },
-  { id: "git" as const, label: "Publish", icon: "G" },
-  { id: "ai" as const, label: "AI", icon: "A" },
-  { id: "settings" as const, label: "Settings", icon: "S" },
+const navItems: Array<{
+  id: "content" | "media" | "theme" | "git" | "ai" | "settings";
+  label: string;
+  icon: LucideIcon;
+  devOnly: boolean;
+}> = [
+  { id: "content", label: "Content", icon: FileText, devOnly: false },
+  { id: "media", label: "Media", icon: Image, devOnly: false },
+  { id: "theme", label: "Theme", icon: Palette, devOnly: true },
+  { id: "git", label: "Publish", icon: Globe, devOnly: false },
+  { id: "ai", label: "AI", icon: Sparkles, devOnly: false },
+  { id: "settings", label: "Settings", icon: Settings, devOnly: false },
 ];
 
 export default function Sidebar() {
   const activeView = useUIStore((s) => s.activeView);
   const setView = useUIStore((s) => s.setView);
+  const devMode = useUIStore((s) => s.devMode);
   const current = useProjectStore((s) => s.current);
   const setCurrent = useProjectStore((s) => s.setCurrent);
   const setWizardOpen = useUIStore((s) => s.setWizardOpen);
+
+  const visibleItems = devMode
+    ? navItems
+    : navItems.filter((item) => !item.devOnly);
 
   return (
     <aside className="w-52 bg-ink-900 border-r border-ink-700 flex flex-col shrink-0">
@@ -29,7 +48,7 @@ export default function Sidebar() {
 
       {/* Nav */}
       <nav className="flex-1 py-2">
-        {navItems.map((item) => (
+        {visibleItems.map((item) => (
           <button
             key={item.id}
             onClick={() => setView(item.id)}
@@ -39,9 +58,7 @@ export default function Sidebar() {
                 : "text-ink-400 hover:text-ink-200 hover:bg-ink-800/50"
             }`}
           >
-            <span className="w-5 h-5 rounded bg-ink-700 text-[10px] font-bold flex items-center justify-center text-ink-300">
-              {item.icon}
-            </span>
+            <item.icon className="w-4 h-4" />
             {item.label}
           </button>
         ))}

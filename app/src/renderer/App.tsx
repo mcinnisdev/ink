@@ -6,11 +6,36 @@ import TitleBar from "./components/layout/TitleBar";
 import Welcome from "./components/onboarding/Welcome";
 import ProjectWizard from "./components/onboarding/ProjectWizard";
 import ContentView from "./components/content/ContentView";
+import MediaView from "./components/views/MediaView";
+import ThemeView from "./components/views/ThemeView";
+import PublishView from "./components/views/PublishView";
+import AIView from "./components/views/AIView";
+import SettingsView from "./components/views/SettingsView";
+
+function ViewRouter() {
+  const activeView = useUIStore((s) => s.activeView);
+
+  switch (activeView) {
+    case "content":
+      return <ContentView />;
+    case "media":
+      return <MediaView />;
+    case "theme":
+      return <ThemeView />;
+    case "git":
+      return <PublishView />;
+    case "ai":
+      return <AIView />;
+    case "settings":
+      return <SettingsView />;
+    default:
+      return <ContentView />;
+  }
+}
 
 export default function App() {
   const current = useProjectStore((s) => s.current);
   const loadRecent = useProjectStore((s) => s.loadRecent);
-  const activeView = useUIStore((s) => s.activeView);
   const wizardOpen = useUIStore((s) => s.wizardOpen);
 
   useEffect(() => {
@@ -23,8 +48,7 @@ export default function App() {
       <div className="flex flex-1 overflow-hidden">
         {current && <Sidebar />}
         <main className="flex-1 overflow-hidden">
-          {!current && <Welcome />}
-          {current && activeView === "content" && <ContentView />}
+          {!current ? <Welcome /> : <ViewRouter />}
         </main>
       </div>
       {wizardOpen && <ProjectWizard />}

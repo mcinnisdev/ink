@@ -1,5 +1,6 @@
 import { useProjectStore } from "../../stores/project";
 import { useUIStore } from "../../stores/ui";
+import inkLogo from "../../assets/ink-logo.svg";
 
 export default function Welcome() {
   const recentProjects = useProjectStore((s) => s.recentProjects);
@@ -23,7 +24,10 @@ export default function Welcome() {
       <div className="max-w-md w-full px-8">
         {/* Logo / Brand */}
         <div className="text-center mb-10">
-          <h1 className="text-4xl font-bold text-white mb-2">Ink</h1>
+          <div className="flex items-center justify-center gap-3 mb-2">
+            <img src={inkLogo} alt="Ink" className="w-10 h-10" />
+            <h1 className="text-4xl font-bold text-white">Ink</h1>
+          </div>
           <p className="text-ink-400 text-sm">
             Websites written in Markdown
           </p>

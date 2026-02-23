@@ -1,10 +1,14 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useEditorStore } from "../../stores/editor";
+import { useUIStore } from "../../stores/ui";
 import FileTreeNode from "./FileTreeNode";
+
+const contentDirs = new Set(["content", "media"]);
 
 export default function FileExplorer() {
   const fileTree = useEditorStore((s) => s.fileTree);
   const fileTreeLoading = useEditorStore((s) => s.fileTreeLoading);
+  const devMode = useUIStore((s) => s.devMode);
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
 
   // Auto-expand content/ on first load
@@ -31,6 +35,13 @@ export default function FileExplorer() {
     });
   }, []);
 
+  const visibleTree = useMemo(() => {
+    if (devMode) return fileTree;
+    return fileTree.filter(
+      (node) => node.type === "directory" && contentDirs.has(node.name)
+    );
+  }, [fileTree, devMode]);
+
   if (fileTreeLoading) {
     return (
       <div className="w-60 flex-shrink-0 bg-ink-900 border-r border-ink-700 p-4">
@@ -45,9 +56,9 @@ export default function FileExplorer() {
     <div className="w-60 flex-shrink-0 bg-ink-900 border-r border-ink-700 overflow-y-auto">
       <div className="py-2">
         <div className="px-3 py-1.5 text-[10px] font-semibold text-ink-500 uppercase tracking-wider">
-          Explorer
+          {devMode ? "Explorer" : "Content"}
         </div>
-        {fileTree.map((node) => (
+        {visibleTree.map((node) => (
           <FileTreeNode
             key={node.path}
             node={node}

@@ -1,4 +1,5 @@
-import { ipcMain, BrowserWindow } from "electron";
+import { ipcMain, BrowserWindow, shell, dialog } from "electron";
+import path from "path";
 import {
   createProject,
   openProject,
@@ -12,6 +13,17 @@ import {
   startWatching,
   stopWatching,
 } from "./services/file";
+import {
+  startServer,
+  stopServer,
+  getStatus,
+  buildSite,
+} from "./services/eleventy";
+import {
+  listMedia,
+  copyToMedia,
+  deleteMedia,
+} from "./services/media";
 
 export function registerIpcHandlers(): void {
   // --- Project ---
@@ -54,5 +66,61 @@ export function registerIpcHandlers(): void {
 
   ipcMain.handle("file:watchStop", async () => {
     stopWatching();
+  });
+
+  // --- Eleventy ---
+  ipcMain.handle("eleventy:start", async (event, projectPath: string) => {
+    const win = BrowserWindow.fromWebContents(event.sender);
+    if (!win) throw new Error("No window");
+    return startServer(projectPath, win);
+  });
+
+  ipcMain.handle("eleventy:stop", async () => {
+    return stopServer();
+  });
+
+  ipcMain.handle("eleventy:status", async () => {
+    return getStatus();
+  });
+
+  ipcMain.handle("eleventy:build", async (_event, projectPath: string) => {
+    return buildSite(projectPath);
+  });
+
+  // --- Shell ---
+  ipcMain.handle("shell:openExternal", async (_event, url: string) => {
+    if (url.startsWith("http://") || url.startsWith("https://")) {
+      await shell.openExternal(url);
+    }
+  });
+
+  // --- Media ---
+  ipcMain.handle("media:list", async (_event, mediaDir: string) => {
+    return listMedia(mediaDir);
+  });
+
+  ipcMain.handle("media:upload", async (event, destDir: string) => {
+    const win = BrowserWindow.fromWebContents(event.sender);
+    const result = await dialog.showOpenDialog(win!, {
+      properties: ["openFile", "multiSelections"],
+      filters: [
+        {
+          name: "Images",
+          extensions: ["jpg", "jpeg", "png", "gif", "svg", "webp", "avif"],
+        },
+      ],
+    });
+    if (result.canceled) return null;
+    const paths: string[] = [];
+    for (const sourcePath of result.filePaths) {
+      const fileName = path.basename(sourcePath);
+      const dest = await copyToMedia(sourcePath, destDir, fileName);
+      paths.push(dest);
+    }
+    return paths;
+  });
+
+  ipcMain.handle("media:delete", async (_event, filePath: string) => {
+    return deleteMedia(filePath);
   });
 }

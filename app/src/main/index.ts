@@ -1,6 +1,7 @@
 import { app, BrowserWindow, shell } from "electron";
 import path from "path";
 import { registerIpcHandlers } from "./ipc";
+import { cleanup as eleventyCleanup } from "./services/eleventy";
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -11,6 +12,7 @@ function createWindow(): void {
     minWidth: 900,
     minHeight: 600,
     title: "Ink",
+    icon: path.join(__dirname, "../../resources/icon.ico"),
     titleBarStyle: "hidden",
     titleBarOverlay: {
       color: "#0f172a",
@@ -50,7 +52,12 @@ app.whenReady().then(() => {
   });
 });
 
+app.on("before-quit", () => {
+  eleventyCleanup();
+});
+
 app.on("window-all-closed", () => {
+  eleventyCleanup();
   if (process.platform !== "darwin") {
     app.quit();
   }

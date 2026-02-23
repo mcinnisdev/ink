@@ -1,3 +1,4 @@
+import { ChevronRight, ChevronDown, Folder, FolderOpen, FileText } from "lucide-react";
 import { type FileNode, useEditorStore } from "../../stores/editor";
 
 interface Props {
@@ -36,8 +37,12 @@ export default function FileTreeNode({
         style={{ paddingLeft: `${depth * 16 + 8}px` }}
       >
         {node.type === "directory" ? (
-          <span className="text-ink-500 w-3 text-center flex-shrink-0">
-            {isExpanded ? "▾" : "▸"}
+          <span className="text-ink-500 w-3 flex items-center justify-center flex-shrink-0">
+            {isExpanded ? (
+              <ChevronDown className="w-3 h-3" />
+            ) : (
+              <ChevronRight className="w-3 h-3" />
+            )}
           </span>
         ) : (
           <span className="w-3 flex-shrink-0" />
@@ -47,7 +52,15 @@ export default function FileTreeNode({
             node.type === "directory" ? "text-ink-400" : "text-ink-500"
           }`}
         >
-          {node.type === "directory" ? "📁" : "📄"}
+          {node.type === "directory" ? (
+            isExpanded ? (
+              <FolderOpen className="w-3.5 h-3.5" />
+            ) : (
+              <Folder className="w-3.5 h-3.5" />
+            )
+          ) : (
+            <FileText className="w-3.5 h-3.5" />
+          )}
         </span>
         <span className="truncate">{node.name}</span>
       </button>

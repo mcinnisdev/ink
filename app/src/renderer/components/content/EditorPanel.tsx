@@ -11,36 +11,34 @@ export default function EditorPanel() {
 
   const activeTab = tabs.find((t) => t.filePath === activeTabPath);
 
-  if (tabs.length === 0) {
-    return (
-      <div className="flex-1 flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-ink-500 text-sm mb-1">No file open</p>
-          <p className="text-ink-600 text-xs">
-            Select a file from the explorer to start editing
-          </p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="flex-1 flex flex-col min-w-0">
       <TabBar />
-      {activeTab && (
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <FrontmatterForm
-            frontmatter={activeTab.content.frontmatter}
-            onChange={(key, value) =>
-              updateFrontmatter(activeTab.filePath, key, value)
-            }
-          />
-          <MarkdownEditor
-            key={activeTab.filePath}
-            value={activeTab.content.body}
-            onChange={(body) => updateBody(activeTab.filePath, body)}
-          />
+      {tabs.length === 0 ? (
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <p className="text-ink-500 text-sm mb-1">No file open</p>
+            <p className="text-ink-600 text-xs">
+              Select a file from the explorer to start editing
+            </p>
+          </div>
         </div>
+      ) : (
+        activeTab && (
+          <div className="flex-1 flex flex-col overflow-hidden">
+            <FrontmatterForm
+              frontmatter={activeTab.content.frontmatter}
+              onChange={(key, value) =>
+                updateFrontmatter(activeTab.filePath, key, value)
+              }
+            />
+            <MarkdownEditor
+              key={activeTab.filePath}
+              value={activeTab.content.body}
+              onChange={(body) => updateBody(activeTab.filePath, body)}
+            />
+          </div>
+        )
       )}
     </div>
   );

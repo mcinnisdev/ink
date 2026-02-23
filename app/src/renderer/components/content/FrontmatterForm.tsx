@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { ChevronRight, ChevronDown } from "lucide-react";
 
 interface Props {
   frontmatter: Record<string, unknown>;
@@ -24,7 +25,13 @@ export default function FrontmatterForm({ frontmatter, onChange }: Props) {
         className="w-full flex items-center gap-2 px-4 py-2 text-xs font-semibold text-ink-400 uppercase tracking-wider hover:bg-ink-800/50 transition-colors"
         onClick={() => setCollapsed(!collapsed)}
       >
-        <span className="text-ink-500">{collapsed ? "▸" : "▾"}</span>
+        <span className="text-ink-500">
+          {collapsed ? (
+            <ChevronRight className="w-3 h-3" />
+          ) : (
+            <ChevronDown className="w-3 h-3" />
+          )}
+        </span>
         Frontmatter
         <span className="text-ink-600 font-normal normal-case">
           ({entries.length} fields)
