@@ -1,0 +1,7 @@
+{
+  "main": [
+    { "label": "Services", "url": "/services/" },
+    { "label": "Team", "url": "/team/" },
+    { "label": "Contact", "url": "/contact/" }
+  ]
+}

@@ -1,0 +1,15 @@
+{% set heroClass = "hero" %}
+{% if not featured_image %}{% set heroClass = heroClass + " hero--no-image" %}{% endif %}
+{% if hero_size == "sm" %}{% set heroClass = heroClass + " hero--sm" %}{% endif %}
+
+<section class="{{ heroClass }}"{% if featured_image %} style="background-image: url('{{ featured_image }}')"{% endif %}>
+  <div class="hero__content">
+    <h1 class="hero__title">{{ hero_headline or title }}</h1>
+    {% if hero_subtitle or excerpt %}
+    <p class="hero__subtitle">{{ hero_subtitle or excerpt }}</p>
+    {% endif %}
+    {% if hero_cta_text %}
+    <a href="{{ hero_cta_url or '#main' }}" class="btn btn--primary">{{ hero_cta_text }}</a>
+    {% endif %}
+  </div>
+</section>

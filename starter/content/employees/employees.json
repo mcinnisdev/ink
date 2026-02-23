@@ -1,0 +1,5 @@
+{
+  "layout": "employee.njk",
+  "tags": "employees",
+  "published": true
+}

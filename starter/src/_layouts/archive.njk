@@ -1,0 +1,35 @@
+---
+layout: base.njk
+---
+{% if featured_image or hero_headline %}
+  {% include "components/hero.njk" %}
+{% else %}
+<section class="hero hero--no-image hero--sm">
+  <div class="hero__content">
+    <h1 class="hero__title">{{ title }}</h1>
+    {% if excerpt %}<p class="hero__subtitle">{{ excerpt }}</p>{% endif %}
+  </div>
+</section>
+{% endif %}
+
+<section class="section">
+  <div class="container">
+    {% if collections[collection_name] and collections[collection_name].length %}
+    <div class="card-grid">
+      {% for item in collections[collection_name] %}
+        {% include "components/card.njk" %}
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-center">No items to display yet.</p>
+    {% endif %}
+  </div>
+</section>
+
+{% if content | trim %}
+<section class="section section--alt">
+  <div class="container container--narrow">
+    {{ content | safe }}
+  </div>
+</section>
+{% endif %}

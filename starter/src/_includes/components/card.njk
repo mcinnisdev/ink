@@ -1,0 +1,21 @@
+<article class="card">
+  {% if item.data.featured_image or item.data.photo %}
+  <img
+    class="card__image"
+    src="{{ item.data.featured_image or item.data.photo }}"
+    alt="{{ item.data.title }}"
+    loading="lazy"
+  >
+  {% endif %}
+  <div class="card__body">
+    <h3 class="card__title">
+      <a href="{{ item.url }}">{{ item.data.title }}</a>
+    </h3>
+    {% if item.data.role %}
+    <p class="card__subtitle">{{ item.data.role }}</p>
+    {% endif %}
+    {% if item.data.excerpt %}
+    <p class="card__excerpt">{{ item.data.excerpt }}</p>
+    {% endif %}
+  </div>
+</article>

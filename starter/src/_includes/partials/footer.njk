@@ -1,0 +1,29 @@
+<footer class="site-footer">
+  <div class="site-footer__inner">
+    <div>
+      <p class="site-footer__heading">{{ site.name }}</p>
+      <p style="color: rgba(255,255,255,0.7); font-size: var(--text-sm);">{{ site.tagline }}</p>
+    </div>
+    <div>
+      <p class="site-footer__heading">Navigation</p>
+      <ul class="site-footer__nav">
+        <li><a href="/">Home</a></li>
+        {% for item in navigation.main %}
+        <li><a href="{{ item.url }}">{{ item.label }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% if site.email or site.phone %}
+    <div>
+      <p class="site-footer__heading">Contact</p>
+      <ul class="site-footer__nav">
+        {% if site.phone %}<li><a href="tel:{{ site.phone }}">{{ site.phone }}</a></li>{% endif %}
+        {% if site.email %}<li><a href="mailto:{{ site.email }}">{{ site.email }}</a></li>{% endif %}
+      </ul>
+    </div>
+    {% endif %}
+  </div>
+  <div class="site-footer__bottom">
+    <p>&copy; {{ "" | year }} {{ site.name }}. All rights reserved.</p>
+  </div>
+</footer>

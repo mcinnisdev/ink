@@ -1,0 +1,4 @@
+{
+  "services": { "glob": "content/services/*.md", "sort": "order" },
+  "employees": { "glob": "content/employees/*.md", "sort": "order" }
+}

@@ -1,0 +1,31 @@
+<title>{{ seo_title or title }} | {{ site.name }}</title>
+<meta name="description" content="{{ meta_description or excerpt or site.description }}">
+
+{# Open Graph #}
+<meta property="og:title" content="{{ seo_title or title }}">
+<meta property="og:description" content="{{ meta_description or excerpt or site.description }}">
+<meta property="og:type" content="website">
+<meta property="og:url" content="{{ site.url }}{{ page.url }}">
+{% if og_image or featured_image %}
+<meta property="og:image" content="{{ site.url }}{{ og_image or featured_image }}">
+{% endif %}
+
+{# Twitter #}
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ seo_title or title }}">
+<meta name="twitter:description" content="{{ meta_description or excerpt or site.description }}">
+
+{# Canonical #}
+<link rel="canonical" href="{{ site.url }}{{ page.url }}">
+
+{# JSON-LD Organization (site-wide) #}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "{{ site.name }}",
+  "url": "{{ site.url }}",
+  "description": "{{ site.description }}"{% if site.phone %},
+  "telephone": "{{ site.phone }}"{% endif %}
+}
+</script>
