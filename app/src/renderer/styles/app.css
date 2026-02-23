@@ -36,3 +36,23 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #475569;
 }
+
+/* Hide scrollbar for tab bar */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* CodeMirror overrides */
+.cm-container .cm-editor {
+  height: 100%;
+}
+.cm-container .cm-editor .cm-scroller {
+  overflow: auto;
+}
+.cm-container .cm-editor .cm-content {
+  user-select: text;
+}
