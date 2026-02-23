@@ -19,6 +19,8 @@ interface ProjectStore {
     path: string;
     siteName: string;
     siteUrl: string;
+    contentTypes?: string[];
+    siteDescription?: string;
   }) => Promise<string>;
   openProject: () => Promise<void>;
   openByPath: (path: string) => Promise<void>;

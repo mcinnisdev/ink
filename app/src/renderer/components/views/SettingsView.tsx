@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
-import { Save, Plus, Trash2 } from "lucide-react";
+import { Save, Plus, Trash2, Sparkles } from "lucide-react";
 import { useProjectStore } from "../../stores/project";
+import { useAIStore, type AIConfig } from "../../stores/ai";
 
 interface SiteConfig {
   name: string;
@@ -62,6 +63,19 @@ export default function SettingsView() {
   const [saving, setSaving] = useState(false);
   const [loaded, setLoaded] = useState(false);
 
+  // AI config (per-user, stored in userData)
+  const aiConfig = useAIStore((s) => s.config);
+  const aiConfigLoaded = useAIStore((s) => s.configLoaded);
+  const loadAIConfig = useAIStore((s) => s.loadConfig);
+  const saveAIConfig = useAIStore((s) => s.saveConfig);
+  const [localAI, setLocalAI] = useState<AIConfig>({
+    provider: "anthropic",
+    apiKey: "",
+    model: "claude-sonnet-4-20250514",
+  });
+  const [aiDirty, setAiDirty] = useState(false);
+  const [aiSaving, setAiSaving] = useState(false);
+
   useEffect(() => {
     if (!projectPath) return;
     const siteJsonPath = `${projectPath}/src/_data/site.json`;
@@ -76,6 +90,17 @@ export default function SettingsView() {
       setDirty(false);
     });
   }, [projectPath]);
+
+  // Load AI config
+  useEffect(() => {
+    if (!aiConfigLoaded) loadAIConfig();
+  }, [aiConfigLoaded, loadAIConfig]);
+
+  useEffect(() => {
+    if (aiConfig) {
+      setLocalAI(aiConfig);
+    }
+  }, [aiConfig]);
 
   const updateSite = useCallback(
     (updates: Partial<SiteConfig>) => {
@@ -255,6 +280,109 @@ export default function SettingsView() {
                 value={site.gtm_id}
                 onChange={(v) => updateSite({ gtm_id: v })}
               />
+            </div>
+          </section>
+
+          {/* AI Assistant */}
+          <section>
+            <h3 className="text-sm font-semibold text-ink-300 mb-3 flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-amber-400" />
+              AI Assistant
+            </h3>
+            <div className="space-y-4 max-w-sm">
+              <div>
+                <label className="block text-xs font-medium text-ink-400 mb-1">
+                  Provider
+                </label>
+                <select
+                  value={localAI.provider}
+                  onChange={(e) => {
+                    const provider = e.target.value as "anthropic" | "openai";
+                    setLocalAI((prev) => ({
+                      ...prev,
+                      provider,
+                      model:
+                        provider === "anthropic"
+                          ? "claude-sonnet-4-20250514"
+                          : "gpt-4o",
+                    }));
+                    setAiDirty(true);
+                  }}
+                  className="w-full bg-ink-900 border border-ink-600 rounded-lg px-3 py-2 text-sm text-white focus:border-accent focus:outline-none"
+                >
+                  <option value="anthropic">Anthropic (Claude)</option>
+                  <option value="openai">OpenAI (GPT)</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-ink-400 mb-1">
+                  API Key
+                </label>
+                <input
+                  type="password"
+                  value={localAI.apiKey}
+                  onChange={(e) => {
+                    setLocalAI((prev) => ({ ...prev, apiKey: e.target.value }));
+                    setAiDirty(true);
+                  }}
+                  placeholder={
+                    localAI.provider === "anthropic" ? "sk-ant-..." : "sk-..."
+                  }
+                  className="w-full bg-ink-900 border border-ink-600 rounded-lg px-3 py-2 text-sm text-white focus:border-accent focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-ink-400 mb-1">
+                  Model
+                </label>
+                <select
+                  value={localAI.model}
+                  onChange={(e) => {
+                    setLocalAI((prev) => ({ ...prev, model: e.target.value }));
+                    setAiDirty(true);
+                  }}
+                  className="w-full bg-ink-900 border border-ink-600 rounded-lg px-3 py-2 text-sm text-white focus:border-accent focus:outline-none"
+                >
+                  {localAI.provider === "anthropic" ? (
+                    <>
+                      <option value="claude-sonnet-4-20250514">
+                        Claude Sonnet 4
+                      </option>
+                      <option value="claude-haiku-4-20250414">
+                        Claude Haiku 4
+                      </option>
+                    </>
+                  ) : (
+                    <>
+                      <option value="gpt-4o">GPT-4o</option>
+                      <option value="gpt-4o-mini">GPT-4o Mini</option>
+                    </>
+                  )}
+                </select>
+              </div>
+
+              <button
+                onClick={async () => {
+                  setAiSaving(true);
+                  try {
+                    await saveAIConfig(localAI);
+                    setAiDirty(false);
+                  } finally {
+                    setAiSaving(false);
+                  }
+                }}
+                disabled={!aiDirty || aiSaving}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                  aiDirty
+                    ? "bg-accent hover:bg-accent-hover text-white"
+                    : "bg-ink-800 text-ink-500 cursor-not-allowed"
+                }`}
+              >
+                <Save className="w-3.5 h-3.5" />
+                {aiSaving ? "Saving..." : "Save AI Settings"}
+              </button>
             </div>
           </section>
 

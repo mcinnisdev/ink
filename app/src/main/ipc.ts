@@ -24,6 +24,13 @@ import {
   copyToMedia,
   deleteMedia,
 } from "./services/media";
+import {
+  loadAIConfig,
+  saveAIConfig,
+  sendMessage as aiSendMessage,
+  stopGeneration,
+} from "./services/ai";
+import { scaffoldProject } from "./services/scaffold";
 
 export function registerIpcHandlers(): void {
   // --- Project ---
@@ -42,6 +49,20 @@ export function registerIpcHandlers(): void {
   ipcMain.handle("project:list", async () => {
     return listRecent();
   });
+
+  ipcMain.handle(
+    "project:scaffold",
+    async (
+      _event,
+      projectPath: string,
+      contentTypes: string[],
+      siteDescription: string,
+      siteName: string,
+      siteUrl: string
+    ) => {
+      return scaffoldProject(projectPath, contentTypes, siteDescription, siteName, siteUrl);
+    }
+  );
 
   // --- File ---
   ipcMain.handle("file:list", async (_event, dirPath: string) => {
@@ -122,5 +143,24 @@ export function registerIpcHandlers(): void {
 
   ipcMain.handle("media:delete", async (_event, filePath: string) => {
     return deleteMedia(filePath);
+  });
+
+  // --- AI ---
+  ipcMain.handle("ai:getConfig", async () => {
+    return loadAIConfig();
+  });
+
+  ipcMain.handle("ai:saveConfig", async (_event, config) => {
+    return saveAIConfig(config);
+  });
+
+  ipcMain.handle("ai:sendMessage", async (event, messages, context) => {
+    const win = BrowserWindow.fromWebContents(event.sender);
+    if (!win) throw new Error("No window");
+    return aiSendMessage(messages, context, win);
+  });
+
+  ipcMain.handle("ai:stopGeneration", async () => {
+    return stopGeneration();
   });
 }

@@ -27,6 +27,29 @@ export interface MediaFile {
   modified: number;
 }
 
+export interface AIConfig {
+  provider: "anthropic" | "openai";
+  apiKey: string;
+  model: string;
+}
+
+export interface AIStreamEvent {
+  type: "chunk" | "tool_call" | "tool_result" | "done" | "error";
+  content?: string;
+  toolCall?: { id: string; name: string; arguments: Record<string, unknown> };
+  toolResult?: { toolCallId: string; content: string; isError: boolean };
+  error?: string;
+  messageId: string;
+}
+
+export interface ProjectContext {
+  projectPath: string;
+  siteName: string;
+  siteUrl: string;
+  currentFilePath?: string;
+  currentFile?: string;
+}
+
 export interface InkAPI {
   project: {
     create: (config: {
@@ -55,6 +78,13 @@ export interface InkAPI {
         siteUrl: string;
       }>
     >;
+    scaffold: (
+      projectPath: string,
+      contentTypes: string[],
+      siteDescription: string,
+      siteName: string,
+      siteUrl: string
+    ) => Promise<void>;
   };
   file: {
     list: (dirPath: string) => Promise<FileNode[]>;
@@ -79,6 +109,13 @@ export interface InkAPI {
     upload: (destDir: string) => Promise<string[] | null>;
     delete: (filePath: string) => Promise<void>;
   };
+  ai: {
+    getConfig: () => Promise<AIConfig | null>;
+    saveConfig: (config: AIConfig) => Promise<void>;
+    sendMessage: (messages: unknown[], context: ProjectContext) => Promise<unknown>;
+    stopGeneration: () => Promise<void>;
+    onStream: (callback: (event: AIStreamEvent) => void) => () => void;
+  };
 }
 
 const api: InkAPI = {
@@ -87,6 +124,15 @@ const api: InkAPI = {
     open: () => ipcRenderer.invoke("project:open"),
     openByPath: (path) => ipcRenderer.invoke("project:openByPath", path),
     list: () => ipcRenderer.invoke("project:list"),
+    scaffold: (projectPath, contentTypes, siteDescription, siteName, siteUrl) =>
+      ipcRenderer.invoke(
+        "project:scaffold",
+        projectPath,
+        contentTypes,
+        siteDescription,
+        siteName,
+        siteUrl
+      ),
   },
   file: {
     list: (dirPath) => ipcRenderer.invoke("file:list", dirPath),
@@ -125,6 +171,21 @@ const api: InkAPI = {
     list: (mediaDir) => ipcRenderer.invoke("media:list", mediaDir),
     upload: (destDir) => ipcRenderer.invoke("media:upload", destDir),
     delete: (filePath) => ipcRenderer.invoke("media:delete", filePath),
+  },
+  ai: {
+    getConfig: () => ipcRenderer.invoke("ai:getConfig"),
+    saveConfig: (config) => ipcRenderer.invoke("ai:saveConfig", config),
+    sendMessage: (messages, context) =>
+      ipcRenderer.invoke("ai:sendMessage", messages, context),
+    stopGeneration: () => ipcRenderer.invoke("ai:stopGeneration"),
+    onStream: (callback) => {
+      const handler = (_event: unknown, data: AIStreamEvent) =>
+        callback(data);
+      ipcRenderer.on("ai:stream", handler);
+      return () => {
+        ipcRenderer.removeListener("ai:stream", handler);
+      };
+    },
   },
 };
 
