@@ -58,11 +58,48 @@ export function registerIpcHandlers(): void {
       contentTypes: string[],
       siteDescription: string,
       siteName: string,
-      siteUrl: string
+      siteUrl: string,
+      logoPath?: string,
+      brandColors?: { primary: string; secondary: string }
     ) => {
-      return scaffoldProject(projectPath, contentTypes, siteDescription, siteName, siteUrl);
+      return scaffoldProject(
+        projectPath,
+        contentTypes,
+        siteDescription,
+        siteName,
+        siteUrl,
+        logoPath,
+        brandColors
+      );
     }
   );
+
+  // --- Dialog ---
+  ipcMain.handle("dialog:pickImage", async (event) => {
+    console.log("[dialog:pickImage] invoked");
+    const win = BrowserWindow.fromWebContents(event.sender);
+    console.log("[dialog:pickImage] win:", win ? "found" : "null");
+    const opts: Electron.OpenDialogOptions = {
+      properties: ["openFile"],
+      filters: [
+        {
+          name: "Images",
+          extensions: ["jpg", "jpeg", "png", "gif", "svg", "webp", "avif"],
+        },
+      ],
+    };
+    try {
+      const result = win
+        ? await dialog.showOpenDialog(win, opts)
+        : await dialog.showOpenDialog(opts);
+      console.log("[dialog:pickImage] result:", result);
+      if (result.canceled || result.filePaths.length === 0) return null;
+      return result.filePaths[0];
+    } catch (err) {
+      console.error("[dialog:pickImage] error:", err);
+      throw err;
+    }
+  });
 
   // --- File ---
   ipcMain.handle("file:list", async (_event, dirPath: string) => {

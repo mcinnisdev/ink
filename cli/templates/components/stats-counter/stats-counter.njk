@@ -1,0 +1,12 @@
+{% macro statsCounter(items, id) %}
+<div class="stats-counter" id="{{ id or 'stats' }}">
+  {% for item in items %}
+  <div class="stats-counter__item">
+    <span class="stats-counter__value" data-count="{{ item.value }}">
+      {{ item.prefix or "" }}0{{ item.suffix or "" }}
+    </span>
+    <span class="stats-counter__label">{{ item.label }}</span>
+  </div>
+  {% endfor %}
+</div>
+{% endmacro %}

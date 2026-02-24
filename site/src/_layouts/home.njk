@@ -1,0 +1,104 @@
+---
+layout: base.njk
+---
+{# Hero #}
+<section class="hero hero--dev">
+  <div class="hero__content">
+    <span class="badge badge--mono">Open Source</span>
+    <h1 class="hero__title">{{ hero_headline or title }}</h1>
+    {% if hero_subtitle or excerpt %}
+    <p class="hero__subtitle">{{ hero_subtitle or excerpt }}</p>
+    {% endif %}
+    <div class="hero__actions">
+      {% if hero_cta_text %}
+      <a href="{{ hero_cta_url or '#main' }}" class="btn btn--primary">{{ hero_cta_text }}</a>
+      {% endif %}
+      <a href="https://github.com/mcinnisdev/ink" class="btn btn--ghost">
+        <svg aria-hidden="true" width="20" height="20" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+        GitHub
+      </a>
+    </div>
+    {% if hero_code %}
+    <div class="hero__code-preview">
+      {{ hero_code | safe }}
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+{# Features #}
+{% if features_section %}
+<section class="section">
+  <div class="container">
+    <h2 class="section__title">{{ features_section.heading }}</h2>
+    {% from "components/feature-grid.njk" import featureGrid %}
+    {{ featureGrid(features_section.items, features_section.columns or 3) }}
+    {% if features_section.cta_text %}
+    <p class="text-center mt-lg">
+      <a href="{{ features_section.cta_url or '#' }}" class="btn btn--secondary">{{ features_section.cta_text }}</a>
+    </p>
+    {% endif %}
+  </div>
+</section>
+{% endif %}
+
+{# How It Works #}
+{% if how_it_works %}
+<section class="section section--alt">
+  <div class="container">
+    <h2 class="section__title">{{ how_it_works.heading }}</h2>
+    <div class="steps">
+      {% for step in how_it_works.steps %}
+      <div class="step">
+        <span class="step__number" aria-hidden="true">{{ loop.index }}</span>
+        <h3 class="step__title">{{ step.title }}</h3>
+        <p class="step__text">{{ step.description }}</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{# Code Examples #}
+{% if code_examples %}
+<section class="section">
+  <div class="container container--narrow">
+    <h2 class="section__title">{{ code_examples.heading }}</h2>
+    {% from "components/tabs.njk" import tabs %}
+    {{ tabs(code_examples.tabs, "code-examples") }}
+  </div>
+</section>
+{% endif %}
+
+{# Stats #}
+{% if stats %}
+<section class="section section--alt">
+  <div class="container">
+    {% from "components/stats-counter.njk" import statsCounter %}
+    {{ statsCounter(stats) }}
+  </div>
+</section>
+{% endif %}
+
+{# CTA Strip #}
+{% include "components/cta-strip.njk" %}
+
+{# Newsletter #}
+{% if newsletter %}
+<section class="section">
+  <div class="container container--narrow">
+    {% from "components/newsletter-signup.njk" import newsletterSignup %}
+    {{ newsletterSignup(newsletter.action, newsletter.heading, newsletter.description) }}
+  </div>
+</section>
+{% endif %}
+
+{# Page content (if any markdown below frontmatter) #}
+{% if content | trim %}
+<section class="section">
+  <div class="container container--narrow">
+    {{ content | safe }}
+  </div>
+</section>
+{% endif %}

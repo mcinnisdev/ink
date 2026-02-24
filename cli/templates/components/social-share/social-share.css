@@ -1,0 +1,47 @@
+.social-share {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+.social-share__label {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+.social-share__buttons {
+  display: flex;
+  gap: var(--space-xs);
+}
+
+.social-share__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  text-decoration: none;
+  cursor: pointer;
+  transition: all var(--duration) var(--ease);
+}
+
+.social-share__btn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.social-share__btn--twitter:hover { color: #1da1f2; border-color: #1da1f2; }
+.social-share__btn--facebook:hover { color: #1877f2; border-color: #1877f2; }
+.social-share__btn--linkedin:hover { color: #0a66c2; border-color: #0a66c2; }
+.social-share__btn--email:hover { color: var(--color-text); border-color: var(--color-text); }
+
+.social-share__btn--copy.copied {
+  color: #16a34a;
+  border-color: #16a34a;
+}

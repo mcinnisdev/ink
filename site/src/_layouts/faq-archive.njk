@@ -1,0 +1,32 @@
+---
+layout: base.njk
+---
+{# Hero (small) #}
+<section class="hero hero--sm">
+  <div class="hero__content">
+    <h1 class="hero__title">{{ title }}</h1>
+    {% if excerpt %}
+    <p class="hero__subtitle">{{ excerpt }}</p>
+    {% endif %}
+  </div>
+</section>
+
+{# FAQ Accordion #}
+<section class="section">
+  <div class="container container--narrow">
+    {% if collections.faqs and collections.faqs.length %}
+    <div class="accordion" data-single>
+      {% for item in collections.faqs %}
+      <details class="accordion__item">
+        <summary class="accordion__header">{{ item.data.title }}</summary>
+        <div class="accordion__body">
+          {{ item.templateContent | safe }}
+        </div>
+      </details>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-center">No FAQs to display yet.</p>
+    {% endif %}
+  </div>
+</section>

@@ -2,6 +2,42 @@ import fs from "fs";
 import path from "path";
 import { readFile, writeFile } from "./file";
 
+// --- Color helpers for brand color variants ---
+
+function hexToRgb(hex: string): [number, number, number] {
+  const h = hex.replace("#", "");
+  return [
+    parseInt(h.substring(0, 2), 16),
+    parseInt(h.substring(2, 4), 16),
+    parseInt(h.substring(4, 6), 16),
+  ];
+}
+
+function rgbToHex(r: number, g: number, b: number): string {
+  return (
+    "#" +
+    [r, g, b]
+      .map((v) =>
+        Math.max(0, Math.min(255, Math.round(v)))
+          .toString(16)
+          .padStart(2, "0")
+      )
+      .join("")
+  );
+}
+
+function darkenHex(hex: string, percent: number): string {
+  const [r, g, b] = hexToRgb(hex);
+  const f = 1 - percent / 100;
+  return rgbToHex(r * f, g * f, b * f);
+}
+
+function lightenHex(hex: string, percent: number): string {
+  const [r, g, b] = hexToRgb(hex);
+  const f = percent / 100;
+  return rgbToHex(r + (255 - r) * f, g + (255 - g) * f, b + (255 - b) * f);
+}
+
 /**
  * Content type scaffold definitions.
  * Each defines the directory, layout, collection config, directory defaults,
@@ -483,10 +519,30 @@ collection_name: "faqs"
 export async function scaffoldProject(
   projectPath: string,
   contentTypes: string[],
-  _siteDescription: string,
-  _siteName: string,
-  _siteUrl: string
+  siteDescription: string,
+  siteName: string,
+  siteUrl: string,
+  logoPath?: string,
+  brandColors?: { primary: string; secondary: string }
 ): Promise<void> {
+  console.log("[scaffold] Starting scaffold for:", projectPath);
+  console.log("[scaffold] Content types:", contentTypes);
+  console.log("[scaffold] Logo:", logoPath);
+  console.log("[scaffold] Colors:", brandColors);
+
+  // Update site.json with description
+  const siteJsonPath = path.join(projectPath, "src", "_data", "site.json");
+  try {
+    const siteJson = JSON.parse(await readFile(siteJsonPath));
+    if (siteDescription) siteJson.description = siteDescription;
+    if (siteName) siteJson.name = siteName;
+    if (siteUrl) siteJson.url = siteUrl;
+    await writeFile(siteJsonPath, JSON.stringify(siteJson, null, 2));
+    console.log("[scaffold] Updated site.json");
+  } catch (err) {
+    console.error("[scaffold] Failed to update site.json:", err);
+  }
+
   // Read existing contentTypes.json
   const contentTypesPath = path.join(projectPath, "src", "_data", "contentTypes.json");
   let existingTypes: Record<string, { glob: string; sort: string }> = {};
@@ -505,7 +561,10 @@ export async function scaffoldProject(
 
   for (const typeId of contentTypes) {
     const scaffold = SCAFFOLDS[typeId];
-    if (!scaffold) continue;
+    if (!scaffold) {
+      console.log("[scaffold] Unknown type, skipping:", typeId);
+      continue;
+    }
 
     // Skip types that already exist (services, team are already in starter)
     if (typeId === "services" || typeId === "team") {
@@ -570,8 +629,58 @@ export async function scaffoldProject(
   }
 
   // Write updated contentTypes.json
+  console.log("[scaffold] Writing contentTypes:", JSON.stringify(existingTypes));
   await writeFile(contentTypesPath, JSON.stringify(existingTypes, null, 2));
 
   // Write updated navigation.json
+  console.log("[scaffold] Writing navigation:", JSON.stringify(navConfig));
   await writeFile(navPath, JSON.stringify(navConfig, null, 2));
+
+  // Copy logo if provided
+  if (logoPath && fs.existsSync(logoPath)) {
+    const siteMediaDir = path.join(projectPath, "media", "site");
+    if (!fs.existsSync(siteMediaDir)) {
+      fs.mkdirSync(siteMediaDir, { recursive: true });
+    }
+    const ext = path.extname(logoPath);
+    const dest = path.join(siteMediaDir, `logo${ext}`);
+    fs.copyFileSync(logoPath, dest);
+  }
+
+  // Update brand colors in CSS
+  if (brandColors) {
+    const cssPath = path.join(projectPath, "src", "css", "main.css");
+    try {
+      let css = await readFile(cssPath);
+      // Primary
+      css = css.replace(
+        /--color-primary: #[0-9a-fA-F]{6};/,
+        `--color-primary: ${brandColors.primary};`
+      );
+      css = css.replace(
+        /--color-primary-dark: #[0-9a-fA-F]{6};/,
+        `--color-primary-dark: ${darkenHex(brandColors.primary, 15)};`
+      );
+      css = css.replace(
+        /--color-primary-light: #[0-9a-fA-F]{6};/,
+        `--color-primary-light: ${lightenHex(brandColors.primary, 30)};`
+      );
+      // Secondary
+      css = css.replace(
+        /--color-secondary: #[0-9a-fA-F]{6};/,
+        `--color-secondary: ${brandColors.secondary};`
+      );
+      css = css.replace(
+        /--color-secondary-dark: #[0-9a-fA-F]{6};/,
+        `--color-secondary-dark: ${darkenHex(brandColors.secondary, 15)};`
+      );
+      css = css.replace(
+        /--color-secondary-light: #[0-9a-fA-F]{6};/,
+        `--color-secondary-light: ${lightenHex(brandColors.secondary, 30)};`
+      );
+      await writeFile(cssPath, css);
+    } catch {
+      /* CSS update is non-critical */
+    }
+  }
 }

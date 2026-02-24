@@ -1,0 +1,19 @@
+{
+  "name": "Ink",
+  "tagline": "The Markdown-Native CMS",
+  "url": "https://get.ink",
+  "description": "Ink is an open-source CMS built on Eleventy v3. Write content in Markdown, manage it with a CLI, deploy anywhere.",
+  "phone": "",
+  "email": "",
+  "address": {
+    "street": "",
+    "city": "",
+    "state": "",
+    "zip": ""
+  },
+  "social": {
+    "github": "https://github.com/mcinnisdev/ink",
+    "discord": ""
+  },
+  "gtm_id": ""
+}

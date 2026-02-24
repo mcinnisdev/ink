@@ -1,0 +1,18 @@
+---
+layout: base.njk
+og_type: article
+---
+<article class="section">
+  <div class="container container--narrow">
+    {% if featured_image %}
+    <div class="hero hero--sm" style="background-image: url('{{ featured_image }}')">
+      <div class="hero__overlay"></div>
+    </div>
+    {% endif %}
+    <div class="detail__content">
+      <h1>{{ title }}</h1>
+      {% if subtitle %}<p class="detail__subtitle">{{ subtitle }}</p>{% endif %}
+      {{ content | safe }}
+    </div>
+  </div>
+</article>

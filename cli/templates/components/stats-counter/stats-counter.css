@@ -1,0 +1,31 @@
+.stats-counter {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-xl);
+  padding: var(--space-xl) var(--space-md);
+  text-align: center;
+}
+
+.stats-counter__item {
+  flex: 1 1 150px;
+  max-width: 220px;
+}
+
+.stats-counter__value {
+  display: block;
+  font-size: var(--text-display);
+  font-weight: 700;
+  color: var(--color-primary);
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.stats-counter__label {
+  display: block;
+  margin-top: var(--space-xs);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}

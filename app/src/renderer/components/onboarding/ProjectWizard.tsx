@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   FileText,
   BookOpen,
@@ -12,9 +12,14 @@ import {
   Loader2,
   ArrowRight,
   ArrowLeft,
+  Upload,
+  Palette,
+  Key,
+  X,
 } from "lucide-react";
 import { useProjectStore } from "../../stores/project";
 import { useUIStore } from "../../stores/ui";
+import { useAIStore, type AIConfig } from "../../stores/ai";
 
 const CONTENT_TYPES = [
   {
@@ -69,11 +74,19 @@ const CONTENT_TYPES = [
   },
 ];
 
+const STEP_LABELS = ["Project details", "Content structure", "Branding & AI"];
+
 export default function ProjectWizard() {
   const setWizardOpen = useUIStore((s) => s.setWizardOpen);
   const setView = useUIStore((s) => s.setView);
   const createProject = useProjectStore((s) => s.createProject);
   const loading = useProjectStore((s) => s.loading);
+
+  // AI config
+  const aiConfig = useAIStore((s) => s.config);
+  const aiConfigLoaded = useAIStore((s) => s.configLoaded);
+  const loadAIConfig = useAIStore((s) => s.loadConfig);
+  const saveAIConfig = useAIStore((s) => s.saveConfig);
 
   const [step, setStep] = useState(1);
 
@@ -89,8 +102,31 @@ export default function ProjectWizard() {
   );
   const [siteDescription, setSiteDescription] = useState("");
 
+  // Step 3: Branding + AI
+  const [logoPath, setLogoPath] = useState("");
+  const [logoName, setLogoName] = useState("");
+  const [primaryColor, setPrimaryColor] = useState("#2563eb");
+  const [secondaryColor, setSecondaryColor] = useState("#1e293b");
+  const [localAI, setLocalAI] = useState<AIConfig>({
+    provider: "anthropic",
+    apiKey: "",
+    model: "claude-sonnet-4-20250514",
+  });
+  const hasAIKey = !!(aiConfig?.apiKey);
+
   const [error, setError] = useState("");
   const [scaffolding, setScaffolding] = useState(false);
+
+  // Load AI config on mount
+  useEffect(() => {
+    if (!aiConfigLoaded) loadAIConfig();
+  }, [aiConfigLoaded, loadAIConfig]);
+
+  useEffect(() => {
+    if (aiConfig) {
+      setLocalAI(aiConfig);
+    }
+  }, [aiConfig]);
 
   const toggleType = (id: string) => {
     setSelectedTypes((prev) => {
@@ -101,7 +137,7 @@ export default function ProjectWizard() {
     });
   };
 
-  const handleNext = () => {
+  const handleNext1 = () => {
     if (!name.trim()) {
       setError("Project name is required.");
       return;
@@ -114,10 +150,35 @@ export default function ProjectWizard() {
     setStep(2);
   };
 
+  const handleNext2 = () => {
+    setError("");
+    setStep(3);
+  };
+
+  const handlePickLogo = async () => {
+    try {
+      const picked = await window.ink.dialog.pickImage();
+      if (picked) {
+        setLogoPath(picked);
+        // Extract just the file name for display
+        const parts = picked.replace(/\\/g, "/").split("/");
+        setLogoName(parts[parts.length - 1]);
+      }
+    } catch (err) {
+      console.error("Logo picker error:", err);
+      setError("Failed to open file picker.");
+    }
+  };
+
   const handleCreate = async () => {
     setError("");
     setScaffolding(true);
     try {
+      // Save AI config if key was entered or changed in the wizard
+      if (localAI.apiKey.trim()) {
+        await saveAIConfig(localAI);
+      }
+
       const projectPath = await createProject({
         name: name.trim(),
         path: folder.trim(),
@@ -127,26 +188,27 @@ export default function ProjectWizard() {
         siteDescription: siteDescription.trim(),
       });
 
-      // AI scaffolding happens in the background after project opens
-      // The main process handles it via project:scaffold IPC
-      if (siteDescription.trim() || selectedTypes.size > 0) {
-        try {
-          await window.ink.project.scaffold(
-            projectPath,
-            Array.from(selectedTypes),
-            siteDescription.trim(),
-            siteName.trim() || name.trim(),
-            siteUrl.trim() || "https://example.com"
-          );
-        } catch {
-          // Scaffolding failure is non-fatal — project is still created
-        }
+      // Scaffold: content types + logo + brand colors
+      try {
+        await window.ink.project.scaffold(
+          projectPath,
+          Array.from(selectedTypes),
+          siteDescription.trim(),
+          siteName.trim() || name.trim(),
+          siteUrl.trim() || "https://example.com",
+          logoPath || undefined,
+          { primary: primaryColor, secondary: secondaryColor }
+        );
+      } catch (scaffoldErr) {
+        console.error("Scaffold error:", scaffoldErr);
+        // Non-fatal — project was still created
       }
 
       setWizardOpen(false);
       setView("content");
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Failed to create project.";
+      const msg =
+        err instanceof Error ? err.message : "Failed to create project.";
       setError(msg);
       setScaffolding(false);
     }
@@ -160,8 +222,7 @@ export default function ProjectWizard() {
           <div>
             <h2 className="text-lg font-semibold text-white">New Project</h2>
             <p className="text-xs text-ink-500 mt-0.5">
-              Step {step} of 2 —{" "}
-              {step === 1 ? "Project details" : "Content structure"}
+              Step {step} of 3 — {STEP_LABELS[step - 1]}
             </p>
           </div>
           <button
@@ -172,9 +233,9 @@ export default function ProjectWizard() {
           </button>
         </div>
 
+        {/* ===== Step 1: Basic Info ===== */}
         {step === 1 && (
           <>
-            {/* Step 1: Basic Info */}
             <div className="px-6 py-5 space-y-4">
               <div>
                 <label className="block text-xs font-medium text-ink-400 mb-1.5">
@@ -234,7 +295,6 @@ export default function ProjectWizard() {
               {error && <p className="text-red-400 text-sm">{error}</p>}
             </div>
 
-            {/* Footer */}
             <div className="flex justify-end gap-3 px-6 py-4 border-t border-ink-700">
               <button
                 onClick={() => setWizardOpen(false)}
@@ -243,7 +303,7 @@ export default function ProjectWizard() {
                 Cancel
               </button>
               <button
-                onClick={handleNext}
+                onClick={handleNext1}
                 className="flex items-center gap-1.5 px-4 py-2 text-sm bg-accent hover:bg-accent-hover text-white font-medium rounded-lg transition-colors"
               >
                 Next
@@ -253,19 +313,17 @@ export default function ProjectWizard() {
           </>
         )}
 
+        {/* ===== Step 2: Content Types + Description ===== */}
         {step === 2 && (
           <>
-            {/* Step 2: Content Types + Description */}
             <div className="px-6 py-5 space-y-5 max-h-[60vh] overflow-y-auto">
-              {/* Content Types */}
               <div>
                 <label className="block text-xs font-medium text-ink-400 mb-2">
                   Content Types
                 </label>
                 <p className="text-xs text-ink-500 mb-3">
-                  Select the types of content your site will have. The AI
-                  assistant will set up the file structure, layouts, and sample
-                  content for each.
+                  Select the types of content your site will have. Ink will set
+                  up the file structure, layouts, and sample content for each.
                 </p>
                 <div className="grid grid-cols-2 gap-2">
                   {CONTENT_TYPES.map((type) => {
@@ -303,7 +361,6 @@ export default function ProjectWizard() {
                 </div>
               </div>
 
-              {/* Site Description */}
               <div>
                 <label className="block text-xs font-medium text-ink-400 mb-1.5">
                   <span className="flex items-center gap-1">
@@ -327,11 +384,256 @@ export default function ProjectWizard() {
               {error && <p className="text-red-400 text-sm">{error}</p>}
             </div>
 
-            {/* Footer */}
             <div className="flex justify-between gap-3 px-6 py-4 border-t border-ink-700">
               <button
                 onClick={() => {
                   setStep(1);
+                  setError("");
+                }}
+                className="flex items-center gap-1.5 px-4 py-2 text-sm text-ink-400 hover:text-white rounded-lg transition-colors"
+              >
+                <ArrowLeft className="w-3.5 h-3.5" />
+                Back
+              </button>
+              <button
+                onClick={handleNext2}
+                className="flex items-center gap-1.5 px-4 py-2 text-sm bg-accent hover:bg-accent-hover text-white font-medium rounded-lg transition-colors"
+              >
+                Next
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </>
+        )}
+
+        {/* ===== Step 3: Branding & AI ===== */}
+        {step === 3 && (
+          <>
+            <div className="px-6 py-5 space-y-5 max-h-[60vh] overflow-y-auto">
+              {/* Logo */}
+              <div>
+                <label className="block text-xs font-medium text-ink-400 mb-2 flex items-center gap-1.5">
+                  <Upload className="w-3.5 h-3.5" />
+                  Logo
+                </label>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={handlePickLogo}
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium bg-ink-900 border border-ink-600 text-ink-300 hover:border-ink-500 transition-colors"
+                  >
+                    <Upload className="w-3 h-3" />
+                    {logoName ? "Change" : "Choose file"}
+                  </button>
+                  {logoName ? (
+                    <div className="flex items-center gap-2 text-xs text-ink-300">
+                      <span className="truncate max-w-[200px]">{logoName}</span>
+                      <button
+                        onClick={() => {
+                          setLogoPath("");
+                          setLogoName("");
+                        }}
+                        className="text-ink-500 hover:text-red-400"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+                  ) : (
+                    <span className="text-xs text-ink-500">
+                      Optional — PNG, SVG, or JPG
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Brand Colors */}
+              <div>
+                <label className="block text-xs font-medium text-ink-400 mb-2 flex items-center gap-1.5">
+                  <Palette className="w-3.5 h-3.5" />
+                  Brand Colors
+                </label>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[10px] text-ink-500 mb-1.5">
+                      Primary (buttons, links)
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <div className="relative">
+                        <input
+                          type="color"
+                          value={primaryColor}
+                          onChange={(e) => setPrimaryColor(e.target.value)}
+                          className="w-8 h-8 rounded-lg border border-ink-600 cursor-pointer bg-transparent [&::-webkit-color-swatch]:rounded-md [&::-webkit-color-swatch-wrapper]:p-0.5"
+                        />
+                      </div>
+                      <input
+                        type="text"
+                        value={primaryColor}
+                        onChange={(e) => {
+                          const v = e.target.value;
+                          if (/^#[0-9a-fA-F]{0,6}$/.test(v)) setPrimaryColor(v);
+                        }}
+                        className="flex-1 px-2.5 py-1.5 bg-ink-900 border border-ink-600 rounded-lg text-xs text-white font-mono focus:outline-none focus:border-accent"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-[10px] text-ink-500 mb-1.5">
+                      Secondary (headings, nav)
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <div className="relative">
+                        <input
+                          type="color"
+                          value={secondaryColor}
+                          onChange={(e) => setSecondaryColor(e.target.value)}
+                          className="w-8 h-8 rounded-lg border border-ink-600 cursor-pointer bg-transparent [&::-webkit-color-swatch]:rounded-md [&::-webkit-color-swatch-wrapper]:p-0.5"
+                        />
+                      </div>
+                      <input
+                        type="text"
+                        value={secondaryColor}
+                        onChange={(e) => {
+                          const v = e.target.value;
+                          if (/^#[0-9a-fA-F]{0,6}$/.test(v))
+                            setSecondaryColor(v);
+                        }}
+                        className="flex-1 px-2.5 py-1.5 bg-ink-900 border border-ink-600 rounded-lg text-xs text-white font-mono focus:outline-none focus:border-accent"
+                      />
+                    </div>
+                  </div>
+                </div>
+                {/* Color preview */}
+                <div className="flex gap-1 mt-3">
+                  <div
+                    className="h-6 flex-1 rounded-l-lg"
+                    style={{ backgroundColor: primaryColor }}
+                  />
+                  <div
+                    className="h-6 flex-1"
+                    style={{ backgroundColor: secondaryColor }}
+                  />
+                  <div className="h-6 flex-1 rounded-r-lg bg-white" />
+                </div>
+              </div>
+
+              {/* AI Setup */}
+              <div className="border border-ink-700/50 rounded-lg p-4 bg-ink-900/30">
+                <label className="block text-xs font-medium text-ink-400 mb-2 flex items-center gap-1.5">
+                  <Key className="w-3.5 h-3.5 text-amber-400" />
+                  AI Assistant
+                  {hasAIKey && (
+                    <span className="text-[10px] text-emerald-400 font-normal">
+                      Configured
+                    </span>
+                  )}
+                  {!hasAIKey && (
+                    <span className="text-[10px] text-ink-500 font-normal">
+                      (optional)
+                    </span>
+                  )}
+                </label>
+                <p className="text-[11px] text-ink-500 mb-3">
+                  {hasAIKey
+                    ? "Your AI assistant is configured. You can update the settings below."
+                    : "Add an API key to enable the AI assistant for content creation, SEO optimization, and site management."}
+                </p>
+
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-[10px] text-ink-500 mb-1">
+                      Provider
+                    </label>
+                    <select
+                      value={localAI.provider}
+                      onChange={(e) => {
+                        const provider = e.target.value as
+                          | "anthropic"
+                          | "openai";
+                        setLocalAI((prev) => ({
+                          ...prev,
+                          provider,
+                          model:
+                            provider === "anthropic"
+                              ? "claude-sonnet-4-20250514"
+                              : "gpt-4o",
+                        }));
+                      }}
+                      className="w-full bg-ink-900 border border-ink-600 rounded-lg px-2.5 py-1.5 text-xs text-white focus:border-accent focus:outline-none"
+                    >
+                      <option value="anthropic">Anthropic (Claude)</option>
+                      <option value="openai">OpenAI (GPT)</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] text-ink-500 mb-1">
+                      API Key
+                    </label>
+                    <input
+                      type="password"
+                      value={localAI.apiKey}
+                      onChange={(e) =>
+                        setLocalAI((prev) => ({
+                          ...prev,
+                          apiKey: e.target.value,
+                        }))
+                      }
+                      placeholder={
+                        localAI.provider === "anthropic"
+                          ? "sk-ant-..."
+                          : "sk-..."
+                      }
+                      className="w-full bg-ink-900 border border-ink-600 rounded-lg px-2.5 py-1.5 text-xs text-white focus:border-accent focus:outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] text-ink-500 mb-1">
+                      Model
+                    </label>
+                    <select
+                      value={localAI.model}
+                      onChange={(e) =>
+                        setLocalAI((prev) => ({
+                          ...prev,
+                          model: e.target.value,
+                        }))
+                      }
+                      className="w-full bg-ink-900 border border-ink-600 rounded-lg px-2.5 py-1.5 text-xs text-white focus:border-accent focus:outline-none"
+                    >
+                      {localAI.provider === "anthropic" ? (
+                        <>
+                          <option value="claude-sonnet-4-20250514">
+                            Claude Sonnet 4
+                          </option>
+                          <option value="claude-haiku-4-20250414">
+                            Claude Haiku 4
+                          </option>
+                        </>
+                      ) : (
+                        <>
+                          <option value="gpt-4o">GPT-4o</option>
+                          <option value="gpt-4o-mini">GPT-4o Mini</option>
+                        </>
+                      )}
+                    </select>
+                  </div>
+                </div>
+
+                <p className="text-[10px] text-ink-500 mt-2">
+                  You can change this later in Settings. Keys are stored
+                  locally and never sent to Ink servers.
+                </p>
+              </div>
+
+              {error && <p className="text-red-400 text-sm">{error}</p>}
+            </div>
+
+            {/* Footer */}
+            <div className="flex justify-between gap-3 px-6 py-4 border-t border-ink-700">
+              <button
+                onClick={() => {
+                  setStep(2);
                   setError("");
                 }}
                 className="flex items-center gap-1.5 px-4 py-2 text-sm text-ink-400 hover:text-white rounded-lg transition-colors"

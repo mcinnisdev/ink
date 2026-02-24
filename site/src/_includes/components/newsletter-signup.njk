@@ -1,0 +1,26 @@
+{% macro newsletterSignup(action, heading, description, placeholder, buttonText, id) %}
+<div class="newsletter" id="{{ id or 'newsletter' }}">
+  {% if heading %}
+  <h3 class="newsletter__heading">{{ heading }}</h3>
+  {% endif %}
+  {% if description %}
+  <p class="newsletter__description">{{ description }}</p>
+  {% endif %}
+  <form class="newsletter__form" action="{{ action or '#' }}" method="POST">
+    <div class="newsletter__input-group">
+      <label for="{{ id or 'newsletter' }}-email" class="sr-only">Email address</label>
+      <input
+        class="newsletter__input"
+        type="email"
+        id="{{ id or 'newsletter' }}-email"
+        name="email"
+        placeholder="{{ placeholder or 'Enter your email' }}"
+        required>
+      <button class="btn btn--primary newsletter__btn" type="submit">
+        {{ buttonText or "Subscribe" }}
+      </button>
+    </div>
+    <p class="newsletter__privacy">We respect your privacy. Unsubscribe at any time.</p>
+  </form>
+</div>
+{% endmacro %}

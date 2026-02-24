@@ -1,0 +1,18 @@
+{
+  "docs": {
+    "glob": "content/docs/*.md",
+    "sort": "order"
+  },
+  "posts": {
+    "glob": "content/blog/*.md",
+    "sort": "date"
+  },
+  "features": {
+    "glob": "content/features/*.md",
+    "sort": "order"
+  },
+  "faqs": {
+    "glob": "content/faq/*.md",
+    "sort": "order"
+  }
+}

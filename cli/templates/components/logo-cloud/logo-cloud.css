@@ -1,0 +1,38 @@
+.logo-cloud {
+  padding: var(--space-xl) var(--space-md);
+  text-align: center;
+}
+
+.logo-cloud__heading {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-lg);
+}
+
+.logo-cloud__grid {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-lg) var(--space-xl);
+}
+
+.logo-cloud__item {
+  flex-shrink: 0;
+}
+
+.logo-cloud__img {
+  max-height: 40px;
+  width: auto;
+  filter: grayscale(100%);
+  opacity: 0.6;
+  transition: filter var(--duration) var(--ease), opacity var(--duration) var(--ease);
+}
+
+.logo-cloud__item:hover .logo-cloud__img,
+.logo-cloud__item a:focus-visible .logo-cloud__img {
+  filter: grayscale(0%);
+  opacity: 1;
+}

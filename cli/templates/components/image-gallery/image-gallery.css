@@ -1,0 +1,128 @@
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: var(--space-md);
+}
+
+.gallery--2 { grid-template-columns: repeat(2, 1fr); }
+.gallery--3 { grid-template-columns: repeat(3, 1fr); }
+.gallery--4 { grid-template-columns: repeat(4, 1fr); }
+
+@media (max-width: 640px) {
+  .gallery--3,
+  .gallery--4 { grid-template-columns: repeat(2, 1fr); }
+}
+
+.gallery__item {
+  margin: 0;
+}
+
+.gallery__link {
+  display: block;
+  overflow: hidden;
+  border-radius: var(--radius);
+}
+
+.gallery__img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  transition: transform var(--duration) var(--ease);
+}
+
+.gallery__link:hover .gallery__img {
+  transform: scale(1.05);
+}
+
+.gallery__caption {
+  margin-top: var(--space-xs);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+/* Lightbox */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lightbox[hidden] {
+  display: none;
+}
+
+.lightbox__overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.9);
+}
+
+.lightbox__content {
+  position: relative;
+  max-width: 90vw;
+  max-height: 90vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lightbox__img {
+  max-width: 90vw;
+  max-height: 85vh;
+  object-fit: contain;
+  border-radius: var(--radius);
+}
+
+.lightbox__close {
+  position: absolute;
+  top: -2.5rem;
+  right: 0;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 2rem;
+  cursor: pointer;
+  padding: var(--space-xs);
+  line-height: 1;
+}
+
+.lightbox__prev,
+.lightbox__next {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  color: white;
+  font-size: 2rem;
+  cursor: pointer;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius);
+  transition: background var(--duration) var(--ease);
+}
+
+.lightbox__prev:hover,
+.lightbox__next:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.lightbox__prev { left: -4rem; }
+.lightbox__next { right: -4rem; }
+
+.lightbox__caption {
+  position: absolute;
+  bottom: -2rem;
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: var(--text-sm);
+}
+
+@media (max-width: 768px) {
+  .lightbox__prev { left: 0.5rem; }
+  .lightbox__next { right: 0.5rem; }
+}

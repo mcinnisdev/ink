@@ -83,8 +83,13 @@ export interface InkAPI {
       contentTypes: string[],
       siteDescription: string,
       siteName: string,
-      siteUrl: string
+      siteUrl: string,
+      logoPath?: string,
+      brandColors?: { primary: string; secondary: string }
     ) => Promise<void>;
+  };
+  dialog: {
+    pickImage: () => Promise<string | null>;
   };
   file: {
     list: (dirPath: string) => Promise<FileNode[]>;
@@ -124,15 +129,20 @@ const api: InkAPI = {
     open: () => ipcRenderer.invoke("project:open"),
     openByPath: (path) => ipcRenderer.invoke("project:openByPath", path),
     list: () => ipcRenderer.invoke("project:list"),
-    scaffold: (projectPath, contentTypes, siteDescription, siteName, siteUrl) =>
+    scaffold: (projectPath, contentTypes, siteDescription, siteName, siteUrl, logoPath, brandColors) =>
       ipcRenderer.invoke(
         "project:scaffold",
         projectPath,
         contentTypes,
         siteDescription,
         siteName,
-        siteUrl
+        siteUrl,
+        logoPath,
+        brandColors
       ),
+  },
+  dialog: {
+    pickImage: () => ipcRenderer.invoke("dialog:pickImage"),
   },
   file: {
     list: (dirPath) => ipcRenderer.invoke("file:list", dirPath),

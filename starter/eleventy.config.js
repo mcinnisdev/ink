@@ -46,11 +46,60 @@ export default function (eleventyConfig) {
 
   eleventyConfig.addFilter("year", () => new Date().getFullYear());
 
+  eleventyConfig.addFilter("split", (str, sep) =>
+    str ? str.split(sep) : []
+  );
+
+  eleventyConfig.addFilter("capitalize", (str) =>
+    str ? str.charAt(0).toUpperCase() + str.slice(1) : ""
+  );
+
+  eleventyConfig.addFilter("dateFormat", (date) => {
+    if (!date) return "";
+    const d = date === "now" ? new Date() : new Date(date);
+    if (isNaN(d.getTime())) return "";
+    return d.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  });
+
+  eleventyConfig.addFilter("readingTime", (content) => {
+    if (!content) return "";
+    const text = content.replace(/<[^>]*>/g, "");
+    const words = text.trim().split(/\s+/).length;
+    const minutes = Math.max(1, Math.round(words / 200));
+    return `${minutes} min read`;
+  });
+
+  eleventyConfig.addFilter("excerpt", (content) => {
+    if (!content) return "";
+    const text = content.replace(/<[^>]*>/g, "").trim();
+    const firstPara = text.split(/\n\n/)[0];
+    return firstPara.length > 200
+      ? firstPara.slice(0, 197) + "..."
+      : firstPara;
+  });
+
+  eleventyConfig.addFilter("absoluteUrl", (url, base) => {
+    if (!url || !base) return url || "";
+    const baseUrl = base.replace(/\/$/, "");
+    return url.startsWith("/") ? baseUrl + url : url;
+  });
+
   // --- Build-time validation ---
   eleventyConfig.on("eleventy.before", () => {
     const requiredFields = ["title", "slug"];
     const contentDir = "content";
-    const dirs = ["services", "employees"];
+
+    // Auto-discover content directories to validate
+    let dirs = [];
+    try {
+      dirs = fs.readdirSync(contentDir, { withFileTypes: true })
+        .filter((d) => d.isDirectory() && d.name !== "pages")
+        .map((d) => d.name);
+    } catch { /* ok */ }
 
     for (const dir of dirs) {
       const folder = `${contentDir}/${dir}`;

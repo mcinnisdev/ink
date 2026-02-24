@@ -1,0 +1,20 @@
+{% macro logoCloud(logos, heading, id) %}
+<section class="logo-cloud" id="{{ id or 'logo-cloud' }}">
+  {% if heading %}
+  <p class="logo-cloud__heading">{{ heading }}</p>
+  {% endif %}
+  <div class="logo-cloud__grid">
+    {% for logo in logos %}
+    <div class="logo-cloud__item">
+      {% if logo.url %}
+      <a href="{{ logo.url }}" target="_blank" rel="noopener noreferrer">
+        <img src="{{ logo.src }}" alt="{{ logo.alt or '' }}" loading="lazy" class="logo-cloud__img">
+      </a>
+      {% else %}
+      <img src="{{ logo.src }}" alt="{{ logo.alt or '' }}" loading="lazy" class="logo-cloud__img">
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endmacro %}

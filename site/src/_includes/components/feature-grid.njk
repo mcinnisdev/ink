@@ -1,0 +1,25 @@
+{% from "components/icon.njk" import icon as lucideIcon %}
+{% macro featureGrid(items, columns) %}
+<div class="feature-grid feature-grid--{{ columns or 3 }}">
+  {% for item in items %}
+  <div class="feature-grid__item" {% if item.animate %}data-animate="fade-up"{% endif %}>
+    {% if item.icon %}
+    <div class="feature-grid__icon" aria-hidden="true">
+      {%- if "<" in item.icon -%}
+        {{ item.icon | safe }}
+      {%- else -%}
+        {{ lucideIcon(item.icon, 32) }}
+      {%- endif -%}
+    </div>
+    {% endif %}
+    <h3 class="feature-grid__title">{{ item.title }}</h3>
+    {% if item.description %}
+    <p class="feature-grid__desc">{{ item.description }}</p>
+    {% endif %}
+    {% if item.link %}
+    <a href="{{ item.link }}" class="feature-grid__link">Learn more &rarr;</a>
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>
+{% endmacro %}

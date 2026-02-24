@@ -1,0 +1,25 @@
+{% macro imageGallery(images, columns, id) %}
+<div class="gallery{% if columns %} gallery--{{ columns }}{% endif %}" id="{{ id or 'gallery' }}">
+  {% for img in images %}
+  <figure class="gallery__item">
+    <a href="{{ img.src }}" class="gallery__link" data-gallery="{{ id or 'gallery' }}">
+      <img class="gallery__img" src="{{ img.src }}" alt="{{ img.alt or '' }}" loading="lazy">
+    </a>
+    {% if img.caption %}
+    <figcaption class="gallery__caption">{{ img.caption }}</figcaption>
+    {% endif %}
+  </figure>
+  {% endfor %}
+</div>
+
+<div class="lightbox" id="lightbox-{{ id or 'gallery' }}" role="dialog" aria-modal="true" aria-label="Image viewer" hidden>
+  <div class="lightbox__overlay"></div>
+  <div class="lightbox__content">
+    <button class="lightbox__close" aria-label="Close">&times;</button>
+    <button class="lightbox__prev" aria-label="Previous image">&lsaquo;</button>
+    <img class="lightbox__img" src="" alt="">
+    <button class="lightbox__next" aria-label="Next image">&rsaquo;</button>
+    <p class="lightbox__caption"></p>
+  </div>
+</div>
+{% endmacro %}

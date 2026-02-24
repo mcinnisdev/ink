@@ -1,0 +1,107 @@
+.pricing-table {
+  display: flex;
+  gap: var(--space-lg);
+  align-items: stretch;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.pricing-card {
+  flex: 1;
+  min-width: 260px;
+  max-width: 360px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.pricing-card--featured {
+  border-color: var(--color-primary);
+  border-width: 2px;
+  transform: scale(1.05);
+  box-shadow: var(--shadow-lg);
+}
+
+.pricing-card__badge {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  padding: 0.125rem 0.75rem;
+  border-radius: 9999px;
+}
+
+.pricing-card__name {
+  font-size: var(--text-xl);
+  margin-bottom: var(--space-sm);
+}
+
+.pricing-card__price {
+  margin-bottom: var(--space-md);
+}
+
+.pricing-card__amount {
+  font-size: var(--text-3xl);
+  font-weight: 700;
+  color: var(--color-dark);
+}
+
+.pricing-card__period {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.pricing-card__desc {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-md);
+}
+
+.pricing-card__features {
+  list-style: none;
+  text-align: left;
+  margin-bottom: var(--space-lg);
+  flex-grow: 1;
+}
+
+.pricing-card__features li {
+  padding: var(--space-xs) 0;
+  border-bottom: 1px solid var(--color-border-light);
+  font-size: var(--text-sm);
+}
+
+.pricing-card__features li::before {
+  content: "✓ ";
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+.pricing-card .btn {
+  width: 100%;
+  justify-content: center;
+  margin-top: auto;
+}
+
+@media (max-width: 767px) {
+  .pricing-card--featured {
+    transform: none;
+  }
+  
+  .pricing-table {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .pricing-card {
+    max-width: 100%;
+  }
+}

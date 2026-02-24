@@ -1,0 +1,37 @@
+{
+  "name": "ink-cli",
+  "version": "1.0.0",
+  "description": "CLI for Ink — the Markdown-native CMS built on Eleventy",
+  "type": "module",
+  "bin": {
+    "ink": "./src/index.js"
+  },
+  "files": [
+    "src/",
+    "templates/"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "dev": "node src/index.js"
+  },
+  "keywords": [
+    "ink",
+    "cms",
+    "eleventy",
+    "markdown",
+    "cli",
+    "static-site"
+  ],
+  "author": "mcinnisdev",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mcinnisdev/ink-cli"
+  },
+  "homepage": "https://github.com/mcinnisdev/ink-cli",
+  "license": "MIT",
+  "dependencies": {
+    "picocolors": "^1.1.1"
+  }
+}
