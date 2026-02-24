@@ -2,6 +2,7 @@
 title: "Deployment"
 slug: "deployment"
 excerpt: "Deploy your Ink site to Cloudflare Pages, Netlify, Vercel, or GitHub Pages with step-by-step instructions."
+icon: "cloud-upload"
 order: 6
 published: true
 permalink: "/docs/deployment/"
@@ -9,15 +10,15 @@ permalink: "/docs/deployment/"
 
 ## Build Settings
 
-Regardless of hosting provider, the build settings are the same:
+Regardless of hosting provider, the core build settings are the same:
 
 | Setting | Value |
 |---------|-------|
-| **Build command** | `npx @11ty/eleventy` |
+| **Build command** | `npm run build` |
 | **Output directory** | `_site` |
 | **Node.js version** | 18 or later |
 
-Make sure your `package.json` includes `@11ty/eleventy` v3 as a dependency. The hosting provider will run `npm install` automatically before executing your build command.
+Using `npm run build` works for both CSS approaches -- if your project uses Tailwind, the build script compiles Tailwind before running Eleventy. Make sure your `package.json` includes `@11ty/eleventy` v3 as a dependency. The hosting provider will run `npm install` automatically before executing your build command.
 
 ## Cloudflare Pages
 

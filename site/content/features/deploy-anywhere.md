@@ -3,6 +3,7 @@ title: "Deploy Anywhere"
 slug: "deploy-anywhere"
 excerpt: "Static HTML output that runs on any CDN. No servers, no runtime, no vendor lock-in."
 subtitle: "Build once. Host everywhere."
+icon: "cloud"
 order: 8
 published: true
 permalink: "/features/deploy-anywhere/"

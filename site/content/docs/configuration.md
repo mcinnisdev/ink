@@ -2,6 +2,7 @@
 title: "Configuration"
 slug: "configuration"
 excerpt: "Detailed reference for site.json, navigation.json, contentTypes.json, and eleventy.config.js."
+icon: "settings"
 order: 7
 published: true
 permalink: "/docs/configuration/"

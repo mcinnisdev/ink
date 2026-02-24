@@ -3,7 +3,6 @@
     { "label": "Features", "url": "/features/" },
     { "label": "Docs", "url": "/docs/" },
     { "label": "Blog", "url": "/blog/" },
-    { "label": "FAQ", "url": "/faq/" },
     { "label": "GitHub", "url": "https://github.com/mcinnisdev/ink" }
   ]
 }

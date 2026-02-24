@@ -3,6 +3,7 @@ title: "Component Library"
 slug: "component-library"
 excerpt: "12 pre-built UI components you can install with a single command."
 subtitle: "Production-ready components. One command to install."
+icon: "puzzle"
 order: 5
 published: true
 permalink: "/features/component-library/"

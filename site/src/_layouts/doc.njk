@@ -13,9 +13,16 @@ og_type: article
           {%- endfor %}
         </ul>
       </nav>
-      <article class="docs-content detail__content">
-        <h1>{{ title }}</h1>
-        {{ content | safe }}
+      <article class="docs-content">
+        <header class="mb-8 pb-6 border-b border-gray-800">
+          <h1 class="text-3xl font-bold tracking-tight text-gray-100 mb-2">{{ title }}</h1>
+          {% if excerpt %}
+          <p class="text-gray-400">{{ excerpt }}</p>
+          {% endif %}
+        </header>
+        <div class="detail__content prose max-w-none">
+          {{ content | safe }}
+        </div>
       </article>
     </div>
   </div>

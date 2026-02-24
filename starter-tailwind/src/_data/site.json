@@ -1,0 +1,20 @@
+{
+  "name": "Ink Starter",
+  "tagline": "Websites written in Markdown",
+  "url": "https://example.com",
+  "description": "A fast, modern website powered by Ink — the Markdown-native CMS.",
+  "phone": "",
+  "email": "hello@example.com",
+  "address": {
+    "street": "",
+    "city": "",
+    "state": "",
+    "zip": ""
+  },
+  "social": {
+    "facebook": "",
+    "linkedin": "",
+    "instagram": ""
+  },
+  "gtm_id": ""
+}

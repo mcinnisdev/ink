@@ -1,9 +1,10 @@
 ---
-title: "Documentation"
+title: "Docs"
 seo_title: "Documentation"
-meta_description: "Browse our documentation and guides."
+meta_description: "Everything you need to build with Ink — guides, reference, and troubleshooting."
+excerpt: "Everything you need to get started. No gatekeeping."
 slug: "docs"
-layout: "archive.njk"
+layout: "docs-archive.njk"
 permalink: "/docs/"
 published: true
 collection_name: "docs"

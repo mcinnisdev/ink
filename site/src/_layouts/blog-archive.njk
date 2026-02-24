@@ -1,0 +1,59 @@
+---
+layout: base.njk
+---
+<section class="section">
+  <div class="container container--narrow">
+
+    {# Header #}
+    <div class="mb-10">
+      <h1 class="text-3xl font-bold tracking-tight text-gray-100 mb-2">
+        <i data-lucide="pen-line" class="icon-heading"></i> {{ title }}
+      </h1>
+      {% if excerpt %}
+      <p class="text-gray-400 mb-4">{{ excerpt }}</p>
+      {% endif %}
+    </div>
+
+    {# Posts #}
+    {%- set items = collections.posts -%}
+    {% if items and items.length %}
+    <div class="flex flex-col gap-5">
+      {% for item in items | reverse %}
+      <a href="{{ item.url }}" class="article-card group">
+        <div class="article-card__meta">
+          {% if item.data.date %}
+          <span class="article-card__date">
+            <i data-lucide="calendar" style="width:12px;height:12px;"></i>
+            {{ item.data.date | dateFormat }}
+          </span>
+          {% endif %}
+          {% if item.templateContent %}
+          <span class="article-card__reading-time">
+            <i data-lucide="clock" style="width:12px;height:12px;"></i>
+            {{ item.templateContent | readingTime }}
+          </span>
+          {% endif %}
+          {% if item.data.author %}
+          <span>&middot; {{ item.data.author }}</span>
+          {% endif %}
+        </div>
+        <div class="article-card__title">{{ item.data.title }}</div>
+        {% if item.data.excerpt %}
+        <p class="article-card__excerpt">{{ item.data.excerpt }}</p>
+        {% endif %}
+        {% if item.data.post_tags %}
+        <div class="article-card__tags">
+          {% for tag in item.data.post_tags | split(",") %}
+          <span class="article-card__tag">{{ tag | trim }}</span>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </a>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-gray-500 text-center py-12">No posts yet. Check back soon.</p>
+    {% endif %}
+
+  </div>
+</section>

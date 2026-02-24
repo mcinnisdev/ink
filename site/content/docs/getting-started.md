@@ -2,6 +2,7 @@
 title: "Getting Started"
 slug: "getting-started"
 excerpt: "Install Ink, create your first project, and understand the directory structure in under five minutes."
+icon: "rocket"
 order: 1
 published: true
 permalink: "/docs/getting-started/"
@@ -30,7 +31,10 @@ The interactive wizard will ask you for:
 1. **Site name** -- Your site's display name
 2. **Site URL** -- The production URL (used for sitemaps and meta tags)
 3. **Primary color** -- A hex color for your brand (e.g. `#2563eb`)
-4. **Content types** -- Choose which content types to include (blog, services, team, etc.)
+4. **CSS framework** -- Use Tailwind CSS or plain CSS custom properties (default)
+5. **Content types** -- Choose which content types to include (blog, services, team, etc.)
+
+If you choose **Tailwind CSS**, the project is scaffolded with `tailwindcss`, `@tailwindcss/typography`, and a `tailwind.config.js` pre-configured with your brand color. If you choose the default, you get a single `main.css` file with CSS custom properties (design tokens).
 
 Once the wizard finishes, you'll have a fully scaffolded project ready to go.
 
@@ -78,7 +82,7 @@ my-site/
 │   ├── _data/          # Data files (site.json, navigation.json, contentTypes.json)
 │   ├── _layouts/       # Nunjucks page layouts
 │   ├── _includes/      # Partials and UI components
-│   ├── css/            # main.css with design tokens
+│   ├── css/            # main.css (or tailwind.css if Tailwind was chosen)
 │   └── js/             # Client-side JavaScript
 ├── media/              # Images organized by content type
 ├── public/             # Static files (favicon, _headers, _redirects)
@@ -90,7 +94,7 @@ my-site/
 
 - **Content lives in Markdown.** Every page, blog post, and service entry is a `.md` file with YAML frontmatter at the top. You can edit these files in any text editor -- or open the `content/` folder in [Obsidian](https://obsidian.md) for a rich editing experience.
 - **Templates use Nunjucks.** Layouts in `src/_layouts/` and partials in `src/_includes/` use the [Nunjucks](https://mozilla.github.io/nunjucks/) templating language.
-- **One CSS file.** All styles live in `src/css/main.css`, organized with CSS custom properties (design tokens) that you can adjust to match your brand.
+- **One CSS file.** All styles live in a single stylesheet -- `src/css/main.css` (CSS custom properties) or `src/css/tailwind.css` (Tailwind), depending on what you chose during `ink init`.
 - **Data-driven collections.** The `contentTypes.json` file tells Eleventy which folders to collect and how to sort them. You never need to write manual collection code.
 
 ## Generate Sample Content

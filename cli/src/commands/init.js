@@ -42,6 +42,10 @@ export async function init(args) {
     const primaryColor = (await ask("  Primary color (default #2563eb): ")).trim() || "#2563eb";
     const secondaryColor = (await ask("  Secondary color (default #1e3a5f): ")).trim() || "#1e3a5f";
 
+    // 3b. Tailwind CSS option
+    const useTailwind = (await ask("\n  Use Tailwind CSS? (y/N): ")).trim().toLowerCase();
+    const tailwind = useTailwind === "y" || useTailwind === "yes";
+
     // 4. Content types
     console.log("\n  Which content types do you want? (starter includes services + team)");
     const extraTypes = [];
@@ -59,7 +63,7 @@ export async function init(args) {
     console.log(`\n  Creating project at ${projectDir}...\n`);
 
     // Copy starter template
-    const starterDir = findStarterDir();
+    const starterDir = findStarterDir(tailwind);
     if (!starterDir) {
       console.error("  Could not find the Ink starter template.");
       console.error("  Make sure ink-cli is installed properly.\n");
@@ -83,7 +87,11 @@ export async function init(args) {
     console.log("  Configured site.json");
 
     // Update brand colors in CSS
-    updateBrandColors(projectDir, primaryColor, secondaryColor);
+    if (tailwind) {
+      updateBrandColorsTailwind(projectDir, primaryColor);
+    } else {
+      updateBrandColors(projectDir, primaryColor, secondaryColor);
+    }
     console.log("  Applied brand colors");
 
     // Scaffold extra content types
@@ -149,6 +157,33 @@ function updateBrandColors(projectDir, primary, secondary) {
 }
 
 /**
+ * Replace brand color in tailwind.config.js and --color-primary in tailwind.css.
+ */
+function updateBrandColorsTailwind(projectDir, primary) {
+  // Update tailwind.config.js — replace the DEFAULT color value
+  const configPath = path.join(projectDir, "tailwind.config.js");
+  if (fs.existsSync(configPath)) {
+    let config = fs.readFileSync(configPath, "utf-8");
+    config = config.replace(
+      /(DEFAULT:\s*")#[0-9a-fA-F]{6}(")/,
+      `$1${primary}$2`
+    );
+    fs.writeFileSync(configPath, config);
+  }
+
+  // Update tailwind.css — replace --color-primary custom property
+  const cssPath = path.join(projectDir, "src", "css", "tailwind.css");
+  if (fs.existsSync(cssPath)) {
+    let css = fs.readFileSync(cssPath, "utf-8");
+    css = css.replace(
+      /(--color-primary:\s*)#[0-9a-fA-F]{6}/,
+      `$1${primary}`
+    );
+    fs.writeFileSync(cssPath, css);
+  }
+}
+
+/**
  * Scaffold a content type into an existing project (same as ink add <type>).
  */
 function scaffoldContentType(projectDir, type, typeId) {
@@ -210,19 +245,21 @@ function scaffoldContentType(projectDir, type, typeId) {
 
 /**
  * Find the starter template directory. Checks:
- * 1. Sibling directory ../starter (monorepo)
+ * 1. Sibling directory ../starter or ../starter-tailwind (monorepo)
  * 2. Bundled with the CLI package
  */
-function findStarterDir() {
+function findStarterDir(tailwind = false) {
+  const dirName = tailwind ? "starter-tailwind" : "starter";
+
   // __dirname is cli/src/commands/
   // Monorepo layout: cli/ and starter/ are siblings
-  const monorepoPath = path.resolve(__dirname, "..", "..", "..", "starter");
+  const monorepoPath = path.resolve(__dirname, "..", "..", "..", dirName);
   if (fs.existsSync(path.join(monorepoPath, "eleventy.config.js"))) {
     return monorepoPath;
   }
 
   // Fallback: check if bundled alongside the CLI
-  const bundledPath = path.resolve(__dirname, "..", "..", "starter");
+  const bundledPath = path.resolve(__dirname, "..", "..", dirName);
   if (fs.existsSync(path.join(bundledPath, "eleventy.config.js"))) {
     return bundledPath;
   }

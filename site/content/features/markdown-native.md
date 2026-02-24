@@ -3,6 +3,7 @@ title: "Markdown-Native Content"
 slug: "markdown-native"
 excerpt: "Your content lives in plain .md files — no database, no proprietary format, no lock-in."
 subtitle: "Write in the format the web was built on."
+icon: "file-text"
 order: 1
 published: true
 permalink: "/features/markdown-native/"

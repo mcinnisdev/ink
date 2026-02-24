@@ -1,0 +1,51 @@
+---
+layout: base.njk
+---
+{# Hero #}
+{% include "components/hero.njk" %}
+
+{# Featured Services #}
+{% if collections.services.length %}
+<section class="section">
+  <div class="container">
+    <h2 class="section__title">Our Services</h2>
+    <div class="card-grid">
+      {% for item in collections.services | limit(3) %}
+        {% include "components/card.njk" %}
+      {% endfor %}
+    </div>
+    <p class="text-center mt-lg">
+      <a href="/services/" class="btn btn--secondary">View All Services</a>
+    </p>
+  </div>
+</section>
+{% endif %}
+
+{# Featured Team #}
+{% if collections.employees.length %}
+<section class="section section--alt">
+  <div class="container">
+    <h2 class="section__title">Meet the Team</h2>
+    <div class="card-grid">
+      {% for item in collections.employees | limit(3) %}
+        {% include "components/card.njk" %}
+      {% endfor %}
+    </div>
+    <p class="text-center mt-lg">
+      <a href="/team/" class="btn btn--secondary">View Full Team</a>
+    </p>
+  </div>
+</section>
+{% endif %}
+
+{# Page content (if any markdown below frontmatter) #}
+{% if content | trim %}
+<section class="section">
+  <div class="container container--narrow">
+    {{ content | safe }}
+  </div>
+</section>
+{% endif %}
+
+{# CTA #}
+{% include "components/cta-strip.njk" %}

@@ -1,0 +1,16 @@
+<nav id="main-nav" class="main-nav" aria-label="Main navigation">
+  {% for item in navigation.main %}
+    {% if item.children %}
+    <div class="has-dropdown">
+      <a href="{{ item.url }}" class="main-nav__link" aria-haspopup="true" aria-expanded="false">{{ item.label }}</a>
+      <ul class="dropdown">
+        {% for child in item.children %}
+        <li><a href="{{ child.url }}" class="dropdown__link">{{ child.label }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% else %}
+    <a href="{{ item.url }}" class="main-nav__link">{{ item.label }}</a>
+    {% endif %}
+  {% endfor %}
+</nav>

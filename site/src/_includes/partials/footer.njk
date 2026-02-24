@@ -1,39 +1,40 @@
-<footer class="site-footer" role="contentinfo">
-  <div class="site-footer__inner">
+<footer class="border-t border-gray-800 mt-16 bg-gray-950" role="contentinfo">
+  <div class="max-w-5xl mx-auto px-6 py-12 grid grid-cols-2 md:grid-cols-4 gap-8">
     <div>
-      <p class="site-footer__heading">
-        <span class="logo-mark">ink</span><span class="logo-dot">.</span>
-      </p>
-      <p class="site-footer__tagline">The Markdown-Native CMS</p>
+      <a href="/" class="flex items-center mb-3">
+        <span class="font-sans font-extrabold text-4xl italic tracking-tight text-gray-100">ink</span>
+        <img src="/media/site/ink-logo.png" alt="" aria-hidden="true" class="h-12 w-auto opacity-85 -ml-1">
+      </a>
+      <p class="text-sm text-gray-400">The Markdown-Native CMS</p>
     </div>
     <div>
-      <p class="site-footer__heading">Product</p>
-      <ul class="site-footer__nav">
-        <li><a href="/features/">Features</a></li>
-        <li><a href="/docs/">Docs</a></li>
-        <li><a href="/docs/components-guide/">Components</a></li>
-        <li><a href="/docs/cli-reference/">CLI Reference</a></li>
+      <p class="text-sm font-semibold text-gray-100 mb-3">Product</p>
+      <ul class="list-none flex flex-col gap-2 text-sm">
+        <li><a href="/features/" class="text-gray-400 hover:text-gray-100 transition-colors">Features</a></li>
+        <li><a href="/docs/" class="text-gray-400 hover:text-gray-100 transition-colors">Docs</a></li>
+        <li><a href="/docs/components-guide/" class="text-gray-400 hover:text-gray-100 transition-colors">Components</a></li>
+        <li><a href="/docs/cli-reference/" class="text-gray-400 hover:text-gray-100 transition-colors">CLI Reference</a></li>
       </ul>
     </div>
     <div>
-      <p class="site-footer__heading">Resources</p>
-      <ul class="site-footer__nav">
-        <li><a href="/blog/">Blog</a></li>
-        <li><a href="/faq/">FAQ</a></li>
-        <li><a href="/docs/getting-started/">Getting Started</a></li>
-        <li><a href="/docs/deployment/">Deployment</a></li>
+      <p class="text-sm font-semibold text-gray-100 mb-3">Resources</p>
+      <ul class="list-none flex flex-col gap-2 text-sm">
+        <li><a href="/blog/" class="text-gray-400 hover:text-gray-100 transition-colors">Blog</a></li>
+        <li><a href="/faq/" class="text-gray-400 hover:text-gray-100 transition-colors">FAQ</a></li>
+        <li><a href="/docs/getting-started/" class="text-gray-400 hover:text-gray-100 transition-colors">Getting Started</a></li>
+        <li><a href="/docs/deployment/" class="text-gray-400 hover:text-gray-100 transition-colors">Deployment</a></li>
       </ul>
     </div>
     <div>
-      <p class="site-footer__heading">Community</p>
-      <ul class="site-footer__nav">
-        <li><a href="{{ site.social.github }}" rel="noopener noreferrer" target="_blank">GitHub</a></li>
-        <li><a href="/community/">Community</a></li>
+      <p class="text-sm font-semibold text-gray-100 mb-3">Community</p>
+      <ul class="list-none flex flex-col gap-2 text-sm">
+        <li><a href="{{ site.social.github }}" rel="noopener noreferrer" target="_blank" class="text-gray-400 hover:text-gray-100 transition-colors">GitHub</a></li>
+        <li><a href="/community/" class="text-gray-400 hover:text-gray-100 transition-colors">Community</a></li>
       </ul>
     </div>
   </div>
-  <div class="site-footer__bottom">
-    <p>Built with <span class="logo-mark">Ink</span><span class="logo-dot">.</span></p>
+  <div class="max-w-5xl mx-auto px-6 py-6 border-t border-gray-800 text-sm text-gray-500 text-center">
+    <p>Built with <span class="logo-mark text-sm">Ink</span></p>
     <p>&copy; {{ "now" | year }} Ink. MIT License.</p>
   </div>
 </footer>

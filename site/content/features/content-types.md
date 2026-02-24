@@ -3,6 +3,7 @@ title: "Flexible Content Types"
 slug: "content-types"
 excerpt: "Eight built-in content types with layouts, schemas, and archive pages — plus a wizard for custom ones."
 subtitle: "Structured content without a database."
+icon: "layers"
 order: 4
 published: true
 permalink: "/features/content-types/"

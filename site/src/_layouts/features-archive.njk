@@ -1,0 +1,84 @@
+---
+layout: base.njk
+---
+<section class="section">
+  <div class="container container--narrow">
+
+    {# Header #}
+    <div class="mb-10">
+      <h1 class="text-3xl font-bold tracking-tight text-gray-100 mb-2">
+        <i data-lucide="sparkles" class="icon-heading"></i> {{ title }}
+      </h1>
+      {% if excerpt %}
+      <p class="text-gray-400 mb-4">{{ excerpt }}</p>
+      {% endif %}
+      {% if content | trim %}
+      <div class="text-gray-300 leading-relaxed">
+        {{ content | safe }}
+      </div>
+      {% endif %}
+    </div>
+
+    {# Core — first 4 features #}
+    {%- set items = collections.features -%}
+    {%- set core = [] -%}
+    {%- set ecosystem = [] -%}
+    {%- for item in items %}
+      {%- if item.data.order <= 4 %}
+        {%- set core = (core.push(item), core) -%}
+      {%- else %}
+        {%- set ecosystem = (ecosystem.push(item), ecosystem) -%}
+      {%- endif %}
+    {%- endfor %}
+
+    {% if core.length %}
+    <div class="mb-10">
+      <p class="section-label">
+        <i data-lucide="box" class="icon-xs"></i> Core
+      </p>
+      <div class="row-card-group">
+        {% for item in core %}
+        <a href="{{ item.url }}" class="row-card group">
+          <div class="row-card__icon">
+            <i data-lucide="{{ item.data.icon or 'star' }}"></i>
+          </div>
+          <div class="row-card__body">
+            <div class="row-card__title">{{ item.data.title }}</div>
+            {% if item.data.excerpt %}
+            <div class="row-card__desc">{{ item.data.excerpt }}</div>
+            {% endif %}
+          </div>
+          <i data-lucide="arrow-right" class="row-card__arrow"></i>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    {# Ecosystem — remaining features #}
+    {% if ecosystem.length %}
+    <div class="mb-10">
+      <p class="section-label">
+        <i data-lucide="link" class="icon-xs"></i> Ecosystem
+      </p>
+      <div class="row-card-group">
+        {% for item in ecosystem %}
+        <a href="{{ item.url }}" class="row-card group">
+          <div class="row-card__icon">
+            <i data-lucide="{{ item.data.icon or 'star' }}"></i>
+          </div>
+          <div class="row-card__body">
+            <div class="row-card__title">{{ item.data.title }}</div>
+            {% if item.data.excerpt %}
+            <div class="row-card__desc">{{ item.data.excerpt }}</div>
+            {% endif %}
+          </div>
+          <i data-lucide="arrow-right" class="row-card__arrow"></i>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+</section>

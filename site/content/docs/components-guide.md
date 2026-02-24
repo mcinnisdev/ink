@@ -2,6 +2,7 @@
 title: "Components Guide"
 slug: "components-guide"
 excerpt: "Install and use Ink's 12 pre-built UI components -- from contact forms to image galleries."
+icon: "puzzle"
 order: 4
 published: true
 permalink: "/docs/components-guide/"
@@ -12,7 +13,7 @@ permalink: "/docs/components-guide/"
 Ink components are Nunjucks macros bundled with their own CSS and (when needed) JavaScript. When you install a component with the CLI, three things happen:
 
 1. A **Nunjucks partial** is added to `src/_includes/components/`
-2. **Component CSS** is injected into `src/css/main.css`
+2. **Component CSS** is injected into your stylesheet (`src/css/main.css` or `src/css/tailwind.css` -- the CLI auto-detects which one your project uses)
 3. **Component JS** (if any) is added to `src/js/main.js`
 
 To use a component in any layout or page, import the macro and call it.
@@ -224,8 +225,8 @@ The component reads the current page URL and title automatically. No API keys re
 
 ## Customizing Component Styles
 
-Every component uses CSS custom properties from your design tokens, so changing your site's `--color-primary` or `--font-heading` will automatically update component styles. For deeper customization, find the component's CSS block in `src/css/main.css` (marked with a comment like `/* Component: contact-form */`) and edit it directly.
+Every component uses CSS custom properties from your design tokens, so changing your site's `--color-primary` or `--font-heading` will automatically update component styles. For deeper customization, find the component's CSS block in your stylesheet -- `src/css/main.css` or `src/css/tailwind.css` -- (marked with a comment like `/* Component: contact-form */`) and edit it directly.
 
 ## Building Your Own Components
 
-Create a new Nunjucks file in `src/_includes/components/`, add any styles to `src/css/main.css`, and include it in your templates. Follow the existing components as examples for structure and naming conventions.
+Create a new Nunjucks file in `src/_includes/components/`, add any styles to your CSS file (`src/css/main.css` or `src/css/tailwind.css`), and include it in your templates. Follow the existing components as examples for structure and naming conventions.

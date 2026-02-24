@@ -1,0 +1,5 @@
+node_modules/
+content/.obsidian/
+content/.obsidian-templates/
+.claude/
+README.md

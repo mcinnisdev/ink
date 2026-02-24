@@ -1,0 +1,42 @@
+<footer class="site-footer" role="contentinfo">
+  <div class="site-footer__inner">
+    <div>
+      <p class="site-footer__heading">{{ site.name }}</p>
+      <p class="site-footer__tagline">{{ site.tagline }}</p>
+    </div>
+    <div>
+      <p class="site-footer__heading">Navigation</p>
+      <nav aria-label="Footer navigation">
+        <ul class="site-footer__nav">
+          <li><a href="/">Home</a></li>
+          {% for item in navigation.main %}
+          <li><a href="{{ item.url }}">{{ item.label }}</a></li>
+          {% endfor %}
+        </ul>
+      </nav>
+    </div>
+    {% if site.email or site.phone %}
+    <div>
+      <p class="site-footer__heading">Contact</p>
+      <ul class="site-footer__nav">
+        {% if site.phone %}<li><a href="tel:{{ site.phone }}">{{ site.phone }}</a></li>{% endif %}
+        {% if site.email %}<li><a href="mailto:{{ site.email }}">{{ site.email }}</a></li>{% endif %}
+        {% if site.address.street %}<li>{{ site.address.street }}, {{ site.address.city }}, {{ site.address.state }} {{ site.address.zip }}</li>{% endif %}
+      </ul>
+    </div>
+    {% endif %}
+    {% if site.social.facebook or site.social.linkedin or site.social.instagram %}
+    <div>
+      <p class="site-footer__heading">Follow Us</p>
+      <ul class="site-footer__nav">
+        {% if site.social.facebook %}<li><a href="{{ site.social.facebook }}" rel="noopener noreferrer" target="_blank">Facebook</a></li>{% endif %}
+        {% if site.social.linkedin %}<li><a href="{{ site.social.linkedin }}" rel="noopener noreferrer" target="_blank">LinkedIn</a></li>{% endif %}
+        {% if site.social.instagram %}<li><a href="{{ site.social.instagram }}" rel="noopener noreferrer" target="_blank">Instagram</a></li>{% endif %}
+      </ul>
+    </div>
+    {% endif %}
+  </div>
+  <div class="site-footer__bottom">
+    <p>&copy; {{ "" | year }} {{ site.name }}. All rights reserved.</p>
+  </div>
+</footer>

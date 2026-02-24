@@ -2,6 +2,7 @@
 title: "Content Types Guide"
 slug: "content-types-guide"
 excerpt: "How Ink's 8 built-in content types work, their frontmatter fields, and how to create your own custom types."
+icon: "file-text"
 order: 3
 published: true
 permalink: "/docs/content-types-guide/"

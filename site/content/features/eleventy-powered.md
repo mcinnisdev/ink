@@ -3,6 +3,7 @@ title: "Built on Eleventy v3"
 slug: "eleventy-powered"
 excerpt: "A zero-config static site generator with lightning-fast builds and no client-side JS."
 subtitle: "The simplest, fastest static site generator — now with ESM."
+icon: "zap"
 order: 6
 published: true
 permalink: "/features/eleventy-powered/"

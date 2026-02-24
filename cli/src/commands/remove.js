@@ -200,15 +200,17 @@ async function removeComponent(args) {
     removed.push(`src/_includes/components/${component.files.njk}`);
   }
 
-  // 2. Strip CSS block from main.css
-  const cssPath = path.join(projectRoot, "src", "css", "main.css");
+  // 2. Strip CSS block from main.css or tailwind.css
+  const twCssPath = path.join(projectRoot, "src", "css", "tailwind.css");
+  const cssPath = fs.existsSync(twCssPath) ? twCssPath : path.join(projectRoot, "src", "css", "main.css");
+  const cssFileName = path.basename(cssPath);
   if (component.files.css && fs.existsSync(cssPath)) {
     const cssMarker = `/* === ${component.label} (added by Ink CLI) === */`;
     let css = fs.readFileSync(cssPath, "utf-8");
     if (css.includes(cssMarker)) {
       css = stripBlock(css, cssMarker, /\n\/\* === .+ \(added by Ink CLI\) === \*\/|\n?$/);
       fs.writeFileSync(cssPath, css);
-      removed.push("CSS block from main.css");
+      removed.push(`CSS block from ${cssFileName}`);
     }
   }
 

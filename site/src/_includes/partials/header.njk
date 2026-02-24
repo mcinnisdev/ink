@@ -1,17 +1,43 @@
-<header class="site-header">
-  <div class="site-header__inner">
-    <a href="/" class="site-header__logo">
-      <span class="logo-mark">ink</span><span class="logo-dot">.</span>
+<header class="sticky top-0 z-50 bg-gray-950/95 backdrop-blur-sm border-b border-gray-800">
+  <nav class="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
+
+    <!-- Logo -->
+    <a href="/" class="flex items-center group" aria-label="Ink home">
+      <span class="logo-mark group-hover:text-coral transition-colors duration-150">ink</span>
+      <img src="/media/site/ink-logo.png" alt="" aria-hidden="true"
+           class="logo-img -ml-1 group-hover:opacity-100">
     </a>
 
-    <button class="nav-toggle" aria-expanded="false" aria-controls="main-nav" aria-label="Toggle navigation">
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <line x1="3" y1="6" x2="21" y2="6"/>
-        <line x1="3" y1="12" x2="21" y2="12"/>
-        <line x1="3" y1="18" x2="21" y2="18"/>
-      </svg>
-    </button>
+    <!-- Desktop nav -->
+    <ul class="hidden md:flex items-center gap-6 list-none m-0 p-0">
+      {% for item in navigation.main %}
+      <li>
+        <a href="{{ item.url }}" class="nav-link{% if page.url == item.url %} active{% endif %}"
+           {% if item.url.startsWith("http") %} target="_blank" rel="noopener"{% endif %}>{{ item.label }}</a>
+      </li>
+      {% endfor %}
+    </ul>
 
-    {% include "partials/nav.njk" %}
+    <!-- Mobile hamburger -->
+    <button id="menu-toggle"
+            class="md:hidden p-2 -mr-2 text-gray-400 hover:text-gray-100 transition-colors"
+            aria-label="Toggle menu" aria-expanded="false">
+      <span class="block w-5 h-0.5 bg-current mb-1.5 transition-all duration-200" id="bar1"></span>
+      <span class="block w-5 h-0.5 bg-current mb-1.5 transition-all duration-200" id="bar2"></span>
+      <span class="block w-5 h-0.5 bg-current transition-all duration-200" id="bar3"></span>
+    </button>
+  </nav>
+
+  <!-- Mobile dropdown -->
+  <div id="mobile-menu" class="hidden md:hidden border-t border-gray-800 bg-gray-950">
+    <ul class="max-w-5xl mx-auto px-6 py-3 flex flex-col gap-0.5 list-none m-0">
+      {% for item in navigation.main %}
+      <li>
+        <a href="{{ item.url }}"
+           class="block px-2 py-2 text-sm font-medium text-gray-400 hover:text-gray-100 rounded transition-colors"
+           {% if item.url.startsWith("http") %} target="_blank" rel="noopener"{% endif %}>{{ item.label }}</a>
+      </li>
+      {% endfor %}
+    </ul>
   </div>
 </header>

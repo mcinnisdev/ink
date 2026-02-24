@@ -4,33 +4,47 @@ og_type: article
 ---
 <article class="section">
   <div class="container container--narrow">
-    {% if featured_image %}
-    <div class="hero hero--sm" style="background-image: url('{{ featured_image }}')">
-      <div class="hero__overlay"></div>
-    </div>
-    {% endif %}
-    <header class="detail__header">
-      <h1>{{ title }}</h1>
-      <div class="post-meta">
-        {% if date %}<time class="post-meta__item" datetime="{{ date | dateISO }}">{{ date | dateFormat }}</time>{% endif %}
-        {% if author %}<span class="post-meta__item">{{ author }}</span>{% endif %}
-        {% if content %}<span class="post-meta__item">{{ content | readingTime }}</span>{% endif %}
+    {# Header #}
+    <header class="mb-10 pb-8 border-b border-gray-800">
+      {% if post_tags %}
+      <div class="flex flex-wrap gap-1.5 mb-4">
+        {% for tag in post_tags | split(",") %}
+        <span class="article-card__tag">{{ tag | trim }}</span>
+        {% endfor %}
+      </div>
+      {% endif %}
+      <h1 class="text-3xl md:text-4xl font-bold tracking-tight text-gray-100 mb-4">{{ title }}</h1>
+      {% if excerpt %}
+      <p class="text-lg text-gray-400 mb-5">{{ excerpt }}</p>
+      {% endif %}
+      <div class="flex items-center gap-4 text-sm text-gray-500">
+        {% if date %}
+        <span class="inline-flex items-center gap-1.5">
+          <i data-lucide="calendar" style="width:14px;height:14px;"></i>
+          <time datetime="{{ date | dateISO }}">{{ date | dateFormat }}</time>
+        </span>
+        {% endif %}
+        {% if content %}
+        <span class="inline-flex items-center gap-1.5">
+          <i data-lucide="clock" style="width:14px;height:14px;"></i>
+          {{ content | readingTime }}
+        </span>
+        {% endif %}
+        {% if author %}
+        <span class="inline-flex items-center gap-1.5">
+          <i data-lucide="user" style="width:14px;height:14px;"></i>
+          {{ author }}
+        </span>
+        {% endif %}
       </div>
     </header>
-    <div class="detail__content">
+
+    {# Content #}
+    <div class="detail__content prose max-w-none">
       {{ content | safe }}
     </div>
-    {% if post_tags %}
-    <div class="post-tags">
-      {% for tag in post_tags | split(",") %}
-      <span class="post-tags__tag">{{ tag | trim }}</span>
-      {% endfor %}
-    </div>
-    {% endif %}
-    {% from "components/social-share.njk" import socialShare %}
-    <div class="mt-lg">
-      {{ socialShare(title, page.url, site.url) }}
-    </div>
+
+    {# Post Navigation #}
     {%- set allPosts = collections.posts %}
     {%- set currentIndex = -1 %}
     {%- for post in allPosts %}

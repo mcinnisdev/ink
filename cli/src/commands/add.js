@@ -107,7 +107,9 @@ async function addComponent(args) {
 
   const componentDir = path.join(templatesDir, "components", name);
   const targetDir = path.join(projectRoot, "src", "_includes", "components");
-  const cssPath = path.join(projectRoot, "src", "css", "main.css");
+  const twCssPath = path.join(projectRoot, "src", "css", "tailwind.css");
+  const cssPath = fs.existsSync(twCssPath) ? twCssPath : path.join(projectRoot, "src", "css", "main.css");
+  const cssFileName = path.basename(cssPath);
   const jsPath = path.join(projectRoot, "src", "js", "main.js");
 
   console.log(`\n  Installing component: ${component.label}\n`);
@@ -135,7 +137,7 @@ async function addComponent(args) {
     } else {
       const cssBlock = fs.readFileSync(cssSrc, "utf-8");
       fs.appendFileSync(cssPath, `\n${cssMarker}\n${cssBlock}\n`);
-      console.log(`  Appended CSS to src/css/main.css`);
+      console.log(`  Appended CSS to src/css/${cssFileName}`);
     }
   }
 

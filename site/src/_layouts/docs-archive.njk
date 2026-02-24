@@ -1,0 +1,84 @@
+---
+layout: base.njk
+---
+<section class="section">
+  <div class="container container--narrow">
+
+    {# Header #}
+    <div class="mb-10">
+      <h1 class="text-3xl font-bold tracking-tight text-gray-100 mb-2">
+        <i data-lucide="book-open" class="icon-heading"></i> {{ title }}
+      </h1>
+      {% if excerpt %}
+      <p class="text-gray-400 mb-4">{{ excerpt }}</p>
+      {% endif %}
+      {% if content | trim %}
+      <div class="text-gray-300 leading-relaxed">
+        {{ content | safe }}
+      </div>
+      {% endif %}
+    </div>
+
+    {# Guides — first 4 docs (order 1-4) #}
+    {%- set items = collections.docs -%}
+    {%- set guides = [] -%}
+    {%- set reference = [] -%}
+    {%- for item in items %}
+      {%- if item.data.order <= 4 %}
+        {%- set guides = (guides.push(item), guides) -%}
+      {%- else %}
+        {%- set reference = (reference.push(item), reference) -%}
+      {%- endif %}
+    {%- endfor %}
+
+    {% if guides.length %}
+    <div class="mb-10">
+      <p class="section-label">
+        <i data-lucide="rocket" class="icon-xs"></i> Getting Started
+      </p>
+      <div class="row-card-group">
+        {% for item in guides %}
+        <a href="{{ item.url }}" class="row-card group">
+          <div class="row-card__icon">
+            <i data-lucide="{{ item.data.icon or 'file-text' }}"></i>
+          </div>
+          <div class="row-card__body">
+            <div class="row-card__title">{{ item.data.title }}</div>
+            {% if item.data.excerpt %}
+            <div class="row-card__desc">{{ item.data.excerpt }}</div>
+            {% endif %}
+          </div>
+          <i data-lucide="arrow-right" class="row-card__arrow"></i>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    {# Reference — remaining docs (order 5+) #}
+    {% if reference.length %}
+    <div class="mb-10">
+      <p class="section-label">
+        <i data-lucide="book-marked" class="icon-xs"></i> Reference
+      </p>
+      <div class="row-card-group">
+        {% for item in reference %}
+        <a href="{{ item.url }}" class="row-card group">
+          <div class="row-card__icon">
+            <i data-lucide="{{ item.data.icon or 'file-text' }}"></i>
+          </div>
+          <div class="row-card__body">
+            <div class="row-card__title">{{ item.data.title }}</div>
+            {% if item.data.excerpt %}
+            <div class="row-card__desc">{{ item.data.excerpt }}</div>
+            {% endif %}
+          </div>
+          <i data-lucide="arrow-right" class="row-card__arrow"></i>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+</section>

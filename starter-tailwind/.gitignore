@@ -1,0 +1,7 @@
+_site/
+node_modules/
+content/.obsidian/
+.claude/
+.DS_Store
+Thumbs.db
+*.log

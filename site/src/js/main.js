@@ -1,42 +1,22 @@
 document.addEventListener("DOMContentLoaded", () => {
   // --- Mobile Navigation ---
-  const toggle = document.querySelector(".nav-toggle");
-  const nav = document.querySelector(".main-nav");
+  const menuToggle = document.getElementById("menu-toggle");
+  const mobileMenu = document.getElementById("mobile-menu");
+  const bar1 = document.getElementById("bar1");
+  const bar2 = document.getElementById("bar2");
+  const bar3 = document.getElementById("bar3");
 
-  if (toggle && nav) {
-    toggle.addEventListener("click", () => {
-      const expanded = toggle.getAttribute("aria-expanded") === "true";
-      toggle.setAttribute("aria-expanded", !expanded);
-      nav.classList.toggle("is-open");
+  if (menuToggle && mobileMenu) {
+    let menuOpen = false;
+    menuToggle.addEventListener("click", () => {
+      menuOpen = !menuOpen;
+      mobileMenu.classList.toggle("hidden", !menuOpen);
+      menuToggle.setAttribute("aria-expanded", menuOpen);
+      if (bar1) bar1.style.transform = menuOpen ? "translateY(8px) rotate(45deg)" : "";
+      if (bar2) bar2.style.opacity = menuOpen ? "0" : "";
+      if (bar3) bar3.style.transform = menuOpen ? "translateY(-8px) rotate(-45deg)" : "";
     });
   }
-
-  // Close dropdowns when clicking outside
-  document.addEventListener("click", (e) => {
-    if (!e.target.closest(".has-dropdown")) {
-      document.querySelectorAll(".has-dropdown").forEach((item) => {
-        item.classList.remove("is-open");
-        const link = item.querySelector("[aria-haspopup]");
-        if (link) link.setAttribute("aria-expanded", "false");
-      });
-    }
-  });
-
-  // Toggle dropdowns on click (mobile)
-  document.querySelectorAll(".has-dropdown > .main-nav__link").forEach((link) => {
-    link.addEventListener("click", (e) => {
-      if (window.innerWidth < 768) {
-        e.preventDefault();
-        const parent = link.parentElement;
-        const wasOpen = parent.classList.contains("is-open");
-        document.querySelectorAll(".has-dropdown").forEach((item) => {
-          item.classList.remove("is-open");
-        });
-        if (!wasOpen) parent.classList.add("is-open");
-        link.setAttribute("aria-expanded", !wasOpen);
-      }
-    });
-  });
 
   // --- Smooth Scroll for Anchor Links ---
   document.querySelectorAll('a[href^="#"]').forEach((anchor) => {

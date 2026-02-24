@@ -1,13 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   {% include "partials/seo-head.njk" %}
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/src/css/main.css">
+  <link rel="icon" href="/media/site/ink-logo.png" type="image/png">
+  <link rel="stylesheet" href="/src/css/style.css">
   {% if site.gtm_id %}
   <!-- Google Tag Manager -->
   <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -17,7 +15,7 @@
   })(window,document,'script','dataLayer','{{ site.gtm_id }}');</script>
   {% endif %}
 </head>
-<body class="page-{{ slug | default('default') }}">
+<body class="bg-gray-950 text-gray-300 antialiased">
   {% if site.gtm_id %}
   <noscript><iframe src="https://www.googletagmanager.com/ns.html?id={{ site.gtm_id }}" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   {% endif %}
@@ -36,5 +34,7 @@
   {% include "partials/footer.njk" %}
 
   <script src="/src/js/main.js" defer></script>
+  <script src="https://unpkg.com/lucide@0.474.0/dist/umd/lucide.min.js"></script>
+  <script>lucide.createIcons();</script>
 </body>
 </html>

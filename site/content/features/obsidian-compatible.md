@@ -3,6 +3,7 @@ title: "Obsidian Compatible"
 slug: "obsidian-compatible"
 excerpt: "Your content directory is a valid Obsidian vault. Write in the editor you love."
 subtitle: "Your favorite writing tool meets your CMS."
+icon: "gem"
 order: 7
 published: true
 permalink: "/features/obsidian-compatible/"

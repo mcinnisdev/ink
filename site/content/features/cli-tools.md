@@ -3,6 +3,7 @@ title: "Powerful CLI Tools"
 slug: "cli-tools"
 excerpt: "Scaffold projects, add components, and generate content types from the command line."
 subtitle: "One command to scaffold. One command to extend."
+icon: "terminal"
 order: 2
 published: true
 permalink: "/features/cli-tools/"
@@ -14,7 +15,7 @@ The Ink CLI (`ink`) is a command-line tool that handles project scaffolding, com
 
 ## Core Commands
 
-**`ink init <project-name>`** -- Scaffold a new Ink project with content directories, design tokens, layouts, and a working dev server. You get a deployable site from the first command.
+**`ink init <project-name>`** -- Scaffold a new Ink project with content directories, design tokens, layouts, and a working dev server. The wizard lets you choose between **plain CSS custom properties** (default) or **Tailwind CSS** for styling. You get a deployable site from the first command.
 
 ```bash
 npx ink init my-site

@@ -2,6 +2,7 @@
 title: "CLI Reference"
 slug: "cli-reference"
 excerpt: "Complete reference for every ink command -- project setup, content management, components, and builds."
+icon: "terminal"
 order: 2
 published: true
 permalink: "/docs/cli-reference/"
@@ -25,7 +26,7 @@ Interactively scaffold a new Ink project.
 npx ink init my-site
 ```
 
-The wizard prompts for site name, URL, brand colors, and which content types to include. If `dir` is omitted, the project is created in the current directory.
+The wizard prompts for site name, URL, brand colors, CSS framework (Tailwind or plain CSS custom properties), and which content types to include. If `dir` is omitted, the project is created in the current directory.
 
 ### `ink serve`
 

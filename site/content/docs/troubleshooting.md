@@ -2,6 +2,7 @@
 title: "Troubleshooting"
 slug: "troubleshooting"
 excerpt: "Solutions for common issues with Node.js, builds, collections, components, and Windows line endings."
+icon: "life-buoy"
 order: 8
 published: true
 permalink: "/docs/troubleshooting/"
@@ -99,9 +100,9 @@ You installed a component and included it in a template, but it renders unstyled
 
 ### Possible Causes and Fixes
 
-**1. CSS was not injected into `main.css`.**
+**1. CSS was not injected into your stylesheet.**
 
-Open `src/css/main.css` and search for the component name. You should find a comment block like:
+Open your CSS file (`src/css/main.css` or `src/css/tailwind.css`) and search for the component name. You should find a comment block like:
 
 ```css
 /* Component: pricing-table */
@@ -209,6 +210,29 @@ layout: post.njk
 ```
 
 This corresponds to the file `src/_layouts/post.njk`.
+
+## Tailwind CSS Issues
+
+### Styles not updating
+
+If you chose Tailwind during `ink init` and styles are not appearing:
+
+1. **Make sure both processes are running.** The Tailwind watcher and Eleventy run concurrently via `npm run dev` (or `npx ink serve`). If only Eleventy is running, your Tailwind source (`src/css/tailwind.css`) won't be compiled to `src/css/style.css`.
+
+2. **Check `tailwind.config.js` content paths.** The `content` array must include all template and content files:
+
+```js
+content: [
+  "./src/**/*.njk",
+  "./content/**/*.md",
+],
+```
+
+3. **Rebuild after config changes.** Changes to `tailwind.config.js` (adding colors, fonts, plugins) require a restart of the dev server.
+
+### `tailwindcss` command not found
+
+Run `npm install` in your project directory. Tailwind is a devDependency and needs to be installed before the build scripts will work.
 
 ## Getting Help
 

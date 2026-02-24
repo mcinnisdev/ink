@@ -3,6 +3,7 @@ title: "Design Token System"
 slug: "design-tokens"
 excerpt: "Control your entire brand from a single CSS file with custom properties."
 subtitle: "One file. Every color, font, and spacing value in your site."
+icon: "palette"
 order: 3
 published: true
 permalink: "/features/design-tokens/"
@@ -87,3 +88,7 @@ Design tokens give you three things:
 - **Maintainability** -- No magic numbers scattered across dozens of stylesheets
 
 Because tokens are plain CSS custom properties, they work in every browser without a preprocessor, build tool, or runtime dependency.
+
+## Tailwind CSS Option
+
+Prefer utility-first CSS? During `ink init`, you can choose **Tailwind CSS** instead of the default token system. The Tailwind starter includes `tailwindcss`, `@tailwindcss/typography`, and a `tailwind.config.js` pre-configured with your brand colors. CSS custom properties are still defined in `@layer base` so components work seamlessly with either approach.

@@ -2,6 +2,7 @@
 title: "Customization"
 slug: "customization"
 excerpt: "Change colors, fonts, spacing, and layouts using Ink's design token system and Nunjucks templates."
+icon: "palette"
 order: 5
 published: true
 permalink: "/docs/customization/"
@@ -9,7 +10,9 @@ permalink: "/docs/customization/"
 
 ## Design Tokens
 
-Ink uses CSS custom properties (design tokens) defined in the `:root` selector of `src/css/main.css`. Changing a single variable updates every element that references it -- buttons, links, headings, components, and more.
+Ink uses CSS custom properties (design tokens) defined in the `:root` selector of your stylesheet. If you chose the **default CSS** starter during `ink init`, tokens live in `src/css/main.css`. If you chose **Tailwind CSS**, they live in the `@layer base` block of `src/css/tailwind.css` and your brand colors are also configured in `tailwind.config.js`.
+
+Changing a single variable updates every element that references it -- buttons, links, headings, components, and more.
 
 ### Colors
 
@@ -159,7 +162,7 @@ Use it in a layout or page:
 
 ## Overriding Component Styles
 
-Every installed component's CSS is marked with a comment header in `src/css/main.css`. To override styles, either:
+Every installed component's CSS is marked with a comment header in your stylesheet (`src/css/main.css` or `src/css/tailwind.css`). To override styles, either:
 
 1. **Edit the component's CSS block directly** -- Find the `/* Component: component-name */` comment and modify the rules.
 

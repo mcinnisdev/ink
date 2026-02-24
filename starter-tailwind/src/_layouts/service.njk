@@ -1,0 +1,17 @@
+---
+layout: base.njk
+og_type: article
+---
+{% include "components/hero.njk" %}
+
+<section class="section">
+  <div class="detail__content">
+    {{ content | safe }}
+
+    {% if price_note %}
+    <p class="mt-lg"><strong>{{ price_note }}</strong></p>
+    {% endif %}
+  </div>
+</section>
+
+{% include "components/cta-strip.njk" %}
