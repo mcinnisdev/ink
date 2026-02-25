@@ -5,7 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   {% include "partials/seo-head.njk" %}
   <link rel="icon" href="/media/site/ink-logo.png" type="image/png">
-  <link rel="preload" href="/src/css/style.css?v={{ build.hash }}" as="style">
+  <style>
+    /* Critical CSS — enables LCP paint before full stylesheet loads */
+    html{color-scheme:dark}body{margin:0;background:#030712;color:#d1d5db;font-family:ui-sans-serif,system-ui,sans-serif;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+    .hero--dev{position:relative;display:flex;align-items:center;justify-content:center;text-align:center;min-height:70vh;padding:6rem 1.5rem;color:#fff;overflow:hidden;background:linear-gradient(135deg,#030712 0%,#111827 50%,#030712 100%)}
+    .hero--dev .hero__content{position:relative;z-index:1;max-width:48rem}
+    .hero__title{font-size:2.25rem;color:#fff;margin-bottom:1rem;font-weight:700;line-height:1.2}
+    .hero__code-preview{background:#0f172a;border:1px solid #1f2937;border-radius:.75rem;padding:1rem 2rem;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:.875rem;color:#e5e7eb;text-align:left;max-width:36rem;margin:3rem auto 0;overflow-x:auto;line-height:2}
+    .hero__code-preview .prompt{color:#e07850}.hero__code-preview .comment{color:#8b949e}
+  </style>
   <link rel="stylesheet" href="/src/css/style.css?v={{ build.hash }}">
   {% if site.gtm_id %}
   <!-- Google Tag Manager -->

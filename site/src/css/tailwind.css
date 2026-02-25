@@ -98,7 +98,7 @@
     @apply font-sans font-extrabold text-2xl italic tracking-tight text-gray-100 no-underline;
   }
   .logo-img {
-    @apply h-10 w-auto opacity-85 transition-opacity duration-200;
+    @apply h-10 w-10 opacity-85 transition-opacity duration-200;
   }
   .logo-img--sm {
     @apply h-9;
