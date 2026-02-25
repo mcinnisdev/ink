@@ -96,7 +96,7 @@ excerpt: ""
 date: ${new Date().toISOString().split("T")[0]}
 author: "Admin"
 post_tags: ""
-featured_image: ""
+featured_image: "/media/placeholders/landscape-1.png"
 published: true
 permalink: "/blog/${slug}/"
 ---
@@ -127,7 +127,7 @@ Write your blog post content here.
 title: "${title}"
 slug: "${slug}"
 excerpt: ""
-featured_image: ""
+featured_image: "/media/placeholders/building.png"
 order: 10
 published: true
 permalink: "/services/${slug}/"
@@ -158,7 +158,7 @@ Describe this service here.
 title: "${title}"
 slug: "${slug}"
 role: ""
-photo: ""
+photo: "/media/placeholders/avatar-1.png"
 order: 10
 published: true
 permalink: "/team/${slug}/"
@@ -282,6 +282,7 @@ title: "${title}"
 slug: "${slug}"
 excerpt: ""
 subtitle: ""
+featured_image: "/media/placeholders/landscape-1.png"
 order: 10
 published: true
 permalink: "/features/${slug}/"
@@ -416,7 +417,7 @@ slug: "${slug}"
 excerpt: ""
 date: ${new Date().toISOString().split("T")[0]}
 client: ""
-featured_image: ""
+featured_image: "/media/placeholders/product.png"
 published: true
 permalink: "/portfolio/${slug}/"
 ---

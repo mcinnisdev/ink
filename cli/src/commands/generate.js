@@ -85,8 +85,8 @@ function buildEntry(type, typeId, sample, index) {
   if (hasField(type, "date")) fm.date = date;
   if (hasField(type, "author")) fm.author = sample.author || "Admin";
   if (hasField(type, "role")) fm.role = sample.role || "";
-  if (hasField(type, "photo")) fm.photo = "";
-  if (hasField(type, "featured_image")) fm.featured_image = "";
+  if (hasField(type, "photo")) fm.photo = getPlaceholderImage(typeId, "photo", index);
+  if (hasField(type, "featured_image")) fm.featured_image = getPlaceholderImage(typeId, "featured_image", index);
   if (hasField(type, "client")) fm.client = sample.client || "";
   if (hasField(type, "category")) fm.category = sample.category || "General";
   if (hasField(type, "subtitle")) fm.subtitle = sample.subtitle || "";
@@ -140,6 +140,26 @@ function pastDate(weeksAgo) {
   const d = new Date();
   d.setDate(d.getDate() - weeksAgo * 7);
   return d.toISOString().split("T")[0];
+}
+
+// ─── Placeholder images ──────────────────────────────────────────────────────
+
+const PLACEHOLDER_IMAGES = {
+  photo: ["/media/placeholders/avatar-1.png", "/media/placeholders/avatar-2.png"],
+  blog: ["/media/placeholders/landscape-1.png", "/media/placeholders/landscape-2.png", "/media/placeholders/landscape-3.png"],
+  services: ["/media/placeholders/building.png", "/media/placeholders/landscape-1.png"],
+  portfolio: ["/media/placeholders/product.png", "/media/placeholders/landscape-2.png", "/media/placeholders/landscape-3.png"],
+  features: ["/media/placeholders/landscape-1.png", "/media/placeholders/landscape-2.png"],
+  "service-areas": ["/media/placeholders/map.png"],
+};
+
+function getPlaceholderImage(typeId, fieldName, index) {
+  if (fieldName === "photo") {
+    const pool = PLACEHOLDER_IMAGES.photo;
+    return pool[index % pool.length];
+  }
+  const pool = PLACEHOLDER_IMAGES[typeId] || ["/media/placeholders/default.png"];
+  return pool[index % pool.length];
 }
 
 // ─── Sample data per content type ─────────────────────────────────────────────
