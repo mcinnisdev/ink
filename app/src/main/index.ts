@@ -2,6 +2,7 @@ import { app, BrowserWindow, shell, ipcMain } from "electron";
 import path from "path";
 import { registerIpcHandlers } from "./ipc";
 import { cleanup as eleventyCleanup } from "./services/eleventy";
+import { checkForUpdates } from "./services/updates";
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -68,6 +69,18 @@ app.whenReady().then(() => {
   });
 
   createWindow();
+
+  // Check for updates 5 seconds after launch
+  setTimeout(async () => {
+    try {
+      const info = await checkForUpdates(app.getVersion());
+      if (info.available && mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send("updates:available", info);
+      }
+    } catch {
+      // Fail silently — update check is non-critical
+    }
+  }, 5000);
 
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) {

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { Save, Plus, Trash2, Sparkles } from "lucide-react";
+import { Save, Plus, Trash2, Sparkles, Download, RefreshCw, ExternalLink } from "lucide-react";
 import { useProjectStore } from "../../stores/project";
 import { useAIStore, type AIConfig } from "../../stores/ai";
 import { useNotificationStore } from "../../stores/notifications";
@@ -55,6 +55,82 @@ function TextInput({
         className="w-full bg-ink-900 border border-ink-600 rounded-lg px-3 py-2 text-sm text-ink-50 focus:border-accent focus:outline-none"
       />
     </div>
+  );
+}
+
+interface UpdateInfo {
+  available: boolean;
+  currentVersion: string;
+  latestVersion: string;
+  releaseUrl: string;
+  releaseNotes: string;
+}
+
+function UpdateSection() {
+  const [checking, setChecking] = useState(false);
+  const [update, setUpdate] = useState<UpdateInfo | null>(null);
+  const addToast = useNotificationStore((s) => s.addToast);
+
+  const handleCheck = async () => {
+    setChecking(true);
+    try {
+      const info = await window.ink.updates.check();
+      setUpdate(info);
+      if (!info.available) {
+        addToast("success", "You're on the latest version!");
+      }
+    } catch {
+      addToast("error", "Failed to check for updates");
+    } finally {
+      setChecking(false);
+    }
+  };
+
+  return (
+    <section>
+      <h3 className="text-sm font-semibold text-ink-300 mb-3">
+        About & Updates
+      </h3>
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm text-ink-200">Ink</p>
+            <p className="text-xs text-ink-500">
+              v{update?.currentVersion ?? "0.1.0-alpha.1"}
+            </p>
+          </div>
+          <button
+            onClick={handleCheck}
+            disabled={checking}
+            className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium bg-ink-800 text-ink-200 rounded-lg hover:bg-ink-700 disabled:opacity-50 transition-colors"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${checking ? "animate-spin" : ""}`} />
+            {checking ? "Checking..." : "Check for Updates"}
+          </button>
+        </div>
+
+        {update?.available && (
+          <div className="bg-accent/10 border border-accent/30 rounded-lg p-3">
+            <p className="text-sm text-ink-100 font-medium mb-1">
+              v{update.latestVersion} is available!
+            </p>
+            {update.releaseNotes && (
+              <p className="text-xs text-ink-400 mb-2 line-clamp-3">
+                {update.releaseNotes}
+              </p>
+            )}
+            <button
+              onClick={() => window.ink.shell.openExternal(update.releaseUrl)}
+              className="flex items-center gap-1.5 text-xs font-medium text-accent hover:text-accent/80 transition-colors"
+            >
+              <Download className="w-3.5 h-3.5" />
+              Download Update
+              <ExternalLink className="w-3 h-3" />
+            </button>
+          </div>
+        )}
+      </div>
+    </section>
   );
 }
 
@@ -463,6 +539,9 @@ export default function SettingsView() {
               ))}
             </div>
           </section>
+
+          {/* About & Updates */}
+          <UpdateSection />
 
           {/* Project Info */}
           <section>

@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useProjectStore } from "./stores/project";
 import { useUIStore } from "./stores/ui";
 import { useEditorStore } from "./stores/editor";
+import { useNotificationStore } from "./stores/notifications";
 import Sidebar from "./components/layout/Sidebar";
 import TitleBar from "./components/layout/TitleBar";
 import Welcome from "./components/onboarding/Welcome";
@@ -53,6 +54,16 @@ export default function App() {
     document.documentElement.classList.toggle("theme-light", theme === "light");
     window.ink.theme.setOverlay(theme);
   }, [theme]);
+
+  // Listen for update notifications from main process
+  useEffect(() => {
+    const cleanup = window.ink.updates.onUpdateAvailable((info) => {
+      useNotificationStore
+        .getState()
+        .addToast("info", `Ink v${info.latestVersion} is available! Go to Settings to download.`);
+    });
+    return cleanup;
+  }, []);
 
   // Flush all pending saves before the window closes
   useEffect(() => {

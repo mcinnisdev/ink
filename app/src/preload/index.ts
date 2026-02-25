@@ -92,6 +92,14 @@ export interface SearchResult {
   matchLength: number;
 }
 
+export interface UpdateInfo {
+  available: boolean;
+  currentVersion: string;
+  latestVersion: string;
+  releaseUrl: string;
+  releaseNotes: string;
+}
+
 export interface InkAPI {
   project: {
     create: (config: {
@@ -217,6 +225,10 @@ export interface InkAPI {
     enablePages: (owner: string, repo: string, branch?: string) => Promise<{ html_url: string }>;
     onDeviceFlow: (callback: (status: DeviceFlowStatus) => void) => () => void;
   };
+  updates: {
+    check: () => Promise<UpdateInfo>;
+    onUpdateAvailable: (callback: (info: UpdateInfo) => void) => () => void;
+  };
 }
 
 const api: InkAPI = {
@@ -339,6 +351,16 @@ const api: InkAPI = {
       ipcRenderer.on("github:deviceFlow", handler);
       return () => {
         ipcRenderer.removeListener("github:deviceFlow", handler);
+      };
+    },
+  },
+  updates: {
+    check: () => ipcRenderer.invoke("updates:check"),
+    onUpdateAvailable: (callback) => {
+      const handler = (_event: unknown, data: UpdateInfo) => callback(data);
+      ipcRenderer.on("updates:available", handler);
+      return () => {
+        ipcRenderer.removeListener("updates:available", handler);
       };
     },
   },

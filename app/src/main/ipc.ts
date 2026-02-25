@@ -1,4 +1,4 @@
-import { ipcMain, BrowserWindow, shell, dialog } from "electron";
+import { ipcMain, BrowserWindow, shell, dialog, app } from "electron";
 import path from "path";
 import {
   createProject,
@@ -67,6 +67,7 @@ import {
   detectCssFramework,
 } from "./services/cli";
 import { assertWithinProject } from "./services/security";
+import { checkForUpdates } from "./services/updates";
 
 // Track the active project path for path validation
 let activeProjectPath: string | null = null;
@@ -415,4 +416,9 @@ export function registerIpcHandlers(): void {
       return enableGitHubPages(token, owner, repo, branch);
     }
   );
+
+  // --- Updates ---
+  ipcMain.handle("updates:check", async () => {
+    return checkForUpdates(app.getVersion());
+  });
 }
