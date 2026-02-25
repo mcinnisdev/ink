@@ -59,6 +59,13 @@ module.exports = {
               backgroundColor: "#0f172a",
               color: theme("colors.gray.200"),
             },
+            "pre code": {
+              backgroundColor: "transparent",
+              padding: "0",
+              borderRadius: "0",
+              color: "inherit",
+              fontWeight: "inherit",
+            },
           },
         },
       }),
