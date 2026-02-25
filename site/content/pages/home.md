@@ -1,13 +1,13 @@
 ---
 title: "Ink"
-seo_title: "Ink — The Markdown-Native CMS"
-meta_description: "Ink is an open-source, Markdown-native CMS built on Eleventy v3. Zero database, static output, deploy anywhere. Scaffold a complete site in one command."
+seo_title: "Ink — A Markdown Site Scaffolding Tool, Built in Public"
+meta_description: "Ink is an open-source tool for scaffolding fast, static websites from Markdown. Built on Eleventy v3, built in public with AI assistance."
 slug: "home"
 layout: "home.njk"
 permalink: "/index.html"
 published: true
-hero_headline: "Your Website, Written in Markdown."
-hero_subtitle: "Ink is an open-source CMS that turns plain Markdown files into fast, beautiful websites. No database. No lock-in. Just files you own, powered by Eleventy v3."
+hero_headline: "A Personal Tool for Building Websites Fast."
+hero_subtitle: "Ink is an open-source site scaffolding tool I'm building in public. It turns Markdown files into fast, production-ready websites with one command. No database. No lock-in. Powered by Eleventy v3."
 hero_cta_text: "Get Started"
 hero_cta_url: "/docs/getting-started/"
 hero_code: |
@@ -23,9 +23,9 @@ hero_code: |
   <span class="prompt">$</span> npm run dev
   <span class="comment"># ✓ Server running at http://localhost:8080</span>
 features_section:
-  heading: "Everything You Need. Nothing You Don't."
+  heading: "What It Does"
   columns: 3
-  cta_text: "Explore All Features"
+  cta_text: "See All Features"
   cta_url: "/features/"
   items:
     - icon: "file-text"
@@ -47,14 +47,14 @@ features_section:
       title: "Deploy Anywhere"
       description: "Static HTML output means any CDN works. Cloudflare Pages, Netlify, Vercel, GitHub Pages — take your pick."
 how_it_works:
-  heading: "Ship in Three Steps"
+  heading: "How It Works"
   steps:
     - title: "Scaffold"
-      description: "Run npx ink init to generate a complete project with content types, design tokens, layouts, and a dev server — all configured and ready to go."
+      description: "Run npx ink init to generate a complete project with content types, design tokens, layouts, and a dev server. You get a working site in under a minute."
     - title: "Write"
-      description: "Add content in Markdown. Each file is a page. Frontmatter handles metadata. Directories map to URLs. Open the content folder in Obsidian for a rich editing experience."
+      description: "Add content in Markdown. Each file is a page. Frontmatter handles metadata. Open the content folder in Obsidian for a rich editing experience."
     - title: "Deploy"
-      description: "Run npm run build to generate static HTML, then push to any hosting provider. No servers to manage, no databases to maintain, no vendor lock-in."
+      description: "Run npm run build to generate static HTML, then push to any hosting provider. No servers, no databases, no vendor lock-in."
 code_examples:
   heading: "See How Simple It Is"
   tabs:
@@ -79,15 +79,15 @@ stats:
     label: "Static Output"
 faq_items:
   - question: "What is Ink?"
-    answer: "Ink is an open-source, Markdown-native CMS built on Eleventy v3. It gives you a complete website with content types, design tokens, and CLI tools — all powered by plain Markdown files."
-  - question: "Do I need coding experience?"
-    answer: "Basic familiarity with the command line and Markdown is helpful, but you don't need to be a developer. Ink handles the build system, layouts, and components for you."
-  - question: "How is Ink different from WordPress or other CMS platforms?"
-    answer: "Ink has no database, no admin panel, and no server runtime. Your content lives in Markdown files, your site compiles to static HTML, and you can host it anywhere for free."
+    answer: "A personal tool I'm building in the open. It scaffolds complete websites from Markdown files using Eleventy v3 — content types, design tokens, CLI tools, all included."
+  - question: "Is this production-ready?"
+    answer: "I use it for my own projects, and the output is solid static HTML. That said, it's early and actively evolving. Check the GitHub releases for the current state."
+  - question: "How is it different from WordPress or Next.js?"
+    answer: "No database, no admin panel, no server runtime, no JavaScript framework. Content lives in Markdown files, sites compile to static HTML, and you can host them anywhere for free."
   - question: "Can I use Obsidian to write content?"
-    answer: "Yes. Your Ink content directory is a valid Obsidian vault. Open it in Obsidian for a rich writing experience with live preview, backlinks, and graph view."
-  - question: "Where can I deploy an Ink site?"
-    answer: "Anywhere that serves static files — Cloudflare Pages, Netlify, Vercel, GitHub Pages, or your own server. The output is plain HTML, CSS, and JavaScript."
+    answer: "Yes. The content directory is a valid Obsidian vault. Open it in Obsidian for live preview, backlinks, and graph view."
+  - question: "Is Ink built with AI?"
+    answer: "Yes, heavily. I use Claude by Anthropic for code generation, architecture decisions, debugging, and documentation. Every commit includes a Co-Authored-By tag. Read more on the About page."
   - question: "Is Ink free?"
-    answer: "Yes, Ink is fully open source under the MIT License. Free to use, modify, and distribute."
+    answer: "Fully open source under the MIT License. Free to use, modify, and distribute."
 ---
