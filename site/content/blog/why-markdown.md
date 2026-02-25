@@ -1,5 +1,5 @@
 ---
-title: "Why We Built a CMS Around Markdown"
+title: "Why I'm building a CMS Around Markdown"
 slug: "why-markdown"
 excerpt: "Markdown is portable, version-controllable, and human-readable. It's the perfect foundation for a CMS."
 date: 2026-02-22
@@ -12,7 +12,7 @@ permalink: "/blog/why-markdown/"
 
 Most content management systems store your content in a database. Your words, your structure, your metadata -- all locked inside a proprietary format that you can only access through an admin panel. If the platform disappears, or you want to switch, migrating that content becomes a project in itself.
 
-We think there's a better way.
+I think there's a better way.
 
 ## Content Should Be Portable
 
@@ -46,4 +46,4 @@ Every piece of content in Ink is a Markdown file. The YAML frontmatter at the to
 
 ## The Bottom Line
 
-We built Ink around Markdown because we believe your content should outlast any tool. Platforms come and go. Plain text is forever.
+I built Ink around Markdown because I believe your content should outlast any tool. Platforms come and go. Plain text is forever.
