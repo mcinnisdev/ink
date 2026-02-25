@@ -4,7 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   {% include "partials/seo-head.njk" %}
-  <link rel="stylesheet" href="/src/css/style.css">
+  <link rel="preload" href="/src/css/style.css?v={{ build.hash }}" as="style">
+  <link rel="stylesheet" href="/src/css/style.css?v={{ build.hash }}">
   {% if site.gtm_id %}
   <!-- Google Tag Manager -->
   <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -32,6 +33,6 @@
 
   {% include "partials/footer.njk" %}
 
-  <script src="/src/js/main.js" defer></script>
+  <script src="/src/js/main.js?v={{ build.hash }}" defer></script>
 </body>
 </html>

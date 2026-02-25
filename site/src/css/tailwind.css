@@ -15,11 +15,12 @@
   }
 
   a {
-    @apply text-coral no-underline transition-colors duration-200;
+    @apply text-coral underline decoration-coral/40 underline-offset-2
+           transition-colors duration-200;
   }
 
   a:hover {
-    @apply text-coral-dark;
+    @apply text-coral-dark decoration-coral;
   }
 
   a:focus-visible,
@@ -94,7 +95,7 @@
 
   /* --- Logo --- */
   .logo-mark {
-    @apply font-sans font-extrabold text-2xl italic tracking-tight text-gray-100;
+    @apply font-sans font-extrabold text-2xl italic tracking-tight text-gray-100 no-underline;
   }
   .logo-img {
     @apply h-10 w-auto opacity-85 transition-opacity duration-200;
@@ -105,7 +106,7 @@
 
   /* --- Nav Link (animated underline) --- */
   .nav-link {
-    @apply relative text-gray-400 text-sm font-medium
+    @apply relative text-gray-400 text-sm font-medium no-underline
            transition-colors duration-150 hover:text-gray-100;
   }
   .nav-link::after {
@@ -123,22 +124,22 @@
   /* --- Buttons --- */
   .btn-primary {
     @apply inline-flex items-center gap-1.5 bg-coral text-white px-5 py-2.5
-           rounded-lg font-medium text-sm transition-all duration-150
+           rounded-lg font-medium text-sm no-underline transition-all duration-150
            hover:bg-coral-dark hover:-translate-y-px hover:shadow-md;
   }
   .btn-outline {
     @apply inline-flex items-center gap-1.5 border border-gray-700
-           text-gray-300 px-5 py-2.5 rounded-lg font-medium text-sm
+           text-gray-300 px-5 py-2.5 rounded-lg font-medium text-sm no-underline
            transition-all duration-150 hover:border-coral hover:text-coral;
   }
   .btn-ghost {
     @apply inline-flex items-center gap-1.5 bg-transparent text-coral
-           border border-coral px-5 py-2.5 rounded-lg font-medium text-sm
+           border border-coral px-5 py-2.5 rounded-lg font-medium text-sm no-underline
            transition-all duration-150 hover:bg-coral/10 hover:text-coral-light;
   }
   .btn-github {
     @apply inline-flex items-center gap-1.5 bg-gray-900 text-gray-300
-           border border-gray-800 px-5 py-2.5 rounded-lg font-medium text-sm
+           border border-gray-800 px-5 py-2.5 rounded-lg font-medium text-sm no-underline
            transition-all duration-150 hover:border-coral hover:text-coral;
   }
 
@@ -190,7 +191,7 @@
     @apply text-lg mb-1;
   }
   .card__title a {
-    @apply text-gray-100 hover:text-coral;
+    @apply text-gray-100 no-underline hover:text-coral;
   }
   .card__subtitle {
     @apply text-sm text-gray-400 mb-2;
@@ -246,10 +247,10 @@
     @apply text-sm text-gray-400 mt-0.5;
   }
   .row-card__meta {
-    @apply text-xs text-gray-500 mt-1 flex items-center gap-1;
+    @apply text-xs text-gray-400 mt-1 flex items-center gap-1;
   }
   .row-card__arrow {
-    @apply text-gray-500 flex-shrink-0 mt-1 transition-colors;
+    @apply text-gray-400 flex-shrink-0 mt-1 transition-colors;
     width: 0.9em;
     height: 0.9em;
     stroke-width: 2;
@@ -266,7 +267,7 @@
            hover:border-gray-700;
   }
   .article-card__meta {
-    @apply flex items-center gap-3 text-xs text-gray-500 mb-3;
+    @apply flex items-center gap-3 text-xs text-gray-400 mb-3;
   }
   .article-card__date {
     @apply flex items-center gap-1;
@@ -364,7 +365,7 @@
            overflow-x-auto leading-loose;
   }
   .hero__code-preview .prompt { @apply text-coral; }
-  .hero__code-preview .comment { color: #6a737d; }
+  .hero__code-preview .comment { color: #8b949e; }
   .hero__code-preview .output { color: #7ee787; }
 
   /* --- Section --- */
@@ -803,7 +804,7 @@
 .token.comment,
 .token.prolog,
 .token.doctype,
-.token.cdata { color: #6a737d; font-style: italic; }
+.token.cdata { color: #8b949e; font-style: italic; }
 .token.punctuation { color: #e6edf3; }
 .token.property, .token.tag, .token.boolean, .token.number,
 .token.constant, .token.symbol, .token.deleted { color: #ff7b72; }

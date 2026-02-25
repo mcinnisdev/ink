@@ -6,6 +6,17 @@
    Base Layer — CSS custom properties for CLI component compatibility
    ========================================================================== */
 @layer base {
+  a {
+    @apply text-blue-600 underline underline-offset-2;
+    text-decoration-color: rgba(37, 99, 235, 0.4);
+    transition: color 200ms cubic-bezier(0.4, 0, 0.2, 1),
+                text-decoration-color 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  a:hover {
+    @apply text-blue-700;
+    text-decoration-color: currentColor;
+  }
+
   :root {
     /* ---- Brand Colors (swap these to theme) ---- */
     --color-primary: #2563eb;
@@ -114,7 +125,7 @@
   .site-header__logo {
     font-family: var(--font-heading);
     font-size: var(--text-xl);
-    @apply font-bold no-underline;
+    @apply font-bold !no-underline;
     color: var(--color-dark);
   }
   .site-header__logo:hover { color: var(--color-primary); }
@@ -126,7 +137,7 @@
   }
   .main-nav__link {
     font-size: var(--text-base);
-    @apply font-medium;
+    @apply font-medium no-underline;
     color: var(--color-secondary);
     transition: color var(--duration) var(--ease);
   }
@@ -149,7 +160,7 @@
   }
   .has-dropdown:hover .dropdown { @apply block; }
   .dropdown__link {
-    @apply block;
+    @apply block no-underline;
     padding: var(--space-sm) var(--space-md);
     font-size: var(--text-sm);
     color: var(--color-text);
@@ -234,7 +245,7 @@
 
   /* --- Buttons --- */
   .btn {
-    @apply inline-flex items-center font-semibold leading-none border-none cursor-pointer no-underline;
+    @apply inline-flex items-center font-semibold leading-none border-none cursor-pointer !no-underline;
     gap: var(--space-sm);
     padding: 0.75rem 1.5rem;
     font-family: var(--font-body);
@@ -286,7 +297,7 @@
     font-size: var(--text-lg);
     margin-bottom: var(--space-xs);
   }
-  .card__title a { color: var(--color-dark); }
+  .card__title a { color: var(--color-dark); text-decoration: none; }
   .card__title a:hover { color: var(--color-primary); }
   .card__subtitle {
     font-size: var(--text-sm);
@@ -450,6 +461,7 @@
   .site-footer a {
     color: rgba(255, 255, 255, 0.85);
     font-size: var(--text-sm);
+    text-decoration: none;
   }
   .site-footer a:hover { color: var(--color-text-inverse); }
   .site-footer__nav {
@@ -486,7 +498,7 @@
     margin-right: var(--space-xs);
     color: var(--color-text-muted);
   }
-  .breadcrumbs__item a { color: var(--color-text-muted); }
+  .breadcrumbs__item a { color: var(--color-text-muted); text-decoration: none; }
   .breadcrumbs__item a:hover { color: var(--color-primary); }
   .breadcrumbs__item [aria-current="page"] { color: var(--color-text); @apply font-medium; }
 
@@ -582,7 +594,7 @@
   }
   .pagination__link,
   .pagination__current {
-    @apply inline-flex items-center justify-center no-underline font-medium;
+    @apply inline-flex items-center justify-center !no-underline font-medium;
     min-width: 36px;
     height: 36px;
     padding: 0 var(--space-sm);
@@ -625,7 +637,7 @@
     margin-top: var(--space-xl);
   }
   .post-nav__link {
-    @apply block no-underline;
+    @apply block !no-underline;
     padding: var(--space-md);
     border: 1px solid var(--color-border);
     border-radius: var(--radius);
