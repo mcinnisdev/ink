@@ -1,0 +1,31 @@
+---
+layout: base.njk
+og_type: article
+---
+<article class="section">
+  <div class="container container--narrow">
+    <header class="mb-10 pb-8 border-b border-gray-800">
+      {% if icon %}
+      <div class="w-12 h-12 rounded-xl bg-coral/10 flex items-center justify-center mb-4">
+        <i data-lucide="{{ icon }}" class="text-coral" style="width:24px;height:24px;"></i>
+      </div>
+      {% endif %}
+      <h1 class="text-3xl md:text-4xl font-bold tracking-tight text-gray-100 mb-3">{{ title }}</h1>
+      {% if replaces %}
+      <p class="text-sm text-gray-500 mb-3">Replaces: {{ replaces }}</p>
+      {% endif %}
+      {% if excerpt %}
+      <p class="text-lg text-gray-400">{{ excerpt }}</p>
+      {% endif %}
+    </header>
+    <div class="detail__content prose max-w-none">
+      {{ content | safe }}
+    </div>
+    <footer class="mt-12 pt-8 border-t border-gray-800">
+      <a href="/integrations/" class="text-coral hover:text-coral-dark inline-flex items-center gap-2">
+        <i data-lucide="arrow-left" style="width:16px;height:16px;"></i>
+        Back to all integrations
+      </a>
+    </footer>
+  </div>
+</article>

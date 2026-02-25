@@ -1,0 +1,80 @@
+---
+layout: base.njk
+---
+<section class="section">
+  <div class="container container--narrow">
+
+    {# Header #}
+    <div class="mb-10">
+      <h1 class="text-3xl font-bold tracking-tight text-gray-100 mb-2">
+        <i data-lucide="plug" class="icon-heading"></i> {{ title }}
+      </h1>
+      {% if excerpt %}
+      <p class="text-gray-400 mb-4">{{ excerpt }}</p>
+      {% endif %}
+      {% if content | trim %}
+      <div class="text-gray-300 leading-relaxed mb-8">
+        {{ content | safe }}
+      </div>
+      {% endif %}
+    </div>
+
+    {# Quick Reference Table #}
+    {% if quick_reference %}
+    <div class="mb-12">
+      <p class="section-label">
+        <i data-lucide="zap" class="icon-xs"></i> Essential Stack
+      </p>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm text-left border-collapse">
+          <thead>
+            <tr class="border-b border-gray-700">
+              <th class="py-3 pr-4 text-gray-400 font-medium">Need</th>
+              <th class="py-3 pr-4 text-gray-400 font-medium">Tool</th>
+              <th class="py-3 pr-4 text-gray-400 font-medium">Setup</th>
+              <th class="py-3 text-gray-400 font-medium">Cost</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in quick_reference %}
+            <tr class="border-b border-gray-800">
+              <td class="py-3 pr-4 text-gray-100 font-medium">{{ row.need }}</td>
+              <td class="py-3 pr-4 text-gray-300">{{ row.tool }}</td>
+              <td class="py-3 pr-4 text-gray-400">{{ row.setup }}</td>
+              <td class="py-3 text-gray-400">{{ row.cost }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% endif %}
+
+    {# Integration Categories #}
+    {%- set items = collections.integrations -%}
+    {% if items.length %}
+    <div class="mb-10">
+      <p class="section-label">
+        <i data-lucide="layers" class="icon-xs"></i> Categories
+      </p>
+      <div class="row-card-group">
+        {% for item in items %}
+        <a href="{{ item.url }}" class="row-card group">
+          <div class="row-card__icon">
+            <i data-lucide="{{ item.data.icon or 'plug' }}"></i>
+          </div>
+          <div class="row-card__body">
+            <div class="row-card__title">{{ item.data.title }}</div>
+            {% if item.data.excerpt %}
+            <div class="row-card__desc">{{ item.data.excerpt }}</div>
+            {% endif %}
+          </div>
+          <i data-lucide="arrow-right" class="row-card__arrow"></i>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+</section>

@@ -1,6 +1,7 @@
 {
   "main": [
     { "label": "Features", "url": "/features/" },
+    { "label": "Integrations", "url": "/integrations/" },
     { "label": "Docs", "url": "/docs/" },
     { "label": "Blog", "url": "/blog/" },
     { "label": "About", "url": "/about/" },

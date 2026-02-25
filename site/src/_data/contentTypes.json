@@ -14,5 +14,9 @@
   "faqs": {
     "glob": "content/faq/*.md",
     "sort": "order"
+  },
+  "integrations": {
+    "glob": "content/integrations/*.md",
+    "sort": "order"
   }
 }
