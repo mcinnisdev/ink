@@ -6,6 +6,10 @@ import { checkForUpdates } from "./services/updates";
 
 let mainWindow: BrowserWindow | null = null;
 
+const iconPath = app.isPackaged
+  ? path.join(process.resourcesPath, "icon.ico")
+  : path.join(__dirname, "../../resources/icon.ico");
+
 function createWindow(): void {
   mainWindow = new BrowserWindow({
     width: 1280,
@@ -13,7 +17,7 @@ function createWindow(): void {
     minWidth: 900,
     minHeight: 600,
     title: "Ink",
-    icon: path.join(__dirname, "../../resources/icon.ico"),
+    icon: iconPath,
     titleBarStyle: "hidden",
     titleBarOverlay: {
       color: "#0f172a",
