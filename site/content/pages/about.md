@@ -9,7 +9,7 @@ published: true
 excerpt: "The story behind Ink, and how it's built."
 ---
 
-Ink is built and maintained by **Nick McInnis**, a developer based in Colorado. You can find more of my work at [mcinnis.dev](https://mcinnis.dev).
+Ink is built and maintained by **Nick McInnis**, a developer based in Michigan. You can find more of my work at [mcinnis.dev](https://mcinnis.dev).
 
 ## Why I'm Building This
 
