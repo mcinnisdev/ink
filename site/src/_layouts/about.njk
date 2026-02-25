@@ -1,0 +1,23 @@
+---
+layout: base.njk
+---
+<section class="section">
+  <div class="container container--narrow">
+
+    {# Header #}
+    <div class="mb-10">
+      <h1 class="text-3xl font-bold tracking-tight text-gray-100 mb-2">
+        <i data-lucide="user" class="icon-heading"></i> {{ title }}
+      </h1>
+      {% if excerpt %}
+      <p class="text-gray-400 mb-4">{{ excerpt }}</p>
+      {% endif %}
+    </div>
+
+    {# Content #}
+    <div class="detail__content prose max-w-none">
+      {{ content | safe }}
+    </div>
+
+  </div>
+</section>

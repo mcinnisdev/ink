@@ -3,9 +3,10 @@ title: "About"
 seo_title: "About — Ink CMS"
 meta_description: "Ink is built by Nick McInnis as a personal tool for spinning up fast, optimized, scalable websites. Built openly with AI assistance."
 slug: "about"
-layout: "page.njk"
+layout: "about.njk"
 permalink: "/about/"
 published: true
+excerpt: "The story behind Ink, and how it's built."
 ---
 
 Ink is built and maintained by **Nick McInnis**, a developer based in Colorado. You can find more of my work at [mcinnis.dev](https://mcinnis.dev).
