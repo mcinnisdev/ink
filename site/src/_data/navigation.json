@@ -5,7 +5,7 @@
     { "label": "Docs", "url": "/docs/" },
     { "label": "Blog", "url": "/blog/" },
     { "label": "About", "url": "/about/" },
-    { "label": "Download", "url": "https://github.com/mcinnisdev/ink/releases/tag/v0.1.0-alpha.1" },
+    { "label": "Download", "url": "/download/" },
     { "label": "GitHub", "url": "https://github.com/mcinnisdev/ink" }
   ]
 }

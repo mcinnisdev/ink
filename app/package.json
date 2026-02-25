@@ -1,6 +1,6 @@
 {
   "name": "ink-app",
-  "version": "0.1.0-alpha.1",
+  "version": "1.0.0",
   "private": true,
   "description": "Desktop application for Ink — visual editor with live preview and Git publishing.",
   "author": "mcinnisdev",
@@ -15,6 +15,7 @@
     "preview": "electron-vite preview",
     "dist": "electron-vite build && electron-builder --publish never",
     "dist:win": "electron-vite build && electron-builder --win --publish never",
+    "dist:win:publish": "electron-vite build && electron-builder --win --publish always",
     "dist:mac": "electron-vite build && electron-builder --mac --publish never",
     "dist:linux": "electron-vite build && electron-builder --linux --publish never"
   },
@@ -25,6 +26,13 @@
     "directories": {
       "output": "release"
     },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "mcinnisdev",
+        "repo": "ink"
+      }
+    ],
     "extraResources": [
       {
         "from": "resources/icon.ico",
@@ -87,6 +95,8 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",
+    "electron-log": "^5.0.0",
+    "electron-updater": "^6.0.0",
     "@codemirror/commands": "^6.10.2",
     "@codemirror/lang-markdown": "^6.5.0",
     "@codemirror/language": "^6.12.1",

@@ -60,7 +60,7 @@ export default function App() {
     const cleanup = window.ink.updates.onUpdateAvailable((info) => {
       useNotificationStore
         .getState()
-        .addToast("info", `Ink v${info.latestVersion} is available! Go to Settings to download.`);
+        .addToast("info", `Ink v${info.latestVersion} is available! Go to Settings to update.`);
     });
     return cleanup;
   }, []);

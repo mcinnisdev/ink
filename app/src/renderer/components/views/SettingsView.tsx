@@ -69,7 +69,25 @@ interface UpdateInfo {
 function UpdateSection() {
   const [checking, setChecking] = useState(false);
   const [update, setUpdate] = useState<UpdateInfo | null>(null);
+  const [downloading, setDownloading] = useState(false);
+  const [downloadPercent, setDownloadPercent] = useState(0);
+  const [downloaded, setDownloaded] = useState(false);
   const addToast = useNotificationStore((s) => s.addToast);
+
+  useEffect(() => {
+    const cleanupProgress = window.ink.updates.onDownloadProgress((progress) => {
+      setDownloadPercent(Math.round(progress.percent));
+    });
+    const cleanupDownloaded = window.ink.updates.onUpdateDownloaded(() => {
+      setDownloading(false);
+      setDownloaded(true);
+      addToast("success", "Update downloaded! Restart to install.");
+    });
+    return () => {
+      cleanupProgress();
+      cleanupDownloaded();
+    };
+  }, [addToast]);
 
   const handleCheck = async () => {
     setChecking(true);
@@ -86,6 +104,16 @@ function UpdateSection() {
     }
   };
 
+  const handleDownload = () => {
+    setDownloading(true);
+    setDownloadPercent(0);
+    window.ink.updates.download();
+  };
+
+  const handleInstall = () => {
+    window.ink.updates.install();
+  };
+
   return (
     <section>
       <h3 className="text-sm font-semibold text-ink-300 mb-3">
@@ -96,12 +124,12 @@ function UpdateSection() {
           <div>
             <p className="text-sm text-ink-200">Ink</p>
             <p className="text-xs text-ink-500">
-              v{update?.currentVersion ?? "0.1.0-alpha.1"}
+              v{update?.currentVersion ?? "1.0.0"}
             </p>
           </div>
           <button
             onClick={handleCheck}
-            disabled={checking}
+            disabled={checking || downloading}
             className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium bg-ink-800 text-ink-200 rounded-lg hover:bg-ink-700 disabled:opacity-50 transition-colors"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${checking ? "animate-spin" : ""}`} />
@@ -119,14 +147,39 @@ function UpdateSection() {
                 {update.releaseNotes}
               </p>
             )}
-            <button
-              onClick={() => window.ink.shell.openExternal(update.releaseUrl)}
-              className="flex items-center gap-1.5 text-xs font-medium text-accent hover:text-accent/80 transition-colors"
-            >
-              <Download className="w-3.5 h-3.5" />
-              Download Update
-              <ExternalLink className="w-3 h-3" />
-            </button>
+
+            {downloading && (
+              <div className="mb-2">
+                <div className="flex items-center justify-between text-xs text-ink-400 mb-1">
+                  <span>Downloading...</span>
+                  <span>{downloadPercent}%</span>
+                </div>
+                <div className="w-full h-1.5 bg-ink-800 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-accent rounded-full transition-all duration-300"
+                    style={{ width: `${downloadPercent}%` }}
+                  />
+                </div>
+              </div>
+            )}
+
+            {downloaded ? (
+              <button
+                onClick={handleInstall}
+                className="flex items-center gap-1.5 text-xs font-medium bg-accent hover:bg-accent/80 text-white px-3 py-1.5 rounded-lg transition-colors"
+              >
+                <RefreshCw className="w-3.5 h-3.5" />
+                Restart to Update
+              </button>
+            ) : !downloading ? (
+              <button
+                onClick={handleDownload}
+                className="flex items-center gap-1.5 text-xs font-medium text-accent hover:text-accent/80 transition-colors"
+              >
+                <Download className="w-3.5 h-3.5" />
+                Download Update
+              </button>
+            ) : null}
           </div>
         )}
       </div>

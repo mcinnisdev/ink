@@ -67,7 +67,7 @@ import {
   detectCssFramework,
 } from "./services/cli";
 import { assertWithinProject } from "./services/security";
-import { checkForUpdates } from "./services/updates";
+import { checkForUpdates, downloadUpdate, installUpdate } from "./services/updates";
 
 // Track the active project path for path validation
 let activeProjectPath: string | null = null;
@@ -419,6 +419,14 @@ export function registerIpcHandlers(): void {
 
   // --- Updates ---
   ipcMain.handle("updates:check", async () => {
-    return checkForUpdates(app.getVersion());
+    return checkForUpdates();
+  });
+
+  ipcMain.handle("updates:download", async () => {
+    downloadUpdate();
+  });
+
+  ipcMain.handle("updates:install", async () => {
+    installUpdate();
   });
 }

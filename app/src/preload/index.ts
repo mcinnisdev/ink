@@ -227,7 +227,17 @@ export interface InkAPI {
   };
   updates: {
     check: () => Promise<UpdateInfo>;
+    download: () => Promise<void>;
+    install: () => Promise<void>;
     onUpdateAvailable: (callback: (info: UpdateInfo) => void) => () => void;
+    onDownloadProgress: (
+      callback: (progress: {
+        percent: number;
+        transferred: number;
+        total: number;
+      }) => void
+    ) => () => void;
+    onUpdateDownloaded: (callback: () => void) => () => void;
   };
 }
 
@@ -356,11 +366,30 @@ const api: InkAPI = {
   },
   updates: {
     check: () => ipcRenderer.invoke("updates:check"),
+    download: () => ipcRenderer.invoke("updates:download"),
+    install: () => ipcRenderer.invoke("updates:install"),
     onUpdateAvailable: (callback) => {
       const handler = (_event: unknown, data: UpdateInfo) => callback(data);
       ipcRenderer.on("updates:available", handler);
       return () => {
         ipcRenderer.removeListener("updates:available", handler);
+      };
+    },
+    onDownloadProgress: (callback) => {
+      const handler = (
+        _event: unknown,
+        data: { percent: number; transferred: number; total: number }
+      ) => callback(data);
+      ipcRenderer.on("updates:downloadProgress", handler);
+      return () => {
+        ipcRenderer.removeListener("updates:downloadProgress", handler);
+      };
+    },
+    onUpdateDownloaded: (callback) => {
+      const handler = () => callback();
+      ipcRenderer.on("updates:downloaded", handler);
+      return () => {
+        ipcRenderer.removeListener("updates:downloaded", handler);
       };
     },
   },
