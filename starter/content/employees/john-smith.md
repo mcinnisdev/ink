@@ -2,7 +2,7 @@
 title: "John Smith"
 slug: "john-smith"
 role: "Lead Developer"
-photo: ""
+photo: "/media/employees/employee-placeholder-2.png"
 order: 2
 published: true
 permalink: "/team/john-smith/"

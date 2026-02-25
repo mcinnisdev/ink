@@ -8,7 +8,7 @@
 <meta property="og:url" content="{{ site.url }}{{ page.url }}">
 <meta property="og:site_name" content="{{ site.name }}">
 {% if og_image or featured_image %}
-<meta property="og:image" content="{{ site.url }}{{ og_image or featured_image }}">
+<meta property="og:image" content="{{ site.url }}{{ (og_image or featured_image) | imageUrl }}">
 {% endif %}
 
 {# Twitter #}
@@ -16,7 +16,7 @@
 <meta name="twitter:title" content="{{ seo_title or title }}">
 <meta name="twitter:description" content="{{ meta_description or excerpt or site.description }}">
 {% if og_image or featured_image %}
-<meta name="twitter:image" content="{{ site.url }}{{ og_image or featured_image }}">
+<meta name="twitter:image" content="{{ site.url }}{{ (og_image or featured_image) | imageUrl }}">
 {% endif %}
 
 {# Canonical + RSS #}

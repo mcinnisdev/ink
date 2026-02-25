@@ -5,6 +5,8 @@
     src="{{ item.data.featured_image or item.data.photo }}"
     alt="{{ item.data.title }}"
     loading="lazy"
+    eleventy:widths="400,800"
+    sizes="(max-width: 600px) 100vw, 400px"
   >
   {% endif %}
   <div class="card__body">

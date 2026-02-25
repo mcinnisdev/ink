@@ -2,7 +2,7 @@
 title: "Web Design"
 slug: "web-design"
 excerpt: "Modern, responsive websites built for speed and clarity."
-featured_image: ""
+featured_image: "/media/services/service-placeholder-1.png"
 order: 1
 published: true
 permalink: "/services/web-design/"

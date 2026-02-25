@@ -3,7 +3,7 @@
   {% for img in images %}
   <figure class="gallery__item">
     <a href="{{ img.src }}" class="gallery__link" data-gallery="{{ id or 'gallery' }}">
-      <img class="gallery__img" src="{{ img.src }}" alt="{{ img.alt or '' }}" loading="lazy">
+      <img class="gallery__img" src="{{ img.src }}" alt="{{ img.alt or '' }}" loading="lazy" sizes="(max-width: 600px) 100vw, (max-width: 1200px) 50vw, 1200px">
     </a>
     {% if img.caption %}
     <figcaption class="gallery__caption">{{ img.caption }}</figcaption>

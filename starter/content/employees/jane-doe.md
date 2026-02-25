@@ -2,7 +2,7 @@
 title: "Jane Doe"
 slug: "jane-doe"
 role: "Creative Director"
-photo: ""
+photo: "/media/employees/employee-placeholder-1.png"
 order: 1
 published: true
 permalink: "/team/jane-doe/"

@@ -13,7 +13,7 @@ og_type: profile
   <div class="container container--narrow">
     {% if photo %}
     <div class="employee-profile">
-      <img class="employee-profile__photo" src="{{ photo }}" alt="{{ title }}" loading="lazy">
+      <img class="employee-profile__photo" src="{{ photo }}" alt="{{ title }}" loading="lazy" eleventy:widths="200,400" sizes="200px">
       <div>
         {{ content | safe }}
       </div>

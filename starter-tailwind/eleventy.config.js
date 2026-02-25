@@ -1,4 +1,6 @@
 import fs from "fs";
+import path from "path";
+import Image, { eleventyImageTransformPlugin } from "@11ty/eleventy-img";
 
 export default function (eleventyConfig) {
   // --- Passthrough copies ---
@@ -86,6 +88,53 @@ export default function (eleventyConfig) {
     if (!url || !base) return url || "";
     const baseUrl = base.replace(/\/$/, "");
     return url.startsWith("/") ? baseUrl + url : url;
+  });
+
+  // --- Image optimization ---
+  // Transform plugin: automatically converts <img> tags to <picture> with
+  // WebP + JPEG at responsive widths. Use eleventy:widths attribute on <img>
+  // to override default widths per-image.
+  eleventyConfig.addPlugin(eleventyImageTransformPlugin, {
+    extensions: "html",
+    formats: ["webp", "jpeg"],
+    widths: [400, 800, 1200],
+    defaultAttributes: {
+      loading: "lazy",
+      decoding: "async",
+    },
+    filenameFormat: (id, src, width, format) => {
+      const name = path.basename(src, path.extname(src));
+      return `${name}-${width}w.${format}`;
+    },
+  });
+
+  // imageUrl filter: returns the URL of the largest optimized image.
+  // Used for hero background-image and og:image meta tags.
+  eleventyConfig.addAsyncFilter("imageUrl", async function (src) {
+    if (!src) return "";
+    if (src.endsWith(".svg") || src.endsWith(".ico") || src.startsWith("http")) return src;
+
+    // Resolve absolute paths (starting with /) relative to project root
+    const filePath = src.startsWith("/") ? "." + src : src;
+
+    try {
+      const metadata = await Image(filePath, {
+        widths: [800, 1200, 1920],
+        formats: ["jpeg"],
+        outputDir: "_site/img/",
+        urlPath: "/img/",
+        filenameFormat: (id, src, width, format) => {
+          const name = path.basename(src, path.extname(src));
+          return `${name}-${width}w.${format}`;
+        },
+      });
+
+      const jpeg = metadata.jpeg;
+      return jpeg[jpeg.length - 1].url;
+    } catch (e) {
+      console.warn(`[Ink] Image URL optimization failed for "${src}":`, e.message);
+      return src;
+    }
   });
 
   // --- Build-time validation ---

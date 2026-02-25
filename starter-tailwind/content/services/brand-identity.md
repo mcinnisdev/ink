@@ -2,7 +2,7 @@
 title: "Brand Identity"
 slug: "brand-identity"
 excerpt: "Logos, color systems, and brand guides that tell your story."
-featured_image: ""
+featured_image: "/media/services/service-placeholder-2.png"
 order: 2
 published: true
 permalink: "/services/brand-identity/"
