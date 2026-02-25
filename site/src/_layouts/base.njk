@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   {% include "partials/seo-head.njk" %}
   <link rel="icon" href="/media/site/ink-logo.png" type="image/png">
-  <link rel="stylesheet" href="/src/css/style.css">
+  <link rel="stylesheet" href="/src/css/style.css?v={{ build.hash }}">
   {% if site.gtm_id %}
   <!-- Google Tag Manager -->
   <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -33,7 +33,7 @@
 
   {% include "partials/footer.njk" %}
 
-  <script src="/src/js/main.js" defer></script>
+  <script src="/src/js/main.js?v={{ build.hash }}" defer></script>
   <script src="https://unpkg.com/lucide@0.474.0/dist/umd/lucide.min.js"></script>
   <script>lucide.createIcons();</script>
 </body>
