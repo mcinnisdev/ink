@@ -1,9 +1,26 @@
 import fs from "fs";
+import path from "path";
+import { eleventyImageTransformPlugin } from "@11ty/eleventy-img";
 import syntaxHighlight from "@11ty/eleventy-plugin-syntaxhighlight";
 
 export default function (eleventyConfig) {
   // --- Plugins ---
   eleventyConfig.addPlugin(syntaxHighlight);
+
+  // --- Image optimization ---
+  eleventyConfig.addPlugin(eleventyImageTransformPlugin, {
+    extensions: "html",
+    formats: ["webp", "jpeg"],
+    widths: [200, 400, 800, 1200],
+    defaultAttributes: {
+      loading: "lazy",
+      decoding: "async",
+    },
+    filenameFormat: (id, src, width, format) => {
+      const name = path.basename(src, path.extname(src));
+      return `${name}-${width}w.${format}`;
+    },
+  });
 
   // --- Passthrough copies ---
   eleventyConfig.addPassthroughCopy("media");
