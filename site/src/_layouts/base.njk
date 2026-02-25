@@ -35,7 +35,16 @@
   {% include "partials/footer.njk" %}
 
   <script src="/src/js/main.js?v={{ build.hash }}" defer></script>
-  <script src="/src/js/lucide.min.js" defer></script>
-  <script>document.addEventListener('DOMContentLoaded', function() { lucide.createIcons(); });</script>
+  <script>
+    // Load Lucide icons after first paint to avoid blocking LCP
+    requestAnimationFrame(function() {
+      requestAnimationFrame(function() {
+        var s = document.createElement('script');
+        s.src = '/src/js/lucide.min.js';
+        s.onload = function() { lucide.createIcons(); };
+        document.head.appendChild(s);
+      });
+    });
+  </script>
 </body>
 </html>
