@@ -1,11 +1,10 @@
 import { useEffect } from "react";
 import { useProjectStore } from "../../stores/project";
 import { useEditorStore } from "../../stores/editor";
-import { useUIStore } from "../../stores/ui";
 import { useEleventyStore } from "../../stores/eleventy";
 import FileExplorer from "./FileExplorer";
+import ContentActions from "./ContentActions";
 import EditorPanel from "./EditorPanel";
-import PreviewPane from "./PreviewPane";
 
 export default function ContentView() {
   const projectPath = useProjectStore((s) => s.current?.path);
@@ -14,10 +13,6 @@ export default function ContentView() {
   const closeAllTabs = useEditorStore((s) => s.closeAllTabs);
   const saveFile = useEditorStore((s) => s.saveFile);
   const activeTabPath = useEditorStore((s) => s.activeTabPath);
-  const previewVisible = useUIStore((s) => s.previewVisible);
-  const eleventyStatus = useEleventyStore((s) => s.status);
-  const startEleventy = useEleventyStore((s) => s.start);
-  const stopEleventy = useEleventyStore((s) => s.stop);
   const setEleventyStatus = useEleventyStore((s) => s.setStatus);
 
   // Load file tree and start watcher when project opens
@@ -51,16 +46,6 @@ export default function ContentView() {
     return unsub;
   }, [setEleventyStatus]);
 
-  // Start/stop Eleventy when preview toggled
-  useEffect(() => {
-    if (previewVisible && projectPath && eleventyStatus === "stopped") {
-      startEleventy(projectPath);
-    }
-    if (!previewVisible && eleventyStatus !== "stopped") {
-      stopEleventy();
-    }
-  }, [previewVisible, projectPath]);
-
   // Stop Eleventy when project closes
   useEffect(() => {
     return () => {
@@ -77,12 +62,6 @@ export default function ContentView() {
         e.preventDefault();
         if (activeTabPath) saveFile(activeTabPath);
       }
-      if ((e.ctrlKey || e.metaKey) && e.key === "w") {
-        e.preventDefault();
-        if (activeTabPath) {
-          useEditorStore.getState().closeTab(activeTabPath);
-        }
-      }
     };
 
     window.addEventListener("keydown", handleKeyDown);
@@ -91,9 +70,11 @@ export default function ContentView() {
 
   return (
     <div className="flex h-full">
-      <FileExplorer />
+      <div className="flex flex-col flex-shrink-0">
+        <ContentActions />
+        <FileExplorer />
+      </div>
       <EditorPanel />
-      {previewVisible && <PreviewPane />}
     </div>
   );
 }

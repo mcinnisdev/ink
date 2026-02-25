@@ -46,7 +46,8 @@ export async function copyToMedia(
   fileName: string
 ): Promise<string> {
   fs.mkdirSync(destDir, { recursive: true });
-  const destPath = path.join(destDir, fileName);
+  const safeName = path.basename(fileName);
+  const destPath = path.join(destDir, safeName);
   fs.copyFileSync(sourcePath, destPath);
   return destPath;
 }

@@ -2,6 +2,9 @@ import { useState, useEffect, useCallback } from "react";
 import { Save, Plus, Trash2, Sparkles } from "lucide-react";
 import { useProjectStore } from "../../stores/project";
 import { useAIStore, type AIConfig } from "../../stores/ai";
+import { useNotificationStore } from "../../stores/notifications";
+import ContentTypeManager from "../settings/ContentTypeManager";
+import ComponentManager from "../settings/ComponentManager";
 
 interface SiteConfig {
   name: string;
@@ -49,7 +52,7 @@ function TextInput({
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full bg-ink-900 border border-ink-600 rounded-lg px-3 py-2 text-sm text-white focus:border-accent focus:outline-none"
+        className="w-full bg-ink-900 border border-ink-600 rounded-lg px-3 py-2 text-sm text-ink-50 focus:border-accent focus:outline-none"
       />
     </div>
   );
@@ -57,6 +60,7 @@ function TextInput({
 
 export default function SettingsView() {
   const projectPath = useProjectStore((s) => s.current?.path);
+  const addToast = useNotificationStore((s) => s.addToast);
   const [site, setSite] = useState<SiteConfig>(defaultSite);
   const [nav, setNav] = useState<NavConfig>({ main: [] });
   const [dirty, setDirty] = useState(false);
@@ -123,6 +127,9 @@ export default function SettingsView() {
         JSON.stringify(nav, null, 2)
       );
       setDirty(false);
+      addToast("success", "Settings saved");
+    } catch {
+      addToast("error", "Failed to save settings");
     } finally {
       setSaving(false);
     }
@@ -141,7 +148,7 @@ export default function SettingsView() {
       {/* Header */}
       <div className="flex items-center justify-between px-6 py-4 border-b border-ink-700">
         <div>
-          <h2 className="text-lg font-semibold text-white">Settings</h2>
+          <h2 className="text-lg font-semibold text-ink-50">Settings</h2>
           <p className="text-xs text-ink-500 mt-0.5">Site configuration</p>
         </div>
         <button
@@ -190,7 +197,7 @@ export default function SettingsView() {
                     updateSite({ description: e.target.value });
                   }}
                   rows={2}
-                  className="w-full bg-ink-900 border border-ink-600 rounded-lg px-3 py-2 text-sm text-white focus:border-accent focus:outline-none resize-none"
+                  className="w-full bg-ink-900 border border-ink-600 rounded-lg px-3 py-2 text-sm text-ink-50 focus:border-accent focus:outline-none resize-none"
                 />
               </div>
             </div>
@@ -283,6 +290,16 @@ export default function SettingsView() {
             </div>
           </section>
 
+          {/* Content Types */}
+          <section>
+            <ContentTypeManager />
+          </section>
+
+          {/* Components */}
+          <section>
+            <ComponentManager />
+          </section>
+
           {/* AI Assistant */}
           <section>
             <h3 className="text-sm font-semibold text-ink-300 mb-3 flex items-center gap-2">
@@ -308,7 +325,7 @@ export default function SettingsView() {
                     }));
                     setAiDirty(true);
                   }}
-                  className="w-full bg-ink-900 border border-ink-600 rounded-lg px-3 py-2 text-sm text-white focus:border-accent focus:outline-none"
+                  className="w-full bg-ink-900 border border-ink-600 rounded-lg px-3 py-2 text-sm text-ink-50 focus:border-accent focus:outline-none"
                 >
                   <option value="anthropic">Anthropic (Claude)</option>
                   <option value="openai">OpenAI (GPT)</option>
@@ -329,7 +346,7 @@ export default function SettingsView() {
                   placeholder={
                     localAI.provider === "anthropic" ? "sk-ant-..." : "sk-..."
                   }
-                  className="w-full bg-ink-900 border border-ink-600 rounded-lg px-3 py-2 text-sm text-white focus:border-accent focus:outline-none"
+                  className="w-full bg-ink-900 border border-ink-600 rounded-lg px-3 py-2 text-sm text-ink-50 focus:border-accent focus:outline-none"
                 />
               </div>
 
@@ -343,7 +360,7 @@ export default function SettingsView() {
                     setLocalAI((prev) => ({ ...prev, model: e.target.value }));
                     setAiDirty(true);
                   }}
-                  className="w-full bg-ink-900 border border-ink-600 rounded-lg px-3 py-2 text-sm text-white focus:border-accent focus:outline-none"
+                  className="w-full bg-ink-900 border border-ink-600 rounded-lg px-3 py-2 text-sm text-ink-50 focus:border-accent focus:outline-none"
                 >
                   {localAI.provider === "anthropic" ? (
                     <>
@@ -416,7 +433,7 @@ export default function SettingsView() {
                       setNav({ ...nav, main: updated });
                       setDirty(true);
                     }}
-                    className="flex-1 bg-ink-900 border border-ink-600 rounded-lg px-3 py-2 text-sm text-white focus:border-accent focus:outline-none"
+                    className="flex-1 bg-ink-900 border border-ink-600 rounded-lg px-3 py-2 text-sm text-ink-50 focus:border-accent focus:outline-none"
                   />
                   <input
                     type="text"
@@ -428,7 +445,7 @@ export default function SettingsView() {
                       setNav({ ...nav, main: updated });
                       setDirty(true);
                     }}
-                    className="flex-1 bg-ink-900 border border-ink-600 rounded-lg px-3 py-2 text-sm text-white focus:border-accent focus:outline-none"
+                    className="flex-1 bg-ink-900 border border-ink-600 rounded-lg px-3 py-2 text-sm text-ink-50 focus:border-accent focus:outline-none"
                   />
                   <button
                     onClick={() => {

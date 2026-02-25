@@ -1,4 +1,5 @@
 import { spawn, execSync, type ChildProcess } from "child_process";
+import net from "net";
 import path from "path";
 import fs from "fs";
 import { BrowserWindow } from "electron";
@@ -44,6 +45,36 @@ function killProcessTree(pid: number): void {
   }
 }
 
+/** Try to connect to a port. Resolves true if something is listening. */
+function isPortListening(p: number): Promise<boolean> {
+  return new Promise((resolve) => {
+    const socket = net.connect({ port: p, host: "127.0.0.1" }, () => {
+      socket.end();
+      resolve(true);
+    });
+    socket.on("error", () => resolve(false));
+    socket.setTimeout(800, () => {
+      socket.destroy();
+      resolve(false);
+    });
+  });
+}
+
+function markRunning(
+  detectedPort: number,
+  timeout: ReturnType<typeof setTimeout>,
+  pollTimer: ReturnType<typeof setInterval> | null,
+  resolve: (value: { port: number }) => void
+): void {
+  if (status !== "starting") return;
+  clearTimeout(timeout);
+  if (pollTimer) clearInterval(pollTimer);
+  port = detectedPort;
+  status = "running";
+  pushStatus({ status: "running", port: detectedPort });
+  resolve({ port: detectedPort });
+}
+
 export async function startServer(
   projPath: string,
   browserWindow: BrowserWindow
@@ -83,56 +114,104 @@ export async function startServer(
   status = "starting";
   pushStatus({ status: "starting" });
 
+  // Snapshot which ports are already listening so poll only detects NEW ones
+  const preExistingPorts = new Set<number>();
+  for (let p = 8080; p <= 8090; p++) {
+    if (await isPortListening(p)) {
+      preExistingPorts.add(p);
+    }
+  }
+
   return new Promise<{ port: number }>((resolve, reject) => {
     const proc = spawn("npx", ["@11ty/eleventy", "--serve", "--watch"], {
       cwd: projPath,
       shell: true,
       stdio: "pipe",
-      detached: process.platform !== "win32", // For POSIX process group killing
+      detached: process.platform !== "win32",
     });
 
     childProcess = proc;
+    let pollTimer: ReturnType<typeof setInterval> | null = null;
+    let stderrOutput = "";
 
     const timeout = setTimeout(() => {
       if (status === "starting") {
+        if (pollTimer) clearInterval(pollTimer);
         status = "error";
         pushStatus({
           status: "error",
-          error: "Eleventy server startup timed out (30s)",
+          error: "Eleventy server startup timed out (45s)",
         });
         reject(new Error("Startup timeout"));
       }
-    }, 30000);
+    }, 45000);
 
+    // Strategy 1: Parse port from stdout/stderr
     const handleOutput = (data: Buffer) => {
       const text = data.toString();
 
-      // Parse for server URL
-      const match = text.match(/Server at http:\/\/localhost:(\d+)/);
+      const match = text.match(/https?:\/\/localhost:(\d+)/);
       if (match && status === "starting") {
-        clearTimeout(timeout);
-        port = parseInt(match[1], 10);
-        status = "running";
-        pushStatus({ status: "running", port });
-        resolve({ port });
+        markRunning(parseInt(match[1], 10), timeout, pollTimer, resolve);
       }
     };
 
     proc.stdout?.on("data", handleOutput);
-    proc.stderr?.on("data", handleOutput);
+    proc.stderr?.on("data", (data: Buffer) => {
+      const text = data.toString();
+      stderrOutput += text;
+      handleOutput(data);
+    });
+
+    // Strategy 2: Poll ports as fallback (Windows often buffers stdout)
+    // Start polling after 3 seconds, check every 2 seconds
+    setTimeout(() => {
+      if (status !== "starting") return;
+
+      pollTimer = setInterval(async () => {
+        if (status !== "starting") {
+          if (pollTimer) clearInterval(pollTimer);
+          return;
+        }
+
+        // Check ports 8080-8090 (Eleventy default range), skip pre-existing
+        for (let p = 8080; p <= 8090; p++) {
+          if (preExistingPorts.has(p)) continue;
+          if (await isPortListening(p)) {
+            markRunning(p, timeout, pollTimer, resolve);
+            return;
+          }
+        }
+      }, 2000);
+    }, 3000);
 
     proc.on("close", (code) => {
       clearTimeout(timeout);
+      if (pollTimer) clearInterval(pollTimer);
       if (status === "running" || status === "starting") {
-        status = "stopped";
-        port = null;
-        childProcess = null;
-        pushStatus({ status: "stopped" });
+        if (status === "starting") {
+          // Process died before server started — extract meaningful error
+          const errorLine = stderrOutput
+            .split("\n")
+            .find((l) => l.includes("Error") || l.includes("Problem"))
+            ?.replace(/^\[11ty\]\s*/, "")
+            .trim();
+          const errorMsg = errorLine || `Eleventy process exited with code ${code}`;
+          status = "error";
+          pushStatus({ status: "error", error: errorMsg });
+          reject(new Error(errorMsg));
+        } else {
+          status = "stopped";
+          port = null;
+          childProcess = null;
+          pushStatus({ status: "stopped" });
+        }
       }
     });
 
     proc.on("error", (err) => {
       clearTimeout(timeout);
+      if (pollTimer) clearInterval(pollTimer);
       status = "error";
       pushStatus({ status: "error", error: err.message });
       reject(err);

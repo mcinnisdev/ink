@@ -34,6 +34,7 @@ export interface ProjectContext {
   siteUrl: string;
   currentFilePath?: string;
   currentFile?: string;
+  agentType?: "content" | "site";
 }
 
 interface AIStore {
@@ -108,7 +109,7 @@ export const useAIStore = create<AIStore>((set, get) => ({
   },
 
   stopGeneration: async () => {
-    await window.ink.ai.stopGeneration();
+    await window.ink.ai.stopGeneration("site");
     set((s) => ({
       messages: s.messages.map((m) =>
         m.streaming ? { ...m, streaming: false } : m
@@ -117,47 +118,49 @@ export const useAIStore = create<AIStore>((set, get) => ({
     }));
   },
 
-  appendChunk: (messageId: string, chunk: string) => {
+  appendChunk: (_messageId: string, chunk: string) => {
     set((s) => ({
       messages: s.messages.map((m) =>
-        m.id === messageId ? { ...m, content: m.content + chunk } : m
+        m.streaming && m.role === "assistant"
+          ? { ...m, content: m.content + chunk }
+          : m
       ),
     }));
   },
 
-  addToolCall: (messageId: string, toolCall: ToolCall) => {
+  addToolCall: (_messageId: string, toolCall: ToolCall) => {
     set((s) => ({
       messages: s.messages.map((m) =>
-        m.id === messageId
+        m.streaming && m.role === "assistant"
           ? { ...m, toolCalls: [...(m.toolCalls || []), toolCall] }
           : m
       ),
     }));
   },
 
-  addToolResult: (messageId: string, toolResult: ToolResult) => {
+  addToolResult: (_messageId: string, toolResult: ToolResult) => {
     set((s) => ({
       messages: s.messages.map((m) =>
-        m.id === messageId
+        m.streaming && m.role === "assistant"
           ? { ...m, toolResults: [...(m.toolResults || []), toolResult] }
           : m
       ),
     }));
   },
 
-  finishMessage: (messageId: string) => {
+  finishMessage: (_messageId: string) => {
     set((s) => ({
       messages: s.messages.map((m) =>
-        m.id === messageId ? { ...m, streaming: false } : m
+        m.streaming ? { ...m, streaming: false } : m
       ),
       isStreaming: false,
     }));
   },
 
-  setError: (messageId: string, error: string) => {
+  setError: (_messageId: string, error: string) => {
     set((s) => ({
       messages: s.messages.map((m) =>
-        m.id === messageId
+        m.streaming && m.role === "assistant"
           ? { ...m, content: `Error: ${error}`, streaming: false }
           : m
       ),

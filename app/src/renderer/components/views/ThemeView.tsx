@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
-import { Palette, Save, AlertTriangle } from "lucide-react";
+import { Palette, Save, Sparkles } from "lucide-react";
 import { useProjectStore } from "../../stores/project";
-import { useUIStore } from "../../stores/ui";
+import { useNotificationStore } from "../../stores/notifications";
 
 interface DesignToken {
   name: string;
@@ -11,14 +11,31 @@ interface DesignToken {
   type: "color" | "font" | "size" | "other";
 }
 
+const COLOR_PRESETS = [
+  { name: "Ocean Blue", primary: "#2563eb", secondary: "#1e3a5f" },
+  { name: "Forest Green", primary: "#16a34a", secondary: "#14532d" },
+  { name: "Sunset Warm", primary: "#ea580c", secondary: "#7c2d12" },
+  { name: "Royal Purple", primary: "#7c3aed", secondary: "#3b0764" },
+  { name: "Slate Professional", primary: "#475569", secondary: "#0f172a" },
+  { name: "Rose", primary: "#e11d48", secondary: "#4c0519" },
+];
+
 function parseDesignTokens(css: string): DesignToken[] {
-  const rootMatch = css.match(/:root\s*\{([\s\S]*?)\n\}/);
-  if (!rootMatch) return [];
+  // Support both plain :root and @layer base { :root { ... } }
+  let rootContent = "";
+  const layerMatch = css.match(/@layer\s+base\s*\{[\s\S]*?:root\s*\{([\s\S]*?)\}/);
+  if (layerMatch) {
+    rootContent = layerMatch[1];
+  } else {
+    const rootMatch = css.match(/:root\s*\{([\s\S]*?)\n\}/);
+    if (rootMatch) rootContent = rootMatch[1];
+  }
+  if (!rootContent) return [];
 
   const tokens: DesignToken[] = [];
   let currentCategory = "";
 
-  for (const line of rootMatch[1].split("\n")) {
+  for (const line of rootContent.split("\n")) {
     const catMatch = line.match(
       /\/\*\s*-+\s*(.+?)\s*(?:\(.*?\))?\s*-+\s*\*\//
     );
@@ -32,16 +49,16 @@ function parseDesignTokens(css: string): DesignToken[] {
     );
     if (varMatch) {
       const [, name, value, comment] = varMatch;
-      const type = name.includes("color") || name.includes("bg-") || name.includes("text-")
-        ? "color"
-        : name.includes("font")
-        ? "font"
-        : name.includes("space") ||
-          name.includes("radius") ||
-          name.includes("width") ||
-          name.includes("text-")
-        ? "size"
-        : "other";
+      const type =
+        name.includes("color") || name.includes("bg-") || name.includes("text-")
+          ? "color"
+          : name.includes("font")
+          ? "font"
+          : name.includes("space") ||
+            name.includes("radius") ||
+            name.includes("width")
+          ? "size"
+          : "other";
       tokens.push({
         name,
         value,
@@ -70,29 +87,42 @@ function isColor(value: string): boolean {
 
 export default function ThemeView() {
   const projectPath = useProjectStore((s) => s.current?.path);
-  const devMode = useUIStore((s) => s.devMode);
+  const addToast = useNotificationStore((s) => s.addToast);
   const [tokens, setTokens] = useState<DesignToken[]>([]);
   const [originalCss, setOriginalCss] = useState("");
   const [dirty, setDirty] = useState(false);
   const [saving, setSaving] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const [cssFramework, setCssFramework] = useState<"vanilla" | "tailwind">("vanilla");
+  const [cssPath, setCssPath] = useState<string | null>(null);
 
-  const cssPath = projectPath ? `${projectPath}/src/css/main.css` : null;
-
+  // Detect CSS framework and load tokens
   useEffect(() => {
-    if (!cssPath) return;
-    window.ink.file
-      .read(cssPath)
-      .then((css) => {
+    if (!projectPath) return;
+
+    async function load() {
+      const framework = await window.ink.cli.detectCssFramework(projectPath!);
+      setCssFramework(framework);
+
+      const filePath =
+        framework === "tailwind"
+          ? `${projectPath}/src/css/tailwind.css`
+          : `${projectPath}/src/css/main.css`;
+      setCssPath(filePath);
+
+      try {
+        const css = await window.ink.file.read(filePath);
         setOriginalCss(css);
         setTokens(parseDesignTokens(css));
-        setLoaded(true);
-        setDirty(false);
-      })
-      .catch(() => {
-        setLoaded(true);
-      });
-  }, [cssPath]);
+      } catch {
+        // File may not exist
+      }
+      setLoaded(true);
+      setDirty(false);
+    }
+
+    load();
+  }, [projectPath]);
 
   const updateToken = useCallback((index: number, newValue: string) => {
     setTokens((prev) => {
@@ -103,6 +133,24 @@ export default function ThemeView() {
     setDirty(true);
   }, []);
 
+  const applyPreset = useCallback(
+    (preset: (typeof COLOR_PRESETS)[0]) => {
+      setTokens((prev) => {
+        const updated = [...prev];
+        for (let i = 0; i < updated.length; i++) {
+          if (updated[i].name === "--color-primary") {
+            updated[i] = { ...updated[i], value: preset.primary };
+          } else if (updated[i].name === "--color-secondary") {
+            updated[i] = { ...updated[i], value: preset.secondary };
+          }
+        }
+        return updated;
+      });
+      setDirty(true);
+    },
+    []
+  );
+
   const handleSave = useCallback(async () => {
     if (!cssPath) return;
     setSaving(true);
@@ -111,35 +159,29 @@ export default function ThemeView() {
       await window.ink.file.write(cssPath, updated);
       setOriginalCss(updated);
       setDirty(false);
+      addToast("success", "Theme saved");
+    } catch {
+      addToast("error", "Failed to save theme");
     } finally {
       setSaving(false);
     }
-  }, [cssPath, originalCss, tokens]);
+  }, [cssPath, originalCss, tokens, addToast]);
 
   // Group tokens by category
   const categories = tokens.reduce<Record<string, DesignToken[]>>(
     (acc, token, i) => {
       const cat = token.category || "Other";
       if (!acc[cat]) acc[cat] = [];
-      acc[cat].push({ ...token, name: token.name, comment: String(i) });
+      // Store original index in comment field for lookup
+      acc[cat].push({ ...token, comment: String(i) });
       return acc;
     },
     {}
   );
 
-  if (!devMode) {
-    return (
-      <div className="flex-1 flex items-center justify-center">
-        <div className="text-center">
-          <AlertTriangle className="w-8 h-8 text-amber-400 mx-auto mb-3" />
-          <p className="text-ink-300 text-sm font-medium">Developer Mode Required</p>
-          <p className="text-ink-500 text-xs mt-1">
-            Enable Dev mode in the title bar to access theme settings
-          </p>
-        </div>
-      </div>
-    );
-  }
+  // Get primary and secondary colors for preview
+  const primaryToken = tokens.find((t) => t.name === "--color-primary");
+  const secondaryToken = tokens.find((t) => t.name === "--color-secondary");
 
   if (!loaded) {
     return (
@@ -153,7 +195,7 @@ export default function ThemeView() {
     return (
       <div className="flex flex-col h-full">
         <div className="px-6 py-4 border-b border-ink-700">
-          <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+          <h2 className="text-lg font-semibold text-ink-50 flex items-center gap-2">
             <Palette className="w-5 h-5 text-accent" />
             Theme
           </h2>
@@ -162,7 +204,8 @@ export default function ThemeView() {
           <div className="text-center">
             <p className="text-ink-400 text-sm">No design tokens found</p>
             <p className="text-ink-600 text-xs mt-1">
-              Add CSS custom properties in <code className="text-ink-400">:root</code> in src/css/main.css
+              Add CSS custom properties in{" "}
+              <code className="text-ink-400">:root</code> in your CSS file
             </p>
           </div>
         </div>
@@ -175,12 +218,13 @@ export default function ThemeView() {
       {/* Header */}
       <div className="flex items-center justify-between px-6 py-4 border-b border-ink-700">
         <div>
-          <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+          <h2 className="text-lg font-semibold text-ink-50 flex items-center gap-2">
             <Palette className="w-5 h-5 text-accent" />
             Theme
           </h2>
           <p className="text-xs text-ink-500 mt-0.5">
-            Edit design tokens in src/css/main.css
+            {cssFramework === "tailwind" ? "Tailwind CSS" : "Vanilla CSS"} design
+            tokens
           </p>
         </div>
         <button
@@ -200,6 +244,58 @@ export default function ThemeView() {
       {/* Content */}
       <div className="flex-1 overflow-y-auto p-6">
         <div className="max-w-2xl space-y-8">
+          {/* Color Presets */}
+          <section>
+            <h3 className="text-sm font-semibold text-ink-300 mb-3 flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-amber-400" />
+              Quick Presets
+            </h3>
+            <div className="grid grid-cols-3 gap-2">
+              {COLOR_PRESETS.map((preset) => (
+                <button
+                  key={preset.name}
+                  onClick={() => applyPreset(preset)}
+                  className="flex items-center gap-2 p-2 rounded-lg border border-ink-700/50 hover:border-ink-500 bg-ink-800/50 transition-colors text-left"
+                >
+                  <div className="flex gap-0.5 flex-shrink-0">
+                    <div
+                      className="w-4 h-4 rounded-l"
+                      style={{ backgroundColor: preset.primary }}
+                    />
+                    <div
+                      className="w-4 h-4 rounded-r"
+                      style={{ backgroundColor: preset.secondary }}
+                    />
+                  </div>
+                  <span className="text-[10px] text-ink-400">{preset.name}</span>
+                </button>
+              ))}
+            </div>
+          </section>
+
+          {/* Color Preview Strip */}
+          {primaryToken && secondaryToken && (
+            <section>
+              <h3 className="text-sm font-semibold text-ink-300 mb-3">
+                Preview
+              </h3>
+              <div className="flex gap-1 h-8 rounded-lg overflow-hidden">
+                <div
+                  className="flex-1"
+                  style={{ backgroundColor: primaryToken.value }}
+                />
+                <div
+                  className="flex-1"
+                  style={{ backgroundColor: secondaryToken.value }}
+                />
+                <div className="flex-1 bg-ink-50" />
+                <div className="flex-1 bg-ink-200" />
+                <div className="flex-1 bg-ink-800" />
+              </div>
+            </section>
+          )}
+
+          {/* Token Categories */}
           {Object.entries(categories).map(([category, catTokens]) => (
             <section key={category}>
               <h3 className="text-sm font-semibold text-ink-300 mb-3">
@@ -235,7 +331,7 @@ export default function ThemeView() {
                         onChange={(e) =>
                           updateToken(tokenIndex, e.target.value)
                         }
-                        className="flex-1 bg-ink-900 border border-ink-600 rounded-lg px-3 py-1.5 text-xs text-white font-mono focus:border-accent focus:outline-none"
+                        className="flex-1 bg-ink-900 border border-ink-600 rounded-lg px-3 py-1.5 text-xs text-ink-50 font-mono focus:border-accent focus:outline-none"
                       />
                     </div>
                   );

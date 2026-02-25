@@ -10,30 +10,36 @@ import { c } from "../colors.js";
  * ink remove component <name>    — Uninstall a CLI component
  */
 export async function remove(args) {
-  const subcommand = args[0];
+  const skipConfirm = args.includes("--yes") || args.includes("-y");
+  const filtered = args.filter((a) => a !== "--yes" && a !== "-y");
+  const subcommand = filtered[0];
 
-  if (subcommand === "component") return removeComponent(args.slice(1));
+  if (subcommand === "component") return removeComponent(filtered.slice(1));
 
   if (!subcommand) {
     console.log("\n  Usage:");
     console.log('    ink remove <type>            Remove a content type and all its entries');
-    console.log("    ink remove component <name>  Uninstall a CLI component\n");
+    console.log("    ink remove component <name>  Uninstall a CLI component");
+    console.log("    --yes, -y                    Skip confirmation prompts\n");
     return;
   }
 
-  return removeContentType(subcommand);
+  return removeContentType(subcommand, skipConfirm);
 }
 
 /**
  * ink delete <type> <slug>  — Delete a single content entry
  */
 export async function deleteEntry(args) {
-  const typeId = args[0];
-  const slug = args[1];
+  const skipConfirm = args.includes("--yes") || args.includes("-y");
+  const filtered = args.filter((a) => a !== "--yes" && a !== "-y");
+  const typeId = filtered[0];
+  const slug = filtered[1];
 
   if (!typeId || !slug) {
     console.log("\n  Usage: ink delete <type> <slug>\n");
-    console.log("  Example: ink delete blog getting-started\n");
+    console.log("  Example: ink delete blog getting-started");
+    console.log("  Options: --yes, -y  Skip confirmation\n");
     return;
   }
 
@@ -47,10 +53,12 @@ export async function deleteEntry(args) {
     process.exit(1);
   }
 
-  const ok = await confirm(c.warn(`  Delete content/${dir}/${slug}.md? (y/N): `));
-  if (!ok) {
-    console.log(c.dim("  Cancelled.\n"));
-    return;
+  if (!skipConfirm) {
+    const ok = await confirm(c.warn(`  Delete content/${dir}/${slug}.md? (y/N): `));
+    if (!ok) {
+      console.log(c.dim("  Cancelled.\n"));
+      return;
+    }
   }
 
   fs.unlinkSync(filePath);
@@ -71,7 +79,7 @@ export async function deleteEntry(args) {
 
 // ─── Remove Content Type ──────────────────────────────────────────────────────
 
-async function removeContentType(typeId) {
+async function removeContentType(typeId, skipConfirm = false) {
   const projectRoot = requireProject();
 
   const type = CONTENT_TYPES[typeId];
@@ -87,12 +95,14 @@ async function removeContentType(typeId) {
   const files = fs.readdirSync(contentDir).filter((f) => f.endsWith(".md"));
   const countStr = files.length === 1 ? "1 entry" : `${files.length} entries`;
 
-  const ok = await confirm(
-    c.warn(`  Remove content type "${label}" (${countStr})? This deletes all files. (y/N): `)
-  );
-  if (!ok) {
-    console.log(c.dim("  Cancelled.\n"));
-    return;
+  if (!skipConfirm) {
+    const ok = await confirm(
+      c.warn(`  Remove content type "${label}" (${countStr})? This deletes all files. (y/N): `)
+    );
+    if (!ok) {
+      console.log(c.dim("  Cancelled.\n"));
+      return;
+    }
   }
 
   console.log(c.bold(`\n  Removing: ${label}\n`));

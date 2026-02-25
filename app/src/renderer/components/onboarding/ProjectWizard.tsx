@@ -102,7 +102,8 @@ export default function ProjectWizard() {
   );
   const [siteDescription, setSiteDescription] = useState("");
 
-  // Step 3: Branding + AI
+  // Step 3: CSS framework + Branding + AI
+  const [useTailwind, setUseTailwind] = useState(false);
   const [logoPath, setLogoPath] = useState("");
   const [logoName, setLogoName] = useState("");
   const [primaryColor, setPrimaryColor] = useState("#2563eb");
@@ -184,24 +185,33 @@ export default function ProjectWizard() {
         path: folder.trim(),
         siteName: siteName.trim() || name.trim(),
         siteUrl: siteUrl.trim() || "https://example.com",
-        contentTypes: Array.from(selectedTypes),
-        siteDescription: siteDescription.trim(),
+        tailwind: useTailwind,
       });
 
-      // Scaffold: content types + logo + brand colors
+      // Apply branding (logo + colors + site metadata)
       try {
-        await window.ink.project.scaffold(
-          projectPath,
-          Array.from(selectedTypes),
-          siteDescription.trim(),
-          siteName.trim() || name.trim(),
-          siteUrl.trim() || "https://example.com",
-          logoPath || undefined,
-          { primary: primaryColor, secondary: secondaryColor }
-        );
-      } catch (scaffoldErr) {
-        console.error("Scaffold error:", scaffoldErr);
-        // Non-fatal — project was still created
+        await window.ink.project.applyBranding(projectPath, {
+          logoPath: logoPath || undefined,
+          brandColors: { primary: primaryColor, secondary: secondaryColor },
+          siteDescription: siteDescription.trim(),
+          siteName: siteName.trim() || name.trim(),
+          siteUrl: siteUrl.trim() || "https://example.com",
+        });
+      } catch (brandingErr) {
+        console.error("Branding error:", brandingErr);
+      }
+
+      // Scaffold content types via CLI (services & team are already in the starter)
+      const starterTypes = new Set(["services", "team"]);
+      const typesToAdd = Array.from(selectedTypes).filter(
+        (t) => !starterTypes.has(t)
+      );
+      for (const typeId of typesToAdd) {
+        try {
+          await window.ink.cli.addContentType(projectPath, typeId);
+        } catch (err) {
+          console.error(`Failed to add content type ${typeId}:`, err);
+        }
       }
 
       setWizardOpen(false);
@@ -220,14 +230,14 @@ export default function ProjectWizard() {
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-ink-700">
           <div>
-            <h2 className="text-lg font-semibold text-white">New Project</h2>
+            <h2 className="text-lg font-semibold text-ink-50">New Project</h2>
             <p className="text-xs text-ink-500 mt-0.5">
               Step {step} of 3 — {STEP_LABELS[step - 1]}
             </p>
           </div>
           <button
             onClick={() => setWizardOpen(false)}
-            className="text-ink-400 hover:text-white text-xl leading-none"
+            className="text-ink-400 hover:text-ink-50 text-xl leading-none"
           >
             &times;
           </button>
@@ -246,7 +256,7 @@ export default function ProjectWizard() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="my-website"
-                  className="w-full px-3 py-2 bg-ink-900 border border-ink-600 rounded-lg text-sm text-white placeholder:text-ink-500 focus:outline-none focus:border-accent"
+                  className="w-full px-3 py-2 bg-ink-900 border border-ink-600 rounded-lg text-sm text-ink-50 placeholder:text-ink-500 focus:outline-none focus:border-accent"
                 />
               </div>
 
@@ -259,7 +269,7 @@ export default function ProjectWizard() {
                   value={folder}
                   onChange={(e) => setFolder(e.target.value)}
                   placeholder="C:\projects"
-                  className="w-full px-3 py-2 bg-ink-900 border border-ink-600 rounded-lg text-sm text-white placeholder:text-ink-500 focus:outline-none focus:border-accent"
+                  className="w-full px-3 py-2 bg-ink-900 border border-ink-600 rounded-lg text-sm text-ink-50 placeholder:text-ink-500 focus:outline-none focus:border-accent"
                 />
                 <p className="text-xs text-ink-500 mt-1">
                   A new folder will be created here with the project name.
@@ -275,7 +285,7 @@ export default function ProjectWizard() {
                   value={siteName}
                   onChange={(e) => setSiteName(e.target.value)}
                   placeholder="My Business"
-                  className="w-full px-3 py-2 bg-ink-900 border border-ink-600 rounded-lg text-sm text-white placeholder:text-ink-500 focus:outline-none focus:border-accent"
+                  className="w-full px-3 py-2 bg-ink-900 border border-ink-600 rounded-lg text-sm text-ink-50 placeholder:text-ink-500 focus:outline-none focus:border-accent"
                 />
               </div>
 
@@ -288,7 +298,7 @@ export default function ProjectWizard() {
                   value={siteUrl}
                   onChange={(e) => setSiteUrl(e.target.value)}
                   placeholder="https://mybusiness.com"
-                  className="w-full px-3 py-2 bg-ink-900 border border-ink-600 rounded-lg text-sm text-white placeholder:text-ink-500 focus:outline-none focus:border-accent"
+                  className="w-full px-3 py-2 bg-ink-900 border border-ink-600 rounded-lg text-sm text-ink-50 placeholder:text-ink-500 focus:outline-none focus:border-accent"
                 />
               </div>
 
@@ -298,7 +308,7 @@ export default function ProjectWizard() {
             <div className="flex justify-end gap-3 px-6 py-4 border-t border-ink-700">
               <button
                 onClick={() => setWizardOpen(false)}
-                className="px-4 py-2 text-sm text-ink-400 hover:text-white rounded-lg transition-colors"
+                className="px-4 py-2 text-sm text-ink-400 hover:text-ink-50 rounded-lg transition-colors"
               >
                 Cancel
               </button>
@@ -334,7 +344,7 @@ export default function ProjectWizard() {
                         onClick={() => toggleType(type.id)}
                         className={`flex items-start gap-2.5 p-3 rounded-lg border text-left transition-colors ${
                           isSelected
-                            ? "bg-accent/10 border-accent/40 text-white"
+                            ? "bg-accent/10 border-accent/40 text-ink-50"
                             : "bg-ink-900/50 border-ink-700/50 text-ink-400 hover:border-ink-600"
                         }`}
                       >
@@ -346,7 +356,7 @@ export default function ProjectWizard() {
                         <div className="min-w-0">
                           <p
                             className={`text-xs font-medium ${
-                              isSelected ? "text-white" : "text-ink-300"
+                              isSelected ? "text-ink-50" : "text-ink-300"
                             }`}
                           >
                             {type.label}
@@ -373,7 +383,7 @@ export default function ProjectWizard() {
                   onChange={(e) => setSiteDescription(e.target.value)}
                   placeholder="e.g. A plumbing company in Denver, CO that offers residential and commercial plumbing services. We want to highlight our team, service areas, and customer reviews."
                   rows={3}
-                  className="w-full px-3 py-2 bg-ink-900 border border-ink-600 rounded-lg text-sm text-white placeholder:text-ink-500 focus:outline-none focus:border-accent resize-none"
+                  className="w-full px-3 py-2 bg-ink-900 border border-ink-600 rounded-lg text-sm text-ink-50 placeholder:text-ink-500 focus:outline-none focus:border-accent resize-none"
                 />
                 <p className="text-xs text-ink-500 mt-1">
                   The AI will use this to customize your site structure, sample
@@ -390,7 +400,7 @@ export default function ProjectWizard() {
                   setStep(1);
                   setError("");
                 }}
-                className="flex items-center gap-1.5 px-4 py-2 text-sm text-ink-400 hover:text-white rounded-lg transition-colors"
+                className="flex items-center gap-1.5 px-4 py-2 text-sm text-ink-400 hover:text-ink-50 rounded-lg transition-colors"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
                 Back
@@ -410,6 +420,47 @@ export default function ProjectWizard() {
         {step === 3 && (
           <>
             <div className="px-6 py-5 space-y-5 max-h-[60vh] overflow-y-auto">
+              {/* CSS Framework */}
+              <div>
+                <label className="block text-xs font-medium text-ink-400 mb-2">
+                  CSS Framework
+                </label>
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setUseTailwind(false)}
+                    className={`p-3 rounded-lg border text-left transition-colors ${
+                      !useTailwind
+                        ? "bg-accent/10 border-accent/40 text-ink-50"
+                        : "bg-ink-900/50 border-ink-700/50 text-ink-400 hover:border-ink-600"
+                    }`}
+                  >
+                    <p className={`text-xs font-medium ${!useTailwind ? "text-ink-50" : "text-ink-300"}`}>
+                      Vanilla CSS
+                    </p>
+                    <p className="text-[10px] text-ink-500 mt-0.5">
+                      Design tokens with CSS custom properties
+                    </p>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setUseTailwind(true)}
+                    className={`p-3 rounded-lg border text-left transition-colors ${
+                      useTailwind
+                        ? "bg-accent/10 border-accent/40 text-ink-50"
+                        : "bg-ink-900/50 border-ink-700/50 text-ink-400 hover:border-ink-600"
+                    }`}
+                  >
+                    <p className={`text-xs font-medium ${useTailwind ? "text-ink-50" : "text-ink-300"}`}>
+                      Tailwind CSS
+                    </p>
+                    <p className="text-[10px] text-ink-500 mt-0.5">
+                      Utility-first CSS with Tailwind
+                    </p>
+                  </button>
+                </div>
+              </div>
+
               {/* Logo */}
               <div>
                 <label className="block text-xs font-medium text-ink-400 mb-2 flex items-center gap-1.5">
@@ -472,7 +523,7 @@ export default function ProjectWizard() {
                           const v = e.target.value;
                           if (/^#[0-9a-fA-F]{0,6}$/.test(v)) setPrimaryColor(v);
                         }}
-                        className="flex-1 px-2.5 py-1.5 bg-ink-900 border border-ink-600 rounded-lg text-xs text-white font-mono focus:outline-none focus:border-accent"
+                        className="flex-1 px-2.5 py-1.5 bg-ink-900 border border-ink-600 rounded-lg text-xs text-ink-50 font-mono focus:outline-none focus:border-accent"
                       />
                     </div>
                   </div>
@@ -497,7 +548,7 @@ export default function ProjectWizard() {
                           if (/^#[0-9a-fA-F]{0,6}$/.test(v))
                             setSecondaryColor(v);
                         }}
-                        className="flex-1 px-2.5 py-1.5 bg-ink-900 border border-ink-600 rounded-lg text-xs text-white font-mono focus:outline-none focus:border-accent"
+                        className="flex-1 px-2.5 py-1.5 bg-ink-900 border border-ink-600 rounded-lg text-xs text-ink-50 font-mono focus:outline-none focus:border-accent"
                       />
                     </div>
                   </div>
@@ -512,7 +563,7 @@ export default function ProjectWizard() {
                     className="h-6 flex-1"
                     style={{ backgroundColor: secondaryColor }}
                   />
-                  <div className="h-6 flex-1 rounded-r-lg bg-white" />
+                  <div className="h-6 flex-1 rounded-r-lg bg-ink-50" />
                 </div>
               </div>
 
@@ -558,7 +609,7 @@ export default function ProjectWizard() {
                               : "gpt-4o",
                         }));
                       }}
-                      className="w-full bg-ink-900 border border-ink-600 rounded-lg px-2.5 py-1.5 text-xs text-white focus:border-accent focus:outline-none"
+                      className="w-full bg-ink-900 border border-ink-600 rounded-lg px-2.5 py-1.5 text-xs text-ink-50 focus:border-accent focus:outline-none"
                     >
                       <option value="anthropic">Anthropic (Claude)</option>
                       <option value="openai">OpenAI (GPT)</option>
@@ -583,7 +634,7 @@ export default function ProjectWizard() {
                           ? "sk-ant-..."
                           : "sk-..."
                       }
-                      className="w-full bg-ink-900 border border-ink-600 rounded-lg px-2.5 py-1.5 text-xs text-white focus:border-accent focus:outline-none"
+                      className="w-full bg-ink-900 border border-ink-600 rounded-lg px-2.5 py-1.5 text-xs text-ink-50 focus:border-accent focus:outline-none"
                     />
                   </div>
 
@@ -599,7 +650,7 @@ export default function ProjectWizard() {
                           model: e.target.value,
                         }))
                       }
-                      className="w-full bg-ink-900 border border-ink-600 rounded-lg px-2.5 py-1.5 text-xs text-white focus:border-accent focus:outline-none"
+                      className="w-full bg-ink-900 border border-ink-600 rounded-lg px-2.5 py-1.5 text-xs text-ink-50 focus:border-accent focus:outline-none"
                     >
                       {localAI.provider === "anthropic" ? (
                         <>
@@ -636,7 +687,7 @@ export default function ProjectWizard() {
                   setStep(2);
                   setError("");
                 }}
-                className="flex items-center gap-1.5 px-4 py-2 text-sm text-ink-400 hover:text-white rounded-lg transition-colors"
+                className="flex items-center gap-1.5 px-4 py-2 text-sm text-ink-400 hover:text-ink-50 rounded-lg transition-colors"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
                 Back

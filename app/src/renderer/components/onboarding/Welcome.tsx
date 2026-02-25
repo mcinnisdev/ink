@@ -26,7 +26,7 @@ export default function Welcome() {
         <div className="text-center mb-10">
           <div className="flex items-center justify-center gap-3 mb-2">
             <img src={inkLogo} alt="Ink" className="w-10 h-10" />
-            <h1 className="text-4xl font-bold text-white">Ink</h1>
+            <h1 className="text-4xl font-bold text-ink-50">Ink</h1>
           </div>
           <p className="text-ink-400 text-sm">
             Websites written in Markdown
@@ -62,7 +62,7 @@ export default function Welcome() {
                   onClick={() => handleRecent(project.path)}
                   className="w-full text-left px-3 py-2 rounded-lg hover:bg-ink-800 transition-colors group"
                 >
-                  <p className="text-sm text-ink-200 group-hover:text-white">
+                  <p className="text-sm text-ink-200 group-hover:text-ink-50">
                     {project.siteName}
                   </p>
                   <p className="text-xs text-ink-500 truncate">

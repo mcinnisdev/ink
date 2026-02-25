@@ -91,6 +91,8 @@ interface EditorStore {
   scheduleSave: (filePath: string) => void;
   handleExternalChange: (changedPath: string) => Promise<void>;
   closeAllTabs: () => void;
+  saveAllDirty: () => Promise<void>;
+  hasDirtyTabs: () => boolean;
 }
 
 const saveTimers: Record<string, number> = {};
@@ -120,13 +122,26 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       return;
     }
 
+    // Single-file mode: save and close the previous file before opening
+    for (const tab of tabs) {
+      if (tab.dirty) {
+        await get().saveFile(tab.filePath);
+      }
+      if (saveTimers[tab.filePath]) {
+        clearTimeout(saveTimers[tab.filePath]);
+        delete saveTimers[tab.filePath];
+      }
+    }
+
     const raw = await window.ink.file.read(filePath);
-    const content = parseFrontmatter(raw);
+    // Only parse frontmatter for .md files
+    const content = filePath.endsWith(".md")
+      ? parseFrontmatter(raw)
+      : { frontmatter: {}, body: raw, raw };
     const fileName = relativePath.split("/").pop() || filePath;
 
-    set((s) => ({
+    set({
       tabs: [
-        ...s.tabs,
         {
           filePath,
           relativePath,
@@ -137,7 +152,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         },
       ],
       activeTabPath: filePath,
-    }));
+    });
   },
 
   closeTab: (filePath) => {
@@ -164,6 +179,8 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   },
 
   updateFrontmatter: (filePath, key, value) => {
+    // Only .md files have frontmatter
+    if (!filePath.endsWith(".md")) return;
     set((s) => ({
       tabs: s.tabs.map((t) => {
         if (t.filePath !== filePath) return t;
@@ -183,7 +200,9 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
     set((s) => ({
       tabs: s.tabs.map((t) => {
         if (t.filePath !== filePath) return t;
-        const newRaw = serializeFrontmatter(t.content.frontmatter, body);
+        // Only serialize frontmatter for .md files
+        const hasFm = filePath.endsWith(".md") && Object.keys(t.content.frontmatter).length > 0;
+        const newRaw = hasFm ? serializeFrontmatter(t.content.frontmatter, body) : body;
         return {
           ...t,
           content: { ...t.content, body, raw: newRaw },
@@ -245,5 +264,24 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
     }
     Object.keys(saveTimers).forEach((k) => delete saveTimers[k]);
     set({ tabs: [], activeTabPath: null });
+  },
+
+  saveAllDirty: async () => {
+    // Flush all pending save timers
+    for (const [filePath, timer] of Object.entries(saveTimers)) {
+      clearTimeout(timer);
+      delete saveTimers[filePath];
+    }
+    // Save all dirty tabs
+    const { tabs } = get();
+    for (const tab of tabs) {
+      if (tab.dirty) {
+        await get().saveFile(tab.filePath);
+      }
+    }
+  },
+
+  hasDirtyTabs: () => {
+    return get().tabs.some((t) => t.dirty);
   },
 }));

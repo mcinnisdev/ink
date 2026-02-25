@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useProjectStore } from "./stores/project";
 import { useUIStore } from "./stores/ui";
+import { useEditorStore } from "./stores/editor";
 import Sidebar from "./components/layout/Sidebar";
 import TitleBar from "./components/layout/TitleBar";
 import Welcome from "./components/onboarding/Welcome";
@@ -11,6 +12,8 @@ import ThemeView from "./components/views/ThemeView";
 import PublishView from "./components/views/PublishView";
 import AIView from "./components/views/AIView";
 import SettingsView from "./components/views/SettingsView";
+import SearchView from "./components/views/SearchView";
+import ToastContainer from "./components/layout/Toast";
 
 function ViewRouter() {
   const activeView = useUIStore((s) => s.activeView);
@@ -20,6 +23,8 @@ function ViewRouter() {
       return <ContentView />;
     case "media":
       return <MediaView />;
+    case "search":
+      return <SearchView />;
     case "theme":
       return <ThemeView />;
     case "git":
@@ -37,10 +42,26 @@ export default function App() {
   const current = useProjectStore((s) => s.current);
   const loadRecent = useProjectStore((s) => s.loadRecent);
   const wizardOpen = useUIStore((s) => s.wizardOpen);
+  const theme = useUIStore((s) => s.theme);
 
   useEffect(() => {
     loadRecent();
   }, [loadRecent]);
+
+  // Apply theme class to <html> so body and all elements get the CSS variables
+  useEffect(() => {
+    document.documentElement.classList.toggle("theme-light", theme === "light");
+    window.ink.theme.setOverlay(theme);
+  }, [theme]);
+
+  // Flush all pending saves before the window closes
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      useEditorStore.getState().saveAllDirty();
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, []);
 
   return (
     <div className="flex flex-col h-screen">
@@ -52,6 +73,7 @@ export default function App() {
         </main>
       </div>
       {wizardOpen && <ProjectWizard />}
+      <ToastContainer />
     </div>
   );
 }

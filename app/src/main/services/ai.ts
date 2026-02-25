@@ -34,6 +34,8 @@ export interface ToolResult {
   isError: boolean;
 }
 
+export type AgentType = "content" | "site";
+
 export interface AIStreamEvent {
   type: "chunk" | "tool_call" | "tool_result" | "done" | "error";
   content?: string;
@@ -41,6 +43,7 @@ export interface AIStreamEvent {
   toolResult?: ToolResult;
   error?: string;
   messageId: string;
+  agentType?: AgentType;
 }
 
 export interface ProjectContext {
@@ -49,6 +52,7 @@ export interface ProjectContext {
   siteUrl: string;
   currentFilePath?: string;
   currentFile?: string;
+  agentType?: AgentType;
 }
 
 // --- Config ---
@@ -323,16 +327,25 @@ const TOOL_DEFINITIONS = [
   },
 ];
 
-function getAnthropicTools(): Anthropic.Tool[] {
-  return TOOL_DEFINITIONS.map((tool) => ({
+const CONTENT_TOOL_NAMES = new Set(["read_file", "write_file", "update_frontmatter"]);
+
+function getToolsForAgent(agentType: AgentType = "site") {
+  if (agentType === "content") {
+    return TOOL_DEFINITIONS.filter((t) => CONTENT_TOOL_NAMES.has(t.name));
+  }
+  return TOOL_DEFINITIONS;
+}
+
+function getAnthropicTools(agentType: AgentType = "site"): Anthropic.Tool[] {
+  return getToolsForAgent(agentType).map((tool) => ({
     name: tool.name,
     description: tool.description,
     input_schema: tool.parameters as Anthropic.Tool["input_schema"],
   }));
 }
 
-function getOpenAITools(): OpenAI.Chat.Completions.ChatCompletionTool[] {
-  return TOOL_DEFINITIONS.map((tool) => ({
+function getOpenAITools(agentType: AgentType = "site"): OpenAI.Chat.Completions.ChatCompletionTool[] {
+  return getToolsForAgent(agentType).map((tool) => ({
     type: "function" as const,
     function: {
       name: tool.name,
@@ -342,9 +355,54 @@ function getOpenAITools(): OpenAI.Chat.Completions.ChatCompletionTool[] {
   }));
 }
 
-// --- System Prompt ---
+// --- System Prompts ---
 
 async function buildSystemPrompt(context: ProjectContext): Promise<string> {
+  if (context.agentType === "content") {
+    return buildContentSystemPrompt(context);
+  }
+  return buildSiteSystemPrompt(context);
+}
+
+function buildContentSystemPrompt(context: ProjectContext): string {
+  let currentFileSection = "";
+  if (context.currentFilePath && context.currentFile) {
+    currentFileSection = `
+## Currently Open File
+Path: ${context.currentFilePath}
+\`\`\`
+${context.currentFile}
+\`\`\``;
+  }
+
+  return `You are a content writing and SEO assistant embedded in the Ink CMS editor.
+You are focused exclusively on the content file the user has open right now.
+
+## Your Specialties
+- Writing compelling, readable markdown content
+- SEO optimization: meta descriptions (150-160 chars), title tags, header hierarchy, keyword placement
+- Content structure: logical heading flow (H1 > H2 > H3), scannable paragraphs, effective use of lists
+- Readability improvements: active voice, concise sentences, clear transitions
+- Frontmatter optimization: seo_title, meta_description, excerpt, featured_image alt text
+- Markdown formatting best practices
+
+## Current Project
+- Name: ${context.siteName}
+- URL: ${context.siteUrl}
+${currentFileSection}
+
+## Guidelines
+- Always return content as valid markdown
+- When suggesting SEO improvements, be specific: give the exact replacement text
+- Keep meta descriptions between 150-160 characters
+- Use kebab-case for slugs
+- Match the existing tone and voice of the content
+- When rewriting sections, preserve the factual content; improve only the prose
+- For frontmatter changes, output the exact key-value pairs to update
+- Be concise. The user is looking at the editor — they want actionable edits, not essays about theory.`;
+}
+
+async function buildSiteSystemPrompt(context: ProjectContext): Promise<string> {
   let siteConfig = "{}";
   try {
     siteConfig = await readFile(path.join(context.projectPath, "src", "_data", "site.json"));
@@ -366,8 +424,17 @@ ${context.currentFile}
 \`\`\``;
   }
 
-  return `You are the AI assistant for Ink, a Markdown-native CMS built on Eleventy v3.
-You help users create, edit, and manage their website content.
+  return `You are the Site AI for Ink, a Markdown-native CMS built on Eleventy v3.
+You help users with site-wide design, templating, configuration, and structural changes.
+
+## Your Specialties
+- Nunjucks template authoring and modification (layouts, includes, macros)
+- CSS and Tailwind CSS styling and theming
+- Eleventy v3 configuration and data cascade
+- Site configuration (site.json) management
+- Creating and organizing content collections
+- Navigation structure and permalink design
+- Multi-page scaffolding and restructuring
 
 ## Current Project
 - Name: ${context.siteName}
@@ -387,22 +454,26 @@ This site has these content collections:
 ${currentFileSection}
 
 ## Guidelines
+- When modifying templates, show the full file contents to write
+- For CSS changes, identify which file to edit and provide complete updated content
+- Use the tools to read files before modifying them
+- For Eleventy/11ty concepts, be precise about v3 syntax
 - When creating pages, always include required fields: title, slug, published, permalink
 - Use kebab-case for slugs
 - Permalinks follow the pattern: /section/slug/ (e.g. /services/web-design/)
-- When writing content, match the tone and style of existing pages
-- For SEO, write compelling meta descriptions (150-160 chars) and optimized titles
-- Be concise and helpful. Explain what you're doing when using tools.`;
+- Explain your changes so the user can learn from them
+- Be concise and helpful.`;
 }
 
 // --- Streaming ---
 
-let currentAbortController: AbortController | null = null;
+const abortControllers = new Map<string, AbortController>();
 
-export function stopGeneration(): void {
-  if (currentAbortController) {
-    currentAbortController.abort();
-    currentAbortController = null;
+export function stopGeneration(agentType: AgentType = "site"): void {
+  const controller = abortControllers.get(agentType);
+  if (controller) {
+    controller.abort();
+    abortControllers.delete(agentType);
   }
 }
 
@@ -424,28 +495,30 @@ export async function sendMessage(
     throw new Error("AI not configured. Please add your API key in Settings.");
   }
 
-  const messageId = messages[messages.length - 1]?.id || crypto.randomUUID();
-  currentAbortController = new AbortController();
-  const signal = currentAbortController.signal;
+  const agentType: AgentType = context.agentType || "site";
+  const messageId = crypto.randomUUID();
+  const controller = new AbortController();
+  abortControllers.set(agentType, controller);
+  const signal = controller.signal;
 
   try {
     const systemPrompt = await buildSystemPrompt(context);
 
     if (config.provider === "anthropic") {
-      return await streamAnthropic(config, systemPrompt, messages, context.projectPath, messageId, win, signal);
+      return await streamAnthropic(config, systemPrompt, messages, context.projectPath, messageId, win, signal, agentType);
     } else {
-      return await streamOpenAI(config, systemPrompt, messages, context.projectPath, messageId, win, signal);
+      return await streamOpenAI(config, systemPrompt, messages, context.projectPath, messageId, win, signal, agentType);
     }
   } catch (err) {
     if ((err as Error).name === "AbortError" || signal.aborted) {
-      emit(win, { type: "done", messageId });
+      emit(win, { type: "done", messageId, agentType });
       return { id: messageId, role: "assistant", content: "", timestamp: Date.now() };
     }
     const errorMsg = (err as Error).message || "Unknown error";
-    emit(win, { type: "error", error: errorMsg, messageId });
+    emit(win, { type: "error", error: errorMsg, messageId, agentType });
     throw err;
   } finally {
-    currentAbortController = null;
+    abortControllers.delete(agentType);
   }
 }
 
@@ -458,7 +531,8 @@ async function streamAnthropic(
   projectPath: string,
   messageId: string,
   win: BrowserWindow,
-  signal: AbortSignal
+  signal: AbortSignal,
+  agentType: AgentType = "site"
 ): Promise<ChatMessage> {
   const client = new Anthropic({ apiKey: config.apiKey });
 
@@ -482,7 +556,7 @@ async function streamAnthropic(
         max_tokens: 4096,
         system: systemPrompt,
         messages: workingMessages,
-        tools: getAnthropicTools(),
+        tools: getAnthropicTools(agentType),
       },
       { signal }
     );
@@ -490,7 +564,7 @@ async function streamAnthropic(
     const finalMessage = await new Promise<Anthropic.Message>((resolve, reject) => {
       stream.on("text", (text) => {
         fullContent += text;
-        emit(win, { type: "chunk", content: text, messageId });
+        emit(win, { type: "chunk", content: text, messageId, agentType });
       });
 
       stream.on("error", reject);
@@ -516,7 +590,7 @@ async function streamAnthropic(
           arguments: block.input as Record<string, unknown>,
         };
 
-        emit(win, { type: "tool_call", toolCall, messageId });
+        emit(win, { type: "tool_call", toolCall, messageId, agentType });
 
         const result = await executeTool(toolCall, projectPath);
         toolResults.push({
@@ -526,7 +600,13 @@ async function streamAnthropic(
           is_error: result.isError,
         });
 
-        emit(win, { type: "tool_result", toolResult: result, messageId });
+        emit(win, { type: "tool_result", toolResult: result, messageId, agentType });
+      }
+
+      // Add paragraph break before next iteration's text
+      if (fullContent) {
+        fullContent += "\n\n";
+        emit(win, { type: "chunk", content: "\n\n", messageId, agentType });
       }
 
       // Add assistant response + tool results to continue the loop
@@ -538,7 +618,7 @@ async function streamAnthropic(
     }
   }
 
-  emit(win, { type: "done", messageId });
+  emit(win, { type: "done", messageId, agentType });
   return { id: messageId, role: "assistant", content: fullContent, timestamp: Date.now() };
 }
 
@@ -551,7 +631,8 @@ async function streamOpenAI(
   projectPath: string,
   messageId: string,
   win: BrowserWindow,
-  signal: AbortSignal
+  signal: AbortSignal,
+  agentType: AgentType = "site"
 ): Promise<ChatMessage> {
   const client = new OpenAI({ apiKey: config.apiKey });
 
@@ -574,7 +655,7 @@ async function streamOpenAI(
       {
         model: config.model,
         messages: workingMessages,
-        tools: getOpenAITools(),
+        tools: getOpenAITools(agentType),
         stream: true,
       },
       { signal }
@@ -593,7 +674,7 @@ async function streamOpenAI(
 
       if (delta?.content) {
         fullContent += delta.content;
-        emit(win, { type: "chunk", content: delta.content, messageId });
+        emit(win, { type: "chunk", content: delta.content, messageId, agentType });
       }
 
       if (delta?.tool_calls) {
@@ -628,16 +709,22 @@ async function streamOpenAI(
           function: { name: tc.name, arguments: tc.arguments },
         });
 
-        emit(win, { type: "tool_call", toolCall, messageId });
+        emit(win, { type: "tool_call", toolCall, messageId, agentType });
 
         const result = await executeTool(toolCall, projectPath);
-        emit(win, { type: "tool_result", toolResult: result, messageId });
+        emit(win, { type: "tool_result", toolResult: result, messageId, agentType });
 
         toolCallMessages.push({
           role: "tool",
           tool_call_id: tc.id,
           content: result.content,
         });
+      }
+
+      // Add paragraph break before next iteration's text
+      if (fullContent) {
+        fullContent += "\n\n";
+        emit(win, { type: "chunk", content: "\n\n", messageId, agentType });
       }
 
       // Add assistant message with tool calls + tool results
@@ -655,6 +742,6 @@ async function streamOpenAI(
     }
   }
 
-  emit(win, { type: "done", messageId });
+  emit(win, { type: "done", messageId, agentType });
   return { id: messageId, role: "assistant", content: fullContent, timestamp: Date.now() };
 }

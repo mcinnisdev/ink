@@ -20,7 +20,7 @@ export default function FrontmatterForm({ frontmatter, onChange }: Props) {
   if (entries.length === 0) return null;
 
   return (
-    <div className="border-b border-ink-700">
+    <div className="border-b border-ink-700 flex-shrink-0">
       <button
         className="w-full flex items-center gap-2 px-4 py-2 text-xs font-semibold text-ink-400 uppercase tracking-wider hover:bg-ink-800/50 transition-colors"
         onClick={() => setCollapsed(!collapsed)}
@@ -38,7 +38,7 @@ export default function FrontmatterForm({ frontmatter, onChange }: Props) {
         </span>
       </button>
       {!collapsed && (
-        <div className="px-4 pb-3 grid grid-cols-2 gap-x-4 gap-y-2">
+        <div className="px-4 pb-3 grid grid-cols-2 gap-x-4 gap-y-2 max-h-[200px] overflow-y-auto">
           {entries.map(([key, value]) => {
             const isLong =
               typeof value === "string" && value.length > 80;
@@ -61,7 +61,7 @@ export default function FrontmatterForm({ frontmatter, onChange }: Props) {
                     onClick={() => onChange(key, !value)}
                   >
                     <span
-                      className={`absolute top-0.5 w-3 h-3 rounded-full bg-white transition-transform ${
+                      className={`absolute top-0.5 w-3 h-3 rounded-full bg-ink-50 transition-transform ${
                         value ? "left-4" : "left-0.5"
                       }`}
                     />
@@ -78,21 +78,21 @@ export default function FrontmatterForm({ frontmatter, onChange }: Props) {
                           : Number(e.target.value)
                       )
                     }
-                    className="w-full bg-ink-900 border border-ink-600 rounded px-2 py-1 text-xs text-white focus:border-accent focus:outline-none"
+                    className="w-full bg-ink-900 border border-ink-600 rounded px-2 py-1 text-xs text-ink-50 focus:border-accent focus:outline-none"
                   />
                 ) : isLong ? (
                   <textarea
                     value={String(value ?? "")}
                     onChange={(e) => onChange(key, e.target.value)}
                     rows={2}
-                    className="w-full bg-ink-900 border border-ink-600 rounded px-2 py-1 text-xs text-white focus:border-accent focus:outline-none resize-none"
+                    className="w-full bg-ink-900 border border-ink-600 rounded px-2 py-1 text-xs text-ink-50 focus:border-accent focus:outline-none resize-none"
                   />
                 ) : (
                   <input
                     type="text"
                     value={String(value ?? "")}
                     onChange={(e) => onChange(key, e.target.value)}
-                    className="w-full bg-ink-900 border border-ink-600 rounded px-2 py-1 text-xs text-white focus:border-accent focus:outline-none"
+                    className="w-full bg-ink-900 border border-ink-600 rounded px-2 py-1 text-xs text-ink-50 focus:border-accent focus:outline-none"
                   />
                 )}
               </div>

@@ -85,6 +85,101 @@ export async function writeFile(
   await fs.promises.writeFile(filePath, content, "utf-8");
 }
 
+export async function renameFile(
+  oldPath: string,
+  newPath: string
+): Promise<void> {
+  await fs.promises.rename(oldPath, newPath);
+}
+
+// --- Search ---
+
+export interface SearchResult {
+  filePath: string;
+  relativePath: string;
+  line: string;
+  lineNumber: number;
+  column: number;
+  matchLength: number;
+}
+
+const TEXT_EXTS = new Set([
+  ".md", ".njk", ".html", ".htm", ".css", ".js", ".ts", ".json",
+  ".yaml", ".yml", ".toml", ".xml", ".txt", ".liquid", ".webc",
+  ".jsx", ".tsx", ".scss", ".sass", ".less", ".svg",
+]);
+
+const MAX_FILE_SIZE = 512 * 1024; // 500 KB
+const MAX_RESULTS = 200;
+const MAX_FILES = 500;
+
+export async function searchFiles(
+  projectPath: string,
+  query: string
+): Promise<SearchResult[]> {
+  if (!query || query.length < 2) return [];
+
+  const results: SearchResult[] = [];
+  let filesScanned = 0;
+  const lowerQuery = query.toLowerCase();
+
+  function walk(dir: string): void {
+    if (results.length >= MAX_RESULTS || filesScanned >= MAX_FILES) return;
+
+    let entries: fs.Dirent[];
+    try {
+      entries = fs.readdirSync(dir, { withFileTypes: true });
+    } catch {
+      return;
+    }
+
+    for (const entry of entries) {
+      if (results.length >= MAX_RESULTS || filesScanned >= MAX_FILES) return;
+      if (IGNORE.has(entry.name) || entry.name.startsWith(".")) continue;
+
+      const fullPath = path.join(dir, entry.name);
+
+      if (entry.isDirectory()) {
+        walk(fullPath);
+      } else if (TEXT_EXTS.has(path.extname(entry.name).toLowerCase())) {
+        try {
+          const stat = fs.statSync(fullPath);
+          if (stat.size > MAX_FILE_SIZE) continue;
+
+          filesScanned++;
+          const content = fs.readFileSync(fullPath, "utf-8");
+          const lines = content.split("\n");
+
+          for (let i = 0; i < lines.length; i++) {
+            if (results.length >= MAX_RESULTS) break;
+            const lowerLine = lines[i].toLowerCase();
+            let col = lowerLine.indexOf(lowerQuery);
+            while (col !== -1 && results.length < MAX_RESULTS) {
+              results.push({
+                filePath: fullPath,
+                relativePath: path.relative(projectPath, fullPath).replace(/\\/g, "/"),
+                line: lines[i].substring(
+                  Math.max(0, col - 40),
+                  Math.min(lines[i].length, col + query.length + 40)
+                ),
+                lineNumber: i + 1,
+                column: col,
+                matchLength: query.length,
+              });
+              col = lowerLine.indexOf(lowerQuery, col + 1);
+            }
+          }
+        } catch {
+          // Skip files that can't be read
+        }
+      }
+    }
+  }
+
+  walk(projectPath);
+  return results;
+}
+
 export function startWatching(dirPath: string, win: BrowserWindow): void {
   stopWatching();
   watcher = fs.watch(dirPath, { recursive: true }, (eventType, filename) => {

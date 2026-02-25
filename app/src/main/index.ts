@@ -1,4 +1,4 @@
-import { app, BrowserWindow, shell } from "electron";
+import { app, BrowserWindow, shell, ipcMain } from "electron";
 import path from "path";
 import { registerIpcHandlers } from "./ipc";
 import { cleanup as eleventyCleanup } from "./services/eleventy";
@@ -23,9 +23,23 @@ function createWindow(): void {
       preload: path.join(__dirname, "../preload/index.js"),
       contextIsolation: true,
       nodeIntegration: false,
-      sandbox: false,
+      sandbox: true,
     },
   });
+
+  // Content Security Policy
+  mainWindow.webContents.session.webRequest.onHeadersReceived(
+    (details, callback) => {
+      callback({
+        responseHeaders: {
+          ...details.responseHeaders,
+          "Content-Security-Policy": [
+            "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' file: data:; font-src 'self' data:; connect-src 'self' https://api.anthropic.com https://api.openai.com https://github.com https://api.github.com",
+          ],
+        },
+      });
+    }
+  );
 
   // Open external links in default browser
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
@@ -43,6 +57,16 @@ function createWindow(): void {
 
 app.whenReady().then(() => {
   registerIpcHandlers();
+
+  // Theme toggle — update title bar overlay colors
+  ipcMain.handle("theme:setOverlay", (_event, theme: "dark" | "light") => {
+    if (!mainWindow) return;
+    mainWindow.setTitleBarOverlay({
+      color: theme === "dark" ? "#0f172a" : "#f8fafc",
+      symbolColor: theme === "dark" ? "#e2e8f0" : "#1e293b",
+    });
+  });
+
   createWindow();
 
   app.on("activate", () => {

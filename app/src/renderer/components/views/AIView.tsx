@@ -10,70 +10,16 @@ import {
   FileText,
   Settings,
   PenTool,
-  Search,
-  Wand2,
+  Palette,
+  Code2,
+  Wrench,
   AlertTriangle,
 } from "lucide-react";
 import { useAIStore, type ChatMessage, type ProjectContext } from "../../stores/ai";
 import { useProjectStore } from "../../stores/project";
 import { useEditorStore } from "../../stores/editor";
 import { useUIStore } from "../../stores/ui";
-
-// --- Lightweight Markdown Renderer ---
-
-function renderMarkdown(text: string): string {
-  let html = text
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
-
-  // Code blocks
-  html = html.replace(
-    /```(\w*)\n([\s\S]*?)```/g,
-    '<pre class="bg-ink-950 rounded-lg p-3 my-2 overflow-x-auto text-xs"><code>$2</code></pre>'
-  );
-
-  // Inline code
-  html = html.replace(
-    /`([^`]+)`/g,
-    '<code class="bg-ink-800 px-1 py-0.5 rounded text-xs text-amber-300">$1</code>'
-  );
-
-  // Bold
-  html = html.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
-
-  // Italic
-  html = html.replace(/\*(.+?)\*/g, "<em>$1</em>");
-
-  // Headings
-  html = html.replace(
-    /^### (.+)$/gm,
-    '<h3 class="text-sm font-semibold text-white mt-3 mb-1">$1</h3>'
-  );
-  html = html.replace(
-    /^## (.+)$/gm,
-    '<h2 class="text-sm font-bold text-white mt-3 mb-1">$1</h2>'
-  );
-  html = html.replace(
-    /^# (.+)$/gm,
-    '<h1 class="text-base font-bold text-white mt-3 mb-1">$1</h1>'
-  );
-
-  // Unordered lists
-  html = html.replace(/^- (.+)$/gm, '<li class="ml-4 list-disc">$1</li>');
-
-  // Ordered lists
-  html = html.replace(
-    /^\d+\. (.+)$/gm,
-    '<li class="ml-4 list-decimal">$1</li>'
-  );
-
-  // Line breaks
-  html = html.replace(/\n\n/g, '<br class="my-2" />');
-  html = html.replace(/\n/g, "<br />");
-
-  return html;
-}
+import { renderMarkdown } from "../../utils/markdown";
 
 // --- Tool Call Indicator ---
 
@@ -147,7 +93,7 @@ function MessageBubble({ message }: { message: ChatMessage }) {
   if (isUser) {
     return (
       <div className="flex justify-end">
-        <div className="max-w-[80%] bg-accent/20 border border-accent/30 rounded-lg px-3 py-2 text-sm text-white whitespace-pre-wrap">
+        <div className="max-w-[80%] bg-accent/20 border border-accent/30 rounded-lg px-3 py-2 text-sm text-ink-50 whitespace-pre-wrap">
           {message.content}
         </div>
       </div>
@@ -175,15 +121,15 @@ function MessageBubble({ message }: { message: ChatMessage }) {
           />
         )}
 
-        {message.streaming && !message.content && toolCalls.length === 0 && (
-          <div className="flex items-center gap-2 text-ink-400 text-sm">
+        {message.streaming && (
+          <div className="flex items-center gap-2 text-accent text-xs mt-2">
             <Loader2 className="w-3.5 h-3.5 animate-spin" />
-            Thinking...
+            {!message.content && toolCalls.length === 0
+              ? "Thinking..."
+              : toolCalls.length > toolResults.length
+                ? "Running tools..."
+                : "Writing..."}
           </div>
-        )}
-
-        {message.streaming && message.content && (
-          <span className="inline-block w-1.5 h-4 bg-accent animate-pulse ml-0.5 align-text-bottom" />
         )}
       </div>
     </div>
@@ -193,9 +139,10 @@ function MessageBubble({ message }: { message: ChatMessage }) {
 // --- Quick Actions ---
 
 const QUICK_ACTIONS = [
-  { label: "Write a page", icon: PenTool, prompt: "Write a new blog post about " },
-  { label: "Improve SEO", icon: Search, prompt: "Analyze and improve the SEO for the currently open page. Suggest better meta descriptions, titles, and content improvements." },
-  { label: "Rewrite", icon: Wand2, prompt: "Rewrite the currently open page to be more engaging and professional while keeping the same information." },
+  { label: "Create a page", icon: PenTool, prompt: "Create a new page for " },
+  { label: "Edit templates", icon: Code2, prompt: "List the templates in this project and suggest improvements to the layout and structure." },
+  { label: "Update styles", icon: Palette, prompt: "Review the CSS/Tailwind styles and suggest visual improvements for the site's design." },
+  { label: "Site config", icon: Wrench, prompt: "Review the current site configuration and suggest optimizations for SEO and metadata." },
 ];
 
 // --- Setup Prompt ---
@@ -209,7 +156,7 @@ function SetupPrompt() {
         <div className="w-12 h-12 rounded-full bg-amber-500/10 flex items-center justify-center mx-auto mb-4">
           <AlertTriangle className="w-6 h-6 text-amber-400" />
         </div>
-        <h3 className="text-sm font-semibold text-white mb-2">
+        <h3 className="text-sm font-semibold text-ink-50 mb-2">
           API Key Required
         </h3>
         <p className="text-xs text-ink-400 mb-4">
@@ -262,9 +209,11 @@ export default function AIView() {
     if (!configLoaded) loadConfig();
   }, [configLoaded, loadConfig]);
 
-  // Subscribe to stream events
+  // Subscribe to stream events — only process site agent events
   useEffect(() => {
     const unsub = window.ink.ai.onStream((event) => {
+      if (event.agentType === "content") return;
+
       switch (event.type) {
         case "chunk":
           if (event.content) appendChunk(event.messageId, event.content);
@@ -303,6 +252,7 @@ export default function AIView() {
       siteUrl,
       currentFilePath: activeTabPath || undefined,
       currentFile: activeTab?.content.raw || undefined,
+      agentType: "site",
     };
 
     await sendMessage(text, context);
@@ -333,9 +283,9 @@ export default function AIView() {
     return (
       <div className="flex flex-col h-full">
         <div className="px-6 py-4 border-b border-ink-700">
-          <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+          <h2 className="text-lg font-semibold text-ink-50 flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-amber-400" />
-            AI Assistant
+            Site AI
           </h2>
         </div>
         <SetupPrompt />
@@ -348,17 +298,12 @@ export default function AIView() {
       {/* Header */}
       <div className="flex items-center justify-between px-6 py-4 border-b border-ink-700">
         <div>
-          <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+          <h2 className="text-lg font-semibold text-ink-50 flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-amber-400" />
-            AI Assistant
+            Site AI
           </h2>
           <p className="text-xs text-ink-500 mt-0.5">
-            {siteName}
-            {activeTabPath && (
-              <span className="text-ink-600">
-                {" "}· {activeTabPath.split(/[/\\]/).pop()}
-              </span>
-            )}
+            Templates, styles, and site configuration
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -391,11 +336,11 @@ export default function AIView() {
               <Sparkles className="w-6 h-6 text-amber-400" />
             </div>
             <p className="text-sm font-medium text-ink-300 mb-1">
-              How can I help?
+              How can I help with your site?
             </p>
             <p className="text-xs text-ink-500 max-w-xs">
-              I can write content, improve SEO, create pages, and help manage
-              your site.
+              I can create pages, edit templates, update styles, and manage your
+              site configuration.
             </p>
           </div>
         ) : (
@@ -434,10 +379,10 @@ export default function AIView() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder={isStreaming ? "Waiting for response..." : "Ask anything about your site..."}
+            placeholder={isStreaming ? "Waiting for response..." : "Ask about templates, styles, or site config..."}
             disabled={isStreaming}
             rows={1}
-            className="flex-1 bg-ink-900 border border-ink-600 rounded-lg px-4 py-3 text-sm text-white placeholder:text-ink-500 focus:border-accent focus:outline-none resize-none disabled:opacity-50"
+            className="flex-1 bg-ink-900 border border-ink-600 rounded-lg px-4 py-3 text-sm text-ink-50 placeholder:text-ink-500 focus:border-accent focus:outline-none resize-none disabled:opacity-50"
           />
           <button
             onClick={handleSend}

@@ -2,13 +2,125 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Theme CSS variables — space-separated RGB for Tailwind alpha support */
+:root {
+  --ink-50: 248 250 252;
+  --ink-100: 241 245 249;
+  --ink-200: 226 232 240;
+  --ink-300: 203 213 225;
+  --ink-400: 148 163 184;
+  --ink-500: 100 116 139;
+  --ink-600: 71 85 105;
+  --ink-700: 51 65 85;
+  --ink-800: 30 41 59;
+  --ink-900: 15 23 42;
+  --ink-950: 2 6 23;
+  --accent: 59 130 246;
+  --accent-hover: 37 99 235;
+  --body-bg: #0f172a;
+  --body-color: #e2e8f0;
+  --scrollbar-thumb: #334155;
+  --scrollbar-thumb-hover: #475569;
+
+  /* CodeMirror editor chrome */
+  --cm-bg: 15 23 42;
+  --cm-text: 203 213 225;
+  --cm-gutter-bg: 15 23 42;
+  --cm-gutter-text: 100 116 139;
+  --cm-gutter-border: #1e293b;
+  --cm-active-gutter-bg: #1e293b;
+  --cm-active-gutter-text: 148 163 184;
+  --cm-active-line: rgba(30, 41, 59, 0.5);
+  --cm-panel-bg: #1e293b;
+  --cm-panel-border: #334155;
+  --cm-input-bg: #0f172a;
+  --cm-input-border: #475569;
+  --cm-input-text: #e2e8f0;
+  --cm-btn-bg: #334155;
+  --cm-btn-text: #cbd5e1;
+  --cm-btn-border: #475569;
+  --cm-btn-hover: #475569;
+  --cm-label-text: #94a3b8;
+
+  /* Syntax highlighting (One Dark) */
+  --cm-keyword: #c678dd;
+  --cm-name: #e06c75;
+  --cm-fn: #61afef;
+  --cm-const: #d19a66;
+  --cm-def: #abb2bf;
+  --cm-type: #e5c07b;
+  --cm-op: #56b6c2;
+  --cm-comment: #7f848e;
+  --cm-strong: #e5c07b;
+  --cm-em: #c678dd;
+  --cm-link: #61afef;
+  --cm-heading: #e06c75;
+  --cm-atom: #d19a66;
+  --cm-string: #98c379;
+}
+
+/* Light theme — invert the scale */
+.theme-light {
+  --ink-50: 2 6 23;
+  --ink-100: 15 23 42;
+  --ink-200: 30 41 59;
+  --ink-300: 51 65 85;
+  --ink-400: 71 85 105;
+  --ink-500: 100 116 139;
+  --ink-600: 148 163 184;
+  --ink-700: 203 213 225;
+  --ink-800: 226 232 240;
+  --ink-900: 248 250 252;
+  --ink-950: 255 255 255;
+  --body-bg: #f8fafc;
+  --body-color: #1e293b;
+  --scrollbar-thumb: #cbd5e1;
+  --scrollbar-thumb-hover: #94a3b8;
+
+  /* CodeMirror editor chrome (light) */
+  --cm-bg: 255 255 255;
+  --cm-text: 30 41 59;
+  --cm-gutter-bg: 248 250 252;
+  --cm-gutter-text: 100 116 139;
+  --cm-gutter-border: #e2e8f0;
+  --cm-active-gutter-bg: #f1f5f9;
+  --cm-active-gutter-text: 51 65 85;
+  --cm-active-line: rgba(241, 245, 249, 0.8);
+  --cm-panel-bg: #f8fafc;
+  --cm-panel-border: #e2e8f0;
+  --cm-input-bg: #ffffff;
+  --cm-input-border: #cbd5e1;
+  --cm-input-text: #1e293b;
+  --cm-btn-bg: #f1f5f9;
+  --cm-btn-text: #334155;
+  --cm-btn-border: #e2e8f0;
+  --cm-btn-hover: #e2e8f0;
+  --cm-label-text: #64748b;
+
+  /* Syntax highlighting (One Light) */
+  --cm-keyword: #a626a4;
+  --cm-name: #e45649;
+  --cm-fn: #4078f2;
+  --cm-const: #986801;
+  --cm-def: #383a42;
+  --cm-type: #c18401;
+  --cm-op: #0184bc;
+  --cm-comment: #a0a1a7;
+  --cm-strong: #c18401;
+  --cm-em: #a626a4;
+  --cm-link: #4078f2;
+  --cm-heading: #e45649;
+  --cm-atom: #986801;
+  --cm-string: #50a14f;
+}
+
 /* App-level base styles */
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, sans-serif;
-  background-color: #0f172a;
-  color: #e2e8f0;
+  background-color: var(--body-bg);
+  color: var(--body-color);
   overflow: hidden;
   user-select: none;
 }
@@ -30,11 +142,11 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #334155;
+  background: var(--scrollbar-thumb);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #475569;
+  background: var(--scrollbar-thumb-hover);
 }
 
 /* Hide scrollbar for tab bar */

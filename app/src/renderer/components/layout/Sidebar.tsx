@@ -1,6 +1,7 @@
 import {
   FileText,
   Image,
+  Search,
   Palette,
   Globe,
   Sparkles,
@@ -11,14 +12,15 @@ import { useUIStore } from "../../stores/ui";
 import { useProjectStore } from "../../stores/project";
 
 const navItems: Array<{
-  id: "content" | "media" | "theme" | "git" | "ai" | "settings";
+  id: "content" | "media" | "search" | "theme" | "git" | "ai" | "settings";
   label: string;
   icon: LucideIcon;
   devOnly: boolean;
 }> = [
   { id: "content", label: "Content", icon: FileText, devOnly: false },
   { id: "media", label: "Media", icon: Image, devOnly: false },
-  { id: "theme", label: "Theme", icon: Palette, devOnly: true },
+  { id: "search", label: "Search", icon: Search, devOnly: false },
+  { id: "theme", label: "Theme", icon: Palette, devOnly: false },
   { id: "git", label: "Publish", icon: Globe, devOnly: false },
   { id: "ai", label: "AI", icon: Sparkles, devOnly: false },
   { id: "settings", label: "Settings", icon: Settings, devOnly: false },
@@ -54,7 +56,7 @@ export default function Sidebar() {
             onClick={() => setView(item.id)}
             className={`w-full text-left px-4 py-2 text-sm flex items-center gap-3 transition-colors ${
               activeView === item.id
-                ? "bg-ink-800 text-white"
+                ? "bg-ink-800 text-ink-50"
                 : "text-ink-400 hover:text-ink-200 hover:bg-ink-800/50"
             }`}
           >

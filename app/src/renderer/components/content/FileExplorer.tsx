@@ -65,6 +65,7 @@ export default function FileExplorer() {
             depth={0}
             expanded={expanded}
             onToggle={handleToggle}
+            devMode={devMode}
           />
         ))}
       </div>
