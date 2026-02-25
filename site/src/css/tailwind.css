@@ -203,6 +203,17 @@
     @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
   }
 
+  /* --- Download Grid --- */
+  .download-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    max-width: 36rem;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 2.5rem;
+  }
+
   /* --- Row Card (docs/features listing) --- */
   .row-card-group {
     @apply flex flex-col divide-y divide-gray-800 border border-gray-800
