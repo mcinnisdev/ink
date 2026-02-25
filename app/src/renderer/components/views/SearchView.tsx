@@ -71,6 +71,7 @@ export default function SearchView() {
   const [results, setResults] = useState<SearchResult[]>([]);
   const [searching, setSearching] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
@@ -87,12 +88,15 @@ export default function SearchView() {
         return;
       }
       setSearching(true);
+      setError(null);
       try {
         const res = await window.ink.file.search(projectPath, query);
         setResults(res);
         setHasSearched(true);
-      } catch {
+      } catch (err) {
         setResults([]);
+        setHasSearched(true);
+        setError(err instanceof Error ? err.message : "Search failed");
       } finally {
         setSearching(false);
       }
@@ -161,7 +165,13 @@ export default function SearchView() {
           </div>
         )}
 
-        {hasSearched && results.length === 0 && (
+        {hasSearched && error && (
+          <div className="flex flex-col items-center justify-center h-full text-ink-500">
+            <p className="text-sm text-red-400">Search error: {error}</p>
+          </div>
+        )}
+
+        {hasSearched && !error && results.length === 0 && (
           <div className="flex flex-col items-center justify-center h-full text-ink-500">
             <p className="text-sm">No results found for "{searchQuery}"</p>
           </div>

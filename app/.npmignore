@@ -1,0 +1,10 @@
+node_modules/
+release/
+src/
+scripts/
+resources/
+*.ts
+*.mjs
+tsconfig*.json
+postcss.config.mjs
+tailwind.config.mjs

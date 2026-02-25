@@ -83,9 +83,9 @@ function validatePath(userPath: string): string {
 export function registerIpcHandlers(): void {
   // --- Project ---
   ipcMain.handle("project:create", async (_event, config) => {
-    const result = await createProject(config);
-    if (result?.path) activeProjectPath = path.resolve(result.path);
-    return result;
+    const projectPath = await createProject(config);
+    if (projectPath) activeProjectPath = path.resolve(projectPath);
+    return projectPath;
   });
 
   ipcMain.handle("project:open", async () => {

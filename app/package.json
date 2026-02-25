@@ -1,18 +1,67 @@
 {
   "name": "ink-app",
-  "version": "0.1.0",
+  "version": "0.1.0-alpha.1",
   "private": true,
   "description": "Desktop application for Ink — visual editor with live preview and Git publishing.",
   "author": "mcinnisdev",
   "license": "MIT",
-  "main": "./out/main/index.js",
+  "main": "./dist-electron/main/index.js",
   "engines": {
     "node": ">=18.0.0"
   },
   "scripts": {
     "dev": "node scripts/dev.js",
     "build": "electron-vite build",
-    "preview": "electron-vite preview"
+    "preview": "electron-vite preview",
+    "dist": "electron-vite build && electron-builder --publish never",
+    "dist:win": "electron-vite build && electron-builder --win --publish never",
+    "dist:mac": "electron-vite build && electron-builder --mac --publish never",
+    "dist:linux": "electron-vite build && electron-builder --linux --publish never"
+  },
+  "build": {
+    "appId": "com.mcinnisdev.ink",
+    "productName": "Ink",
+    "directories": {
+      "output": "release"
+    },
+    "extraResources": [
+      {
+        "from": "../starter",
+        "to": "starter",
+        "filter": ["**/*", "!node_modules/**", "!_site/**"]
+      },
+      {
+        "from": "../starter-tailwind",
+        "to": "starter-tailwind",
+        "filter": ["**/*", "!node_modules/**", "!_site/**"]
+      },
+      {
+        "from": "../cli",
+        "to": "cli",
+        "filter": ["**/*", "!node_modules/**"]
+      }
+    ],
+    "win": {
+      "target": ["nsis"],
+      "icon": "resources/icon.ico",
+      "signAndEditExecutable": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "installerIcon": "resources/icon.ico",
+      "uninstallerIcon": "resources/icon.ico"
+    },
+    "mac": {
+      "target": ["dmg"],
+      "icon": "resources/ink-logo.png",
+      "category": "public.app-category.developer-tools"
+    },
+    "linux": {
+      "target": ["AppImage"],
+      "icon": "resources/ink-logo.png",
+      "category": "Development"
+    }
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",
@@ -34,6 +83,7 @@
     "@vitejs/plugin-react": "^4.3.0",
     "autoprefixer": "^10.4.20",
     "electron": "^31.0.0",
+    "electron-builder": "^26.8.1",
     "electron-vite": "^2.3.0",
     "postcss": "^8.4.49",
     "react": "^18.3.0",
