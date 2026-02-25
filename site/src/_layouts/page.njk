@@ -14,8 +14,10 @@ layout: base.njk
 
 {% if content | trim %}
 <section class="section">
-  <div class="detail__content prose max-w-none">
-    {{ content | safe }}
+  <div class="container container--narrow">
+    <div class="detail__content prose max-w-none">
+      {{ content | safe }}
+    </div>
   </div>
 </section>
 {% endif %}
