@@ -30,7 +30,8 @@
       {
         "provider": "github",
         "owner": "mcinnisdev",
-        "repo": "ink"
+        "repo": "ink",
+        "releaseType": "release"
       }
     ],
     "extraResources": [

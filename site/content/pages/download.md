@@ -34,6 +34,8 @@ The installer is not code-signed yet, so Windows SmartScreen may show a warning.
 
 Ink checks for updates automatically on launch. When a new version is available, you can download and install it directly from **Settings > About & Updates**.
 
+See the [changelog](/changelog/) for what's new in each release.
+
 ---
 
 ## Linux
