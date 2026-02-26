@@ -680,6 +680,14 @@
   .detail__content pre {
     @apply bg-slate-900 border border-gray-800 rounded-xl p-4 md:px-6;
   }
+  .detail__content pre code {
+    @apply bg-transparent p-0 rounded-none text-inherit font-mono text-sm;
+  }
+  .detail__content pre code .token {
+    background: none;
+    padding: 0;
+    border-radius: 0;
+  }
   .detail__content :not(pre) > code {
     @apply bg-coral/10 px-1.5 py-0.5 rounded text-coral-light font-normal;
   }
