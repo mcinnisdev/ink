@@ -33,7 +33,26 @@ function toLabel(key: string): string {
 }
 
 /** Keys that are managed by directory defaults / layout and shouldn't be shown. */
-const HIDDEN_KEYS = new Set(["layout", "tags", "permalink", "og_type"]);
+const HIDDEN_KEYS = new Set(["layout", "tags", "og_type"]);
+
+/** Determine if a key likely represents a path/URL value that should start with /. */
+function looksLikePath(key: string): boolean {
+  const k = key.toLowerCase();
+  return (
+    k === "permalink" ||
+    k.includes("url") ||
+    k.includes("href") ||
+    k.includes("path") ||
+    k.includes("slug")
+  );
+}
+
+/** Return a warning string if a path-like field value is missing a leading /. */
+function pathWarning(key: string, value: unknown): string | undefined {
+  if (typeof value !== "string" || !value || !looksLikePath(key)) return undefined;
+  if (!value.startsWith("/")) return "Path should start with / (e.g. /blog/my-post/)";
+  return undefined;
+}
 
 /** Determine if a key likely represents a media/image path. */
 function looksLikeMedia(key: string, value: unknown): boolean {
@@ -124,6 +143,7 @@ function SchemaField({
           label={label}
           value={String(value ?? "")}
           required={field.required}
+          warning={pathWarning(field.key, value)}
           onChange={onChange}
         />
       );
@@ -184,6 +204,7 @@ function GenericField({
     <TextField
       label={toLabel(fieldKey)}
       value={String(value ?? "")}
+      warning={pathWarning(fieldKey, value)}
       onChange={onChange}
     />
   );

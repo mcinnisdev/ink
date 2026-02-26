@@ -11,6 +11,21 @@ hero_headline: "Changelog"
 hero_subtitle: "Release notes and version history for the Ink desktop app."
 ---
 
+## v1.1.2
+
+### New Features
+
+- **Purpose-built content type layouts** — FAQ uses an accordion archive with expandable Q&As, portfolio gets full-width image heroes with overlay text, features and service areas gain prev/next navigation and back links.
+- **Simplified project wizard** — Removed AI content customization from the new project setup; users now choose how many sample entries to generate per content type (None, 3, 5, or 8).
+- **Field validation warnings** — Frontmatter fields for permalinks, URLs, and media paths show a yellow warning when missing a leading `/`.
+
+### Bug Fixes
+
+- Fixed file explorer sidebar not scrolling when expanded folders push content off-screen.
+- Fixed CLI placeholder images not varying per content type (team now cycles avatars, blog cycles landscapes, etc.).
+
+---
+
 ## v1.1.1
 
 ### Bug Fixes

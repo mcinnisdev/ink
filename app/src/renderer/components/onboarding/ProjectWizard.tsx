@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   FileText,
   BookOpen,
@@ -8,18 +8,15 @@ import {
   Star,
   Layout,
   HelpCircle,
-  Sparkles,
   Loader2,
   ArrowRight,
   ArrowLeft,
   Upload,
   Palette,
-  Key,
   X,
 } from "lucide-react";
 import { useProjectStore } from "../../stores/project";
 import { useUIStore } from "../../stores/ui";
-import { useAIStore, type AIConfig } from "../../stores/ai";
 
 const CONTENT_TYPES = [
   {
@@ -74,19 +71,20 @@ const CONTENT_TYPES = [
   },
 ];
 
-const STEP_LABELS = ["Project details", "Content structure", "Branding & AI"];
+const CONTENT_COUNT_OPTIONS = [
+  { value: 0, label: "None" },
+  { value: 3, label: "3 entries" },
+  { value: 5, label: "5 entries" },
+  { value: 8, label: "8 entries" },
+];
+
+const STEP_LABELS = ["Project details", "Content structure", "Branding"];
 
 export default function ProjectWizard() {
   const setWizardOpen = useUIStore((s) => s.setWizardOpen);
   const setView = useUIStore((s) => s.setView);
   const createProject = useProjectStore((s) => s.createProject);
   const loading = useProjectStore((s) => s.loading);
-
-  // AI config
-  const aiConfig = useAIStore((s) => s.config);
-  const aiConfigLoaded = useAIStore((s) => s.configLoaded);
-  const loadAIConfig = useAIStore((s) => s.loadConfig);
-  const saveAIConfig = useAIStore((s) => s.saveConfig);
 
   const [step, setStep] = useState(1);
 
@@ -96,38 +94,27 @@ export default function ProjectWizard() {
   const [siteName, setSiteName] = useState("");
   const [siteUrl, setSiteUrl] = useState("");
 
-  // Step 2: Content types + description
+  // Step 2: Content types + counts
   const [selectedTypes, setSelectedTypes] = useState<Set<string>>(
     new Set(CONTENT_TYPES.filter((t) => t.default).map((t) => t.id))
   );
-  const [siteDescription, setSiteDescription] = useState("");
+  const [contentCounts, setContentCounts] = useState<Record<string, number>>(
+    () => {
+      const counts: Record<string, number> = {};
+      for (const t of CONTENT_TYPES) counts[t.id] = 3;
+      return counts;
+    }
+  );
 
-  // Step 3: CSS framework + Branding + AI
+  // Step 3: CSS framework + Branding
   const [useTailwind, setUseTailwind] = useState(false);
   const [logoPath, setLogoPath] = useState("");
   const [logoName, setLogoName] = useState("");
   const [primaryColor, setPrimaryColor] = useState("#2563eb");
   const [secondaryColor, setSecondaryColor] = useState("#1e293b");
-  const [localAI, setLocalAI] = useState<AIConfig>({
-    provider: "anthropic",
-    apiKey: "",
-    model: "claude-sonnet-4-20250514",
-  });
-  const hasAIKey = !!(aiConfig?.apiKey);
 
   const [error, setError] = useState("");
   const [scaffolding, setScaffolding] = useState(false);
-
-  // Load AI config on mount
-  useEffect(() => {
-    if (!aiConfigLoaded) loadAIConfig();
-  }, [aiConfigLoaded, loadAIConfig]);
-
-  useEffect(() => {
-    if (aiConfig) {
-      setLocalAI(aiConfig);
-    }
-  }, [aiConfig]);
 
   const toggleType = (id: string) => {
     setSelectedTypes((prev) => {
@@ -161,7 +148,6 @@ export default function ProjectWizard() {
       const picked = await window.ink.dialog.pickImage();
       if (picked) {
         setLogoPath(picked);
-        // Extract just the file name for display
         const parts = picked.replace(/\\/g, "/").split("/");
         setLogoName(parts[parts.length - 1]);
       }
@@ -177,11 +163,6 @@ export default function ProjectWizard() {
     setError("");
     setScaffolding(true);
     try {
-      // Save AI config if key was entered or changed in the wizard
-      if (localAI.apiKey.trim()) {
-        await saveAIConfig(localAI);
-      }
-
       setScaffoldStatus("Creating project...");
       const projectPath = await createProject({
         name: name.trim(),
@@ -197,7 +178,6 @@ export default function ProjectWizard() {
         await window.ink.project.applyBranding(projectPath, {
           logoPath: logoPath || undefined,
           brandColors: { primary: primaryColor, secondary: secondaryColor },
-          siteDescription: siteDescription.trim(),
           siteName: siteName.trim() || name.trim(),
           siteUrl: siteUrl.trim() || "https://example.com",
         });
@@ -206,7 +186,6 @@ export default function ProjectWizard() {
       }
 
       // Scaffold content types via CLI
-      // Add all selected types (CLI gracefully skips types already in the starter)
       setScaffoldStatus("Setting up content types...");
       const allTypes = Array.from(selectedTypes);
       for (const typeId of allTypes) {
@@ -232,23 +211,16 @@ export default function ProjectWizard() {
         }
       }
 
-      // Generate AI content if configured and description was provided
-      const aiReady = localAI.apiKey.trim() || hasAIKey;
-      if (aiReady && siteDescription.trim()) {
-        setScaffoldStatus("Generating content with AI...");
-        try {
-          const result = await window.ink.ai.generateSiteContent({
-            projectPath,
-            siteName: siteName.trim() || name.trim(),
-            siteUrl: siteUrl.trim() || "https://example.com",
-            siteDescription: siteDescription.trim(),
-            contentTypes: allTypes,
-          });
-          if (!result.success) {
-            console.warn("AI content generation failed:", result.error);
+      // Generate sample content for each selected type
+      setScaffoldStatus("Generating sample content...");
+      for (const typeId of allTypes) {
+        const count = contentCounts[typeId] ?? 3;
+        if (count > 0) {
+          try {
+            await window.ink.cli.generateContent(projectPath, typeId, count);
+          } catch (err) {
+            console.error(`Failed to generate content for ${typeId}:`, err);
           }
-        } catch (err) {
-          console.error("AI content generation error:", err);
         }
       }
 
@@ -361,7 +333,7 @@ export default function ProjectWizard() {
           </>
         )}
 
-        {/* ===== Step 2: Content Types + Description ===== */}
+        {/* ===== Step 2: Content Types ===== */}
         {step === 2 && (
           <>
             <div className="px-6 py-5 space-y-5 max-h-[60vh] overflow-y-auto">
@@ -377,56 +349,62 @@ export default function ProjectWizard() {
                   {CONTENT_TYPES.map((type) => {
                     const isSelected = selectedTypes.has(type.id);
                     return (
-                      <button
+                      <div
                         key={type.id}
-                        onClick={() => toggleType(type.id)}
-                        className={`flex items-start gap-2.5 p-3 rounded-lg border text-left transition-colors ${
+                        className={`rounded-lg border transition-colors ${
                           isSelected
-                            ? "bg-accent/10 border-accent/40 text-ink-50"
-                            : "bg-ink-900/50 border-ink-700/50 text-ink-400 hover:border-ink-600"
+                            ? "bg-accent/10 border-accent/40"
+                            : "bg-ink-900/50 border-ink-700/50 hover:border-ink-600"
                         }`}
                       >
-                        <type.icon
-                          className={`w-4 h-4 mt-0.5 flex-shrink-0 ${
-                            isSelected ? "text-accent" : "text-ink-500"
-                          }`}
-                        />
-                        <div className="min-w-0">
-                          <p
-                            className={`text-xs font-medium ${
-                              isSelected ? "text-ink-50" : "text-ink-300"
+                        <button
+                          onClick={() => toggleType(type.id)}
+                          className="flex items-start gap-2.5 p-3 w-full text-left"
+                        >
+                          <type.icon
+                            className={`w-4 h-4 mt-0.5 flex-shrink-0 ${
+                              isSelected ? "text-accent" : "text-ink-500"
                             }`}
-                          >
-                            {type.label}
-                          </p>
-                          <p className="text-[10px] text-ink-500 mt-0.5 leading-tight">
-                            {type.desc}
-                          </p>
-                        </div>
-                      </button>
+                          />
+                          <div className="min-w-0">
+                            <p
+                              className={`text-xs font-medium ${
+                                isSelected ? "text-ink-50" : "text-ink-300"
+                              }`}
+                            >
+                              {type.label}
+                            </p>
+                            <p className="text-[10px] text-ink-500 mt-0.5 leading-tight">
+                              {type.desc}
+                            </p>
+                          </div>
+                        </button>
+                        {isSelected && (
+                          <div className="px-3 pb-2 pt-0">
+                            <select
+                              value={contentCounts[type.id] ?? 3}
+                              onChange={(e) => {
+                                const count = parseInt(e.target.value, 10);
+                                setContentCounts((prev) => ({
+                                  ...prev,
+                                  [type.id]: count,
+                                }));
+                              }}
+                              onClick={(e) => e.stopPropagation()}
+                              className="w-full bg-ink-900 border border-ink-600 rounded px-2 py-1 text-[10px] text-ink-300 focus:border-accent focus:outline-none"
+                            >
+                              {CONTENT_COUNT_OPTIONS.map((opt) => (
+                                <option key={opt.value} value={opt.value}>
+                                  {opt.label}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                        )}
+                      </div>
                     );
                   })}
                 </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-ink-400 mb-1.5">
-                  <span className="flex items-center gap-1">
-                    <Sparkles className="w-3 h-3 text-amber-400" />
-                    Describe your site
-                  </span>
-                </label>
-                <textarea
-                  value={siteDescription}
-                  onChange={(e) => setSiteDescription(e.target.value)}
-                  placeholder="e.g. A plumbing company in Denver, CO that offers residential and commercial plumbing services. We want to highlight our team, service areas, and customer reviews."
-                  rows={3}
-                  className="w-full px-3 py-2 bg-ink-900 border border-ink-600 rounded-lg text-sm text-ink-50 placeholder:text-ink-500 focus:outline-none focus:border-accent resize-none"
-                />
-                <p className="text-xs text-ink-500 mt-1">
-                  The AI will use this to customize your site structure, sample
-                  content, and SEO settings.
-                </p>
               </div>
 
               {error && <p className="text-red-400 text-sm">{error}</p>}
@@ -454,7 +432,7 @@ export default function ProjectWizard() {
           </>
         )}
 
-        {/* ===== Step 3: Branding & AI ===== */}
+        {/* ===== Step 3: Branding ===== */}
         {step === 3 && (
           <>
             <div className="px-6 py-5 space-y-5 max-h-[60vh] overflow-y-auto">
@@ -605,116 +583,6 @@ export default function ProjectWizard() {
                 </div>
               </div>
 
-              {/* AI Setup */}
-              <div className="border border-ink-700/50 rounded-lg p-4 bg-ink-900/30">
-                <label className="block text-xs font-medium text-ink-400 mb-2 flex items-center gap-1.5">
-                  <Key className="w-3.5 h-3.5 text-amber-400" />
-                  AI Assistant
-                  {hasAIKey && (
-                    <span className="text-[10px] text-emerald-400 font-normal">
-                      Configured
-                    </span>
-                  )}
-                  {!hasAIKey && (
-                    <span className="text-[10px] text-ink-500 font-normal">
-                      (optional)
-                    </span>
-                  )}
-                </label>
-                <p className="text-[11px] text-ink-500 mb-3">
-                  {hasAIKey
-                    ? "Your AI assistant is configured. You can update the settings below."
-                    : "Add an API key to enable the AI assistant for content creation, SEO optimization, and site management."}
-                </p>
-
-                <div className="space-y-3">
-                  <div>
-                    <label className="block text-[10px] text-ink-500 mb-1">
-                      Provider
-                    </label>
-                    <select
-                      value={localAI.provider}
-                      onChange={(e) => {
-                        const provider = e.target.value as
-                          | "anthropic"
-                          | "openai";
-                        setLocalAI((prev) => ({
-                          ...prev,
-                          provider,
-                          model:
-                            provider === "anthropic"
-                              ? "claude-sonnet-4-20250514"
-                              : "gpt-4o",
-                        }));
-                      }}
-                      className="w-full bg-ink-900 border border-ink-600 rounded-lg px-2.5 py-1.5 text-xs text-ink-50 focus:border-accent focus:outline-none"
-                    >
-                      <option value="anthropic">Anthropic (Claude)</option>
-                      <option value="openai">OpenAI (GPT)</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-[10px] text-ink-500 mb-1">
-                      API Key
-                    </label>
-                    <input
-                      type="password"
-                      value={localAI.apiKey}
-                      onChange={(e) =>
-                        setLocalAI((prev) => ({
-                          ...prev,
-                          apiKey: e.target.value,
-                        }))
-                      }
-                      placeholder={
-                        localAI.provider === "anthropic"
-                          ? "sk-ant-..."
-                          : "sk-..."
-                      }
-                      className="w-full bg-ink-900 border border-ink-600 rounded-lg px-2.5 py-1.5 text-xs text-ink-50 focus:border-accent focus:outline-none"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-[10px] text-ink-500 mb-1">
-                      Model
-                    </label>
-                    <select
-                      value={localAI.model}
-                      onChange={(e) =>
-                        setLocalAI((prev) => ({
-                          ...prev,
-                          model: e.target.value,
-                        }))
-                      }
-                      className="w-full bg-ink-900 border border-ink-600 rounded-lg px-2.5 py-1.5 text-xs text-ink-50 focus:border-accent focus:outline-none"
-                    >
-                      {localAI.provider === "anthropic" ? (
-                        <>
-                          <option value="claude-sonnet-4-20250514">
-                            Claude Sonnet 4
-                          </option>
-                          <option value="claude-haiku-4-20250414">
-                            Claude Haiku 4
-                          </option>
-                        </>
-                      ) : (
-                        <>
-                          <option value="gpt-4o">GPT-4o</option>
-                          <option value="gpt-4o-mini">GPT-4o Mini</option>
-                        </>
-                      )}
-                    </select>
-                  </div>
-                </div>
-
-                <p className="text-[10px] text-ink-500 mt-2">
-                  You can change this later in Settings. Keys are stored
-                  locally and never sent to Ink servers.
-                </p>
-              </div>
-
               {error && <p className="text-red-400 text-sm">{error}</p>}
             </div>
 
@@ -743,10 +611,7 @@ export default function ProjectWizard() {
                 ) : loading ? (
                   "Creating..."
                 ) : (
-                  <>
-                    <Sparkles className="w-3.5 h-3.5" />
-                    Create Project
-                  </>
+                  "Create Project"
                 )}
               </button>
             </div>

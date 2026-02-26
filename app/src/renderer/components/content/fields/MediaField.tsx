@@ -23,8 +23,13 @@ export default function MediaField({
     }
   };
 
+  const warning =
+    value && !value.startsWith("/")
+      ? "Path should start with / (e.g. /media/photo.jpg)"
+      : undefined;
+
   return (
-    <FieldWrapper label={label} required={required}>
+    <FieldWrapper label={label} required={required} warning={warning}>
       <div className="flex gap-1">
         <input
           type="text"

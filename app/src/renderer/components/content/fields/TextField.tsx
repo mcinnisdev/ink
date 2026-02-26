@@ -4,6 +4,7 @@ interface Props {
   label: string;
   value: string;
   required?: boolean;
+  warning?: string;
   onChange: (value: string) => void;
 }
 
@@ -11,10 +12,11 @@ export default function TextField({
   label,
   value,
   required,
+  warning,
   onChange,
 }: Props) {
   return (
-    <FieldWrapper label={label} required={required}>
+    <FieldWrapper label={label} required={required} warning={warning}>
       <input
         type="text"
         value={value}

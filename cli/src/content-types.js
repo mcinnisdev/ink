@@ -242,6 +242,7 @@ og_type: article
 ---
 <article class="section">
   <div class="container container--narrow">
+    <a href="/features/" class="detail__back-link">&larr; All Features</a>
     {% if featured_image %}
     <div class="hero hero--sm" style="background-image: url('{{ featured_image }}')">
       <div class="hero__overlay"></div>
@@ -252,6 +253,27 @@ og_type: article
       {% if subtitle %}<p class="detail__subtitle">{{ subtitle }}</p>{% endif %}
       {{ content | safe }}
     </div>
+    {%- set allItems = collections.features %}
+    {%- set currentIndex = -1 %}
+    {%- for item in allItems %}
+      {%- if item.url == page.url %}{%- set currentIndex = loop.index0 %}{%- endif %}
+    {%- endfor %}
+    {%- if currentIndex > 0 or currentIndex < allItems.length - 1 %}
+    <nav class="detail__nav" aria-label="Feature navigation">
+      {%- if currentIndex > 0 %}
+      <a href="{{ allItems[currentIndex - 1].url }}" class="detail__nav-link detail__nav-link--prev">
+        <span class="detail__nav-label">Previous</span>
+        <span class="detail__nav-title">{{ allItems[currentIndex - 1].data.title }}</span>
+      </a>
+      {%- else %}<span></span>{%- endif %}
+      {%- if currentIndex < allItems.length - 1 %}
+      <a href="{{ allItems[currentIndex + 1].url }}" class="detail__nav-link detail__nav-link--next">
+        <span class="detail__nav-label">Next</span>
+        <span class="detail__nav-title">{{ allItems[currentIndex + 1].data.title }}</span>
+      </a>
+      {%- else %}<span></span>{%- endif %}
+    </nav>
+    {%- endif %}
   </div>
 </article>`,
     navEntry: { label: "Features", url: "/features/" },
@@ -304,6 +326,7 @@ og_type: article
 ---
 <article class="section">
   <div class="container container--narrow">
+    <a href="/service-areas/" class="detail__back-link">&larr; All Service Areas</a>
     {% if featured_image %}
     <div class="hero hero--sm" style="background-image: url('{{ featured_image }}')">
       <div class="hero__overlay"></div>
@@ -311,10 +334,17 @@ og_type: article
     {% endif %}
     <div class="detail__content">
       <h1>{{ title }}</h1>
+      {% if excerpt %}<p class="detail__subtitle">{{ excerpt }}</p>{% endif %}
       {{ content | safe }}
     </div>
     {% if cta_title %}
-    {% include "components/cta-strip.njk" %}
+    <div class="detail__cta">
+      <h3>{{ cta_title }}</h3>
+      {% if cta_text %}<p>{{ cta_text }}</p>{% endif %}
+      {% if cta_url and cta_label %}
+      <a href="{{ cta_url }}" class="btn btn--primary">{{ cta_label }}</a>
+      {% endif %}
+    </div>
     {% endif %}
   </div>
 </article>`,
@@ -373,19 +403,47 @@ We're proud to serve the ${title} area and surrounding neighborhoods.
 layout: base.njk
 og_type: article
 ---
+{% if featured_image %}
+<div class="hero hero--sm" style="background-image: url('{{ featured_image }}')">
+  <div class="hero__overlay"></div>
+  <div class="hero__content">
+    <h1 class="hero__title">{{ title }}</h1>
+    {% if client %}<p class="hero__subtitle">{{ client }}</p>{% endif %}
+  </div>
+</div>
+{% endif %}
 <article class="section">
   <div class="container container--narrow">
-    {% if featured_image %}
-    <div class="hero hero--sm" style="background-image: url('{{ featured_image }}')">
-      <div class="hero__overlay"></div>
+    <a href="/portfolio/" class="detail__back-link">&larr; All Projects</a>
+    {% if not featured_image %}<h1>{{ title }}</h1>{% endif %}
+    <div class="detail__meta-bar">
+      {% if client %}<span class="detail__badge">{{ client }}</span>{% endif %}
+      {% if date %}<time datetime="{{ date | dateISO }}">{{ date | dateFormat }}</time>{% endif %}
     </div>
-    {% endif %}
     <div class="detail__content">
-      <h1>{{ title }}</h1>
-      {% if client %}<p class="detail__meta">Client: {{ client }}</p>{% endif %}
-      {% if date %}<time class="detail__meta" datetime="{{ date | dateISO }}">{{ date | dateFormat }}</time>{% endif %}
       {{ content | safe }}
     </div>
+    {%- set allItems = collections.projects %}
+    {%- set currentIndex = -1 %}
+    {%- for item in allItems %}
+      {%- if item.url == page.url %}{%- set currentIndex = loop.index0 %}{%- endif %}
+    {%- endfor %}
+    {%- if currentIndex > 0 or currentIndex < allItems.length - 1 %}
+    <nav class="detail__nav" aria-label="Project navigation">
+      {%- if currentIndex > 0 %}
+      <a href="{{ allItems[currentIndex - 1].url }}" class="detail__nav-link detail__nav-link--prev">
+        <span class="detail__nav-label">Previous</span>
+        <span class="detail__nav-title">{{ allItems[currentIndex - 1].data.title }}</span>
+      </a>
+      {%- else %}<span></span>{%- endif %}
+      {%- if currentIndex < allItems.length - 1 %}
+      <a href="{{ allItems[currentIndex + 1].url }}" class="detail__nav-link detail__nav-link--next">
+        <span class="detail__nav-label">Next</span>
+        <span class="detail__nav-title">{{ allItems[currentIndex + 1].data.title }}</span>
+      </a>
+      {%- else %}<span></span>{%- endif %}
+    </nav>
+    {%- endif %}
   </div>
 </article>`,
     navEntry: { label: "Portfolio", url: "/portfolio/" },
@@ -438,13 +496,75 @@ og_type: article
 ---
 <article class="section">
   <div class="container container--narrow">
-    <div class="detail__content">
+    <a href="/faq/" class="detail__back-link">&larr; All FAQ</a>
+    <div class="faq-detail">
+      {% if category %}<span class="faq-category">{{ category }}</span>{% endif %}
       <h1>{{ title }}</h1>
-      {{ content | safe }}
+      <div class="detail__content">
+        {{ content | safe }}
+      </div>
     </div>
+    {%- set allItems = collections.faqs %}
+    {%- set currentIndex = -1 %}
+    {%- for item in allItems %}
+      {%- if item.url == page.url %}{%- set currentIndex = loop.index0 %}{%- endif %}
+    {%- endfor %}
+    {%- if currentIndex > 0 or currentIndex < allItems.length - 1 %}
+    <nav class="detail__nav" aria-label="FAQ navigation">
+      {%- if currentIndex > 0 %}
+      <a href="{{ allItems[currentIndex - 1].url }}" class="detail__nav-link detail__nav-link--prev">
+        <span class="detail__nav-label">Previous</span>
+        <span class="detail__nav-title">{{ allItems[currentIndex - 1].data.title }}</span>
+      </a>
+      {%- else %}<span></span>{%- endif %}
+      {%- if currentIndex < allItems.length - 1 %}
+      <a href="{{ allItems[currentIndex + 1].url }}" class="detail__nav-link detail__nav-link--next">
+        <span class="detail__nav-label">Next</span>
+        <span class="detail__nav-title">{{ allItems[currentIndex + 1].data.title }}</span>
+      </a>
+      {%- else %}<span></span>{%- endif %}
+    </nav>
+    {%- endif %}
   </div>
 </article>`,
     navEntry: { label: "FAQ", url: "/faq/" },
+    additionalLayouts: [
+      {
+        filename: "faq-archive.njk",
+        content: `---
+layout: base.njk
+---
+<section class="hero hero--no-image hero--sm">
+  <div class="hero__content">
+    <h1 class="hero__title">{{ title }}</h1>
+    {% if excerpt %}<p class="hero__subtitle">{{ excerpt }}</p>{% endif %}
+  </div>
+</section>
+
+<section class="section">
+  <div class="container container--narrow">
+    {%- set items = collections[collection_name] -%}
+    {% if items and items.length %}
+    <div class="faq-accordion">
+      {% for item in items %}
+      <details class="faq-accordion__item">
+        <summary class="faq-accordion__question">
+          {{ item.data.title }}
+          {% if item.data.category %}<span class="faq-category">{{ item.data.category }}</span>{% endif %}
+        </summary>
+        <div class="faq-accordion__answer">
+          {{ item.content | safe }}
+        </div>
+      </details>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-center">No questions yet.</p>
+    {% endif %}
+  </div>
+</section>`,
+      },
+    ],
     archivePage: {
       filename: "faq.md",
       content: `---
@@ -452,7 +572,7 @@ title: "Frequently Asked Questions"
 seo_title: "FAQ — Common Questions Answered"
 meta_description: "Find answers to our most frequently asked questions."
 slug: "faq"
-layout: "archive.njk"
+layout: "faq-archive.njk"
 permalink: "/faq/"
 published: true
 collection_name: "faqs"

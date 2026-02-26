@@ -147,10 +147,10 @@ function pastDate(weeksAgo) {
 const PLACEHOLDER_IMAGES = {
   photo: ["/media/placeholders/avatar-1.png", "/media/placeholders/avatar-2.png"],
   blog: ["/media/placeholders/landscape-1.png", "/media/placeholders/landscape-2.png", "/media/placeholders/landscape-3.png"],
-  services: ["/media/placeholders/building.png", "/media/placeholders/landscape-1.png"],
-  portfolio: ["/media/placeholders/product.png", "/media/placeholders/landscape-2.png", "/media/placeholders/landscape-3.png"],
-  features: ["/media/placeholders/landscape-1.png", "/media/placeholders/landscape-2.png"],
-  "service-areas": ["/media/placeholders/map.png"],
+  services: ["/media/placeholders/building.png", "/media/placeholders/product.png", "/media/placeholders/landscape-1.png"],
+  portfolio: ["/media/placeholders/product.png", "/media/placeholders/landscape-1.png", "/media/placeholders/landscape-2.png", "/media/placeholders/landscape-3.png"],
+  features: ["/media/placeholders/product.png", "/media/placeholders/landscape-1.png", "/media/placeholders/landscape-2.png"],
+  "service-areas": ["/media/placeholders/map.png", "/media/placeholders/landscape-2.png", "/media/placeholders/landscape-3.png"],
 };
 
 function getPlaceholderImage(typeId, fieldName, index) {

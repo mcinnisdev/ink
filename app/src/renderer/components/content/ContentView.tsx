@@ -70,7 +70,7 @@ export default function ContentView() {
 
   return (
     <div className="flex h-full">
-      <div className="flex flex-col flex-shrink-0">
+      <div className="flex flex-col flex-shrink-0 h-full overflow-hidden">
         <ContentActions />
         <FileExplorer />
       </div>

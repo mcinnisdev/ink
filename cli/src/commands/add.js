@@ -337,6 +337,17 @@ async function addContentType(projectRoot, type, typeId) {
     }
   }
 
+  // Write any additional layouts (e.g., archive layouts for FAQ)
+  if (type.additionalLayouts) {
+    for (const extra of type.additionalLayouts) {
+      const extraPath = path.join(layoutDir, extra.filename);
+      if (!fs.existsSync(extraPath)) {
+        fs.writeFileSync(extraPath, extra.content);
+        console.log(`  Created src/_layouts/${extra.filename}`);
+      }
+    }
+  }
+
   if (type.sampleEntry) {
     const sampleTitle = getSampleTitle(typeId);
     const sampleSlug = slugify(sampleTitle);

@@ -53,7 +53,7 @@ export default function FileExplorer() {
   }
 
   return (
-    <div className="w-60 flex-shrink-0 bg-ink-900 border-r border-ink-700 overflow-y-auto">
+    <div className="w-60 flex-shrink-0 min-h-0 flex-1 bg-ink-900 border-r border-ink-700 overflow-y-auto">
       <div className="py-2">
         <div className="px-3 py-1.5 text-[10px] font-semibold text-ink-500 uppercase tracking-wider">
           {devMode ? "Explorer" : "Content"}
