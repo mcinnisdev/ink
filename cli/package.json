@@ -4,7 +4,7 @@
   "description": "CLI for Ink — the Markdown-native CMS built on Eleventy",
   "type": "module",
   "bin": {
-    "ink": "./src/index.js"
+    "ink": "src/index.js"
   },
   "files": [
     "src/",
@@ -27,7 +27,7 @@
   "author": "mcinnisdev",
   "repository": {
     "type": "git",
-    "url": "https://github.com/mcinnisdev/ink-cli"
+    "url": "git+https://github.com/mcinnisdev/ink-cli.git"
   },
   "homepage": "https://github.com/mcinnisdev/ink-cli",
   "license": "MIT",
