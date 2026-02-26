@@ -42,6 +42,19 @@ marked.setOptions({
   gfm: true,
 });
 
+/** Restore brackets that turndown escaped inside Nunjucks expressions */
+function unescapeNunjucksBrackets(md: string): string {
+  // Fix inside {{ ... }} expressions
+  md = md.replace(/\{\{([\s\S]*?)\}\}/g, (match) =>
+    match.replace(/\\\[/g, "[").replace(/\\\]/g, "]")
+  );
+  // Fix inside {% ... %} tags
+  md = md.replace(/\{%([\s\S]*?)%\}/g, (match) =>
+    match.replace(/\\\[/g, "[").replace(/\\\]/g, "]")
+  );
+  return md;
+}
+
 interface Props {
   value: string;
   onChange: (value: string) => void;
@@ -172,7 +185,7 @@ export default function TipTapEditor({ value, onChange }: Props) {
     },
     onUpdate: ({ editor: ed }) => {
       const html = ed.getHTML();
-      const md = turndown.turndown(html);
+      const md = unescapeNunjucksBrackets(turndown.turndown(html));
       onChange(md);
       setTick((t) => t + 1);
     },

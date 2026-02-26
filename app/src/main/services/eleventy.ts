@@ -3,6 +3,7 @@ import net from "net";
 import path from "path";
 import fs from "fs";
 import { BrowserWindow } from "electron";
+import log from "electron-log";
 
 export interface EleventyStatusEvent {
   status: "stopped" | "installing" | "starting" | "running" | "error";
@@ -116,7 +117,7 @@ export async function startServer(
 
   // Snapshot which ports are already listening so poll only detects NEW ones
   const preExistingPorts = new Set<number>();
-  for (let p = 8080; p <= 8090; p++) {
+  for (let p = 8080; p <= 8100; p++) {
     if (await isPortListening(p)) {
       preExistingPorts.add(p);
     }
@@ -149,6 +150,7 @@ export async function startServer(
     // Strategy 1: Parse port from stdout/stderr
     const handleOutput = (data: Buffer) => {
       const text = data.toString();
+      log.info("[Eleventy]", text.trim());
 
       const match = text.match(/https?:\/\/localhost:(\d+)/);
       if (match && status === "starting") {
@@ -174,8 +176,8 @@ export async function startServer(
           return;
         }
 
-        // Check ports 8080-8090 (Eleventy default range), skip pre-existing
-        for (let p = 8080; p <= 8090; p++) {
+        // Check ports 8080-8100 (Eleventy default range), skip pre-existing
+        for (let p = 8080; p <= 8100; p++) {
           if (preExistingPorts.has(p)) continue;
           if (await isPortListening(p)) {
             markRunning(p, timeout, pollTimer, resolve);

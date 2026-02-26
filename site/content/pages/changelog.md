@@ -11,6 +11,17 @@ hero_headline: "Changelog"
 hero_subtitle: "Release notes and version history for the Ink desktop app."
 ---
 
+## v1.1.1
+
+### Bug Fixes
+
+- Fixed visual editor corrupting Nunjucks template brackets during markdown roundtrip
+- Fixed "no port detected" error hiding actual Eleventy startup errors
+- Widened dev server port detection range (8080-8100)
+- Added Eleventy output logging for easier debugging
+
+---
+
 ## v1.1.0
 
 ### New Features

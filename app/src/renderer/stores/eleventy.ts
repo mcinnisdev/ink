@@ -23,7 +23,9 @@ export const useEleventyStore = create<EleventyStore>((set) => ({
       const result = await window.ink.eleventy.start(projectPath);
       set({ status: "running", port: result.port });
     } catch (err) {
-      set({ status: "error", error: String(err) });
+      const msg = err instanceof Error ? err.message : String(err);
+      set({ status: "error", error: msg });
+      throw err;
     }
   },
 
