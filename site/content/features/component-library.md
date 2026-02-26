@@ -31,7 +31,7 @@ Ink includes a library of pre-built UI components that cover common website patt
 ## Install with One Command
 
 ```bash
-npx ink add testimonials
+npx ink-cli add testimonials
 # ✓ Copied testimonials.njk to src/_includes/components/
 # ✓ Styles injected into project CSS
 # ✓ Component ready to use

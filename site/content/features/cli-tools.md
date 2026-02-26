@@ -18,28 +18,28 @@ The Ink CLI (`ink`) is a command-line tool that handles project scaffolding, com
 **`ink init <project-name>`** -- Scaffold a new Ink project with content directories, design tokens, layouts, and a working dev server. The wizard lets you choose between **plain CSS custom properties** (default) or **Tailwind CSS** for styling. You get a deployable site from the first command.
 
 ```bash
-npx ink init my-site
+npx ink-cli init my-site
 ```
 
 **`ink add <component>`** -- Install a pre-built UI component. The CLI copies the Nunjucks template, CSS, and JavaScript into your project. No package manager, no dependencies.
 
 ```bash
-npx ink add contact-form
-npx ink add pricing-table
+npx ink-cli add contact-form
+npx ink-cli add pricing-table
 ```
 
 **`ink generate <content-type>`** -- Add a built-in content type to your project. This creates the content directory, layout template, archive page, and directory data file.
 
 ```bash
-npx ink generate blog
-npx ink generate portfolio
+npx ink-cli generate blog
+npx ink-cli generate portfolio
 ```
 
 **`ink list [components|types]`** -- See what is available to install or generate.
 
 ```bash
-npx ink list components    # 12 available
-npx ink list types         # 8 built-in
+npx ink-cli list components    # 12 available
+npx ink-cli list types         # 8 built-in
 ```
 
 **`ink remove <component>`** -- Cleanly remove a component from your project.
@@ -53,7 +53,7 @@ npx ink list types         # 8 built-in
 Need a content type that is not built in? The CLI includes an interactive wizard that walks you through creating one:
 
 ```bash
-npx ink generate custom
+npx ink-cli generate custom
 # ? Content type name: case-studies
 # ? Singular label: Case Study
 # ? Frontmatter fields: title, client, industry, outcome

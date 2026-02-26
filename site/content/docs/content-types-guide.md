@@ -204,7 +204,7 @@ permalink: "/faq/ongoing-support/"
 If the 8 built-in types don't cover your needs, use the interactive wizard:
 
 ```bash
-npx ink add custom
+npx ink-cli add custom
 ```
 
 The wizard asks for:

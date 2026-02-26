@@ -14,7 +14,7 @@ permalink: "/features/deploy-anywhere/"
 When you run `npm run build`, Ink compiles your entire site into a folder of static HTML, CSS, and image files. There is no server-side runtime, no database connection, and no application server. The output is plain files that any web server can deliver.
 
 ```bash
-npx ink build
+npx ink-cli build
 # ✓ Built 47 pages in 0.38s
 # ✓ Output: _site/
 ```

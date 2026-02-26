@@ -27,7 +27,7 @@ Ink ships with eight content types, each with its own layout template, frontmatt
 Generate any of them with a single command:
 
 ```bash
-npx ink generate blog
+npx ink-cli generate blog
 ```
 
 This creates the content directory, layout, archive page, and directory data file. Start writing immediately.
@@ -59,7 +59,7 @@ Each content type defines expected frontmatter fields. A blog post expects `titl
 Need something Ink does not ship with -- case studies, events, recipes, product listings? The CLI wizard generates a custom content type:
 
 ```bash
-npx ink generate custom
+npx ink-cli generate custom
 ```
 
 The wizard asks for a name, singular label, and frontmatter fields, then creates the full directory structure, layout template, archive page, and `contentTypes.json` entry. Your custom type works exactly like the built-in ones -- same collection factory, same archive pagination, same design token integration.

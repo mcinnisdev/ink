@@ -10,10 +10,10 @@ permalink: "/docs/cli-reference/"
 
 ## Overview
 
-The `ink` package provides the `ink` command (when installed globally) or can be invoked with `npx ink`. All commands follow the pattern:
+The `ink` package provides the `ink` command (when installed globally) or can be invoked with `npx ink-cli`. All commands follow the pattern:
 
 ```bash
-npx ink <command> [arguments] [options]
+npx ink-cli <command> [arguments] [options]
 ```
 
 ## Project Commands
@@ -23,7 +23,7 @@ npx ink <command> [arguments] [options]
 Interactively scaffold a new Ink project.
 
 ```bash
-npx ink init my-site
+npx ink-cli init my-site
 ```
 
 The wizard prompts for site name, URL, brand colors, CSS framework (Tailwind or plain CSS custom properties), and which content types to include. If `dir` is omitted, the project is created in the current directory.
@@ -33,7 +33,7 @@ The wizard prompts for site name, URL, brand colors, CSS framework (Tailwind or 
 Start the Eleventy development server with live reload.
 
 ```bash
-npx ink serve
+npx ink-cli serve
 ```
 
 Runs at `http://localhost:8080` by default. File changes trigger an automatic browser refresh.
@@ -43,7 +43,7 @@ Runs at `http://localhost:8080` by default. File changes trigger an automatic br
 Build the site for production. Output goes to `_site/`.
 
 ```bash
-npx ink build
+npx ink-cli build
 ```
 
 ### `ink --version`
@@ -51,7 +51,7 @@ npx ink build
 Print the currently installed ink version.
 
 ```bash
-npx ink --version
+npx ink-cli --version
 ```
 
 ### `ink help`
@@ -59,7 +59,7 @@ npx ink --version
 Display a summary of all available commands.
 
 ```bash
-npx ink help
+npx ink-cli help
 ```
 
 ## Content Type Commands
@@ -69,9 +69,9 @@ npx ink help
 Add a content type to your project. This creates the content directory, layout, includes, and updates `contentTypes.json`.
 
 ```bash
-npx ink add blog
-npx ink add services
-npx ink add docs
+npx ink-cli add blog
+npx ink-cli add services
+npx ink-cli add docs
 ```
 
 **Available types:** `blog`, `docs`, `features`, `faq`, `team`, `services`, `portfolio`, `service-areas`
@@ -81,9 +81,9 @@ npx ink add docs
 Create a new content entry for an existing content type.
 
 ```bash
-npx ink add blog "My First Post"
-npx ink add services "Web Design"
-npx ink add team "Jane Smith"
+npx ink-cli add blog "My First Post"
+npx ink-cli add services "Web Design"
+npx ink-cli add team "Jane Smith"
 ```
 
 This generates a Markdown file with pre-filled frontmatter in the correct directory.
@@ -93,7 +93,7 @@ This generates a Markdown file with pre-filled frontmatter in the correct direct
 Launch an interactive wizard to define a completely custom content type.
 
 ```bash
-npx ink add custom
+npx ink-cli add custom
 ```
 
 You'll be prompted for the type name, directory, tag name, sort field, and layout. The CLI generates all necessary files and registers the type in `contentTypes.json`.
@@ -103,9 +103,9 @@ You'll be prompted for the type name, directory, tag name, sort field, and layou
 Generate sample content entries for a given type. Defaults to 3 entries if `count` is omitted.
 
 ```bash
-npx ink generate blog 5
-npx ink generate services
-npx ink generate faq 10
+npx ink-cli generate blog 5
+npx ink-cli generate services
+npx ink-cli generate faq 10
 ```
 
 ### `ink list [type]`
@@ -113,9 +113,9 @@ npx ink generate faq 10
 List all content entries. If `type` is provided, only entries of that type are shown.
 
 ```bash
-npx ink list          # List all content
-npx ink list blog     # List only blog posts
-npx ink list services # List only services
+npx ink-cli list          # List all content
+npx ink-cli list blog     # List only blog posts
+npx ink-cli list services # List only services
 ```
 
 ### `ink remove <type>`
@@ -123,7 +123,7 @@ npx ink list services # List only services
 Remove an entire content type from the project. This deletes the directory, layout, and unregisters it from `contentTypes.json`.
 
 ```bash
-npx ink remove faq
+npx ink-cli remove faq
 ```
 
 ### `ink delete <type> <slug>`
@@ -131,8 +131,8 @@ npx ink remove faq
 Delete a single content entry by its slug.
 
 ```bash
-npx ink delete blog my-first-post
-npx ink delete services web-design
+npx ink-cli delete blog my-first-post
+npx ink-cli delete services web-design
 ```
 
 ## Component Commands
@@ -142,9 +142,9 @@ npx ink delete services web-design
 Install a pre-built UI component. If `name` is omitted, the CLI lists all available components so you can choose interactively.
 
 ```bash
-npx ink add component                # List all available components
-npx ink add component contact-form   # Install the contact form
-npx ink add component pricing-table  # Install the pricing table
+npx ink-cli add component                # List all available components
+npx ink-cli add component contact-form   # Install the contact form
+npx ink-cli add component pricing-table  # Install the pricing table
 ```
 
 **Available components:** `contact-form`, `feature-grid`, `testimonials`, `pricing-table`, `stats-counter`, `image-gallery`, `tabs`, `logo-cloud`, `newsletter-signup`, `timeline`, `modal`, `social-share`
@@ -156,7 +156,7 @@ Each component installs a Nunjucks macro, associated CSS, and any required JavaS
 Uninstall a previously installed component.
 
 ```bash
-npx ink remove component contact-form
+npx ink-cli remove component contact-form
 ```
 
 ## Icon Commands
@@ -166,7 +166,7 @@ npx ink remove component contact-form
 Install the Lucide icon system. This adds an icon partial and a helper macro for rendering SVG icons inline.
 
 ```bash
-npx ink add icons
+npx ink-cli add icons
 ```
 
 After installation, use icons in your templates:

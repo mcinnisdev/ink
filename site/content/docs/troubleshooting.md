@@ -89,7 +89,7 @@ If an entry has `published: false`, the layout may filter it out. Check the fron
 An empty content directory produces an empty collection. Generate sample content to verify the setup:
 
 ```bash
-npx ink generate blog 3
+npx ink-cli generate blog 3
 ```
 
 ## Component CSS or JS Not Showing
@@ -111,8 +111,8 @@ Open your CSS file (`src/css/main.css` or `src/css/tailwind.css`) and search for
 If it is missing, try removing and reinstalling the component:
 
 ```bash
-npx ink remove component pricing-table
-npx ink add component pricing-table
+npx ink-cli remove component pricing-table
+npx ink-cli add component pricing-table
 ```
 
 **2. JavaScript was not added to `main.js`.**
@@ -189,7 +189,7 @@ You save a file but the browser does not reload, or changes are not reflected.
 
 1. **Check that `ink serve` is still running** in the terminal. Look for error output that may have stopped the process.
 2. **File is outside the watched directories.** Eleventy watches the directories defined in `eleventy.config.js`. Files outside `content/`, `src/`, `public/`, and `media/` will not trigger a rebuild.
-3. **Restart the dev server.** Stop it with `Ctrl+C` and run `npx ink serve` again.
+3. **Restart the dev server.** Stop it with `Ctrl+C` and run `npx ink-cli serve` again.
 
 ## Layout Not Found
 
@@ -217,7 +217,7 @@ This corresponds to the file `src/_layouts/post.njk`.
 
 If you chose Tailwind during `ink init` and styles are not appearing:
 
-1. **Make sure both processes are running.** The Tailwind watcher and Eleventy run concurrently via `npm run dev` (or `npx ink serve`). If only Eleventy is running, your Tailwind source (`src/css/tailwind.css`) won't be compiled to `src/css/style.css`.
+1. **Make sure both processes are running.** The Tailwind watcher and Eleventy run concurrently via `npm run dev` (or `npx ink-cli serve`). If only Eleventy is running, your Tailwind source (`src/css/tailwind.css`) won't be compiled to `src/css/style.css`.
 
 2. **Check `tailwind.config.js` content paths.** The `content` array must include all template and content files:
 
