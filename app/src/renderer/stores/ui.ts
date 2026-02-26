@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-type View = "welcome" | "content" | "media" | "search" | "theme" | "git" | "ai" | "settings";
+type View = "welcome" | "content" | "media" | "search" | "theme" | "gallery" | "git" | "ai" | "settings";
 export type Theme = "dark" | "light";
 
 interface UIStore {

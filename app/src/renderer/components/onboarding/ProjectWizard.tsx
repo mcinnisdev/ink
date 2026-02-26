@@ -171,6 +171,8 @@ export default function ProjectWizard() {
     }
   };
 
+  const [scaffoldStatus, setScaffoldStatus] = useState("");
+
   const handleCreate = async () => {
     setError("");
     setScaffolding(true);
@@ -180,6 +182,7 @@ export default function ProjectWizard() {
         await saveAIConfig(localAI);
       }
 
+      setScaffoldStatus("Creating project...");
       const projectPath = await createProject({
         name: name.trim(),
         path: folder.trim(),
@@ -189,6 +192,7 @@ export default function ProjectWizard() {
       });
 
       // Apply branding (logo + colors + site metadata)
+      setScaffoldStatus("Applying branding...");
       try {
         await window.ink.project.applyBranding(projectPath, {
           logoPath: logoPath || undefined,
@@ -201,16 +205,50 @@ export default function ProjectWizard() {
         console.error("Branding error:", brandingErr);
       }
 
-      // Scaffold content types via CLI (services & team are already in the starter)
-      const starterTypes = new Set(["services", "team"]);
-      const typesToAdd = Array.from(selectedTypes).filter(
-        (t) => !starterTypes.has(t)
-      );
-      for (const typeId of typesToAdd) {
+      // Scaffold content types via CLI
+      // Add all selected types (CLI gracefully skips types already in the starter)
+      setScaffoldStatus("Setting up content types...");
+      const allTypes = Array.from(selectedTypes);
+      for (const typeId of allTypes) {
         try {
-          await window.ink.cli.addContentType(projectPath, typeId);
+          const result = await window.ink.cli.addContentType(projectPath, typeId);
+          if (!result.success) {
+            console.warn(`CLI addContentType "${typeId}" exited with code ${result.exitCode}:`, result.stderr);
+          }
         } catch (err) {
           console.error(`Failed to add content type ${typeId}:`, err);
+        }
+      }
+
+      // Remove starter defaults that the user deselected
+      const starterDefaults = ["services", "team"];
+      for (const typeId of starterDefaults) {
+        if (!selectedTypes.has(typeId)) {
+          try {
+            await window.ink.cli.removeContentType(projectPath, typeId);
+          } catch (err) {
+            console.error(`Failed to remove content type ${typeId}:`, err);
+          }
+        }
+      }
+
+      // Generate AI content if configured and description was provided
+      const aiReady = localAI.apiKey.trim() || hasAIKey;
+      if (aiReady && siteDescription.trim()) {
+        setScaffoldStatus("Generating content with AI...");
+        try {
+          const result = await window.ink.ai.generateSiteContent({
+            projectPath,
+            siteName: siteName.trim() || name.trim(),
+            siteUrl: siteUrl.trim() || "https://example.com",
+            siteDescription: siteDescription.trim(),
+            contentTypes: allTypes,
+          });
+          if (!result.success) {
+            console.warn("AI content generation failed:", result.error);
+          }
+        } catch (err) {
+          console.error("AI content generation error:", err);
         }
       }
 
@@ -700,7 +738,7 @@ export default function ProjectWizard() {
                 {scaffolding ? (
                   <>
                     <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                    Setting up...
+                    {scaffoldStatus || "Setting up..."}
                   </>
                 ) : loading ? (
                   "Creating..."

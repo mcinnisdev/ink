@@ -1,11 +1,20 @@
-import { autoUpdater } from "electron-updater";
 import { BrowserWindow } from "electron";
 import log from "electron-log";
 
-// Configure logging
-autoUpdater.logger = log;
-autoUpdater.autoDownload = false;
-autoUpdater.autoInstallOnAppQuit = true;
+// Lazy-load autoUpdater to avoid accessing electron.app before it's ready
+let _autoUpdater: typeof import("electron-updater").autoUpdater | null = null;
+
+function getAutoUpdater() {
+  if (!_autoUpdater) {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const { autoUpdater } = require("electron-updater");
+    autoUpdater.logger = log;
+    autoUpdater.autoDownload = false;
+    autoUpdater.autoInstallOnAppQuit = true;
+    _autoUpdater = autoUpdater;
+  }
+  return _autoUpdater;
+}
 
 export interface UpdateInfo {
   available: boolean;
@@ -16,6 +25,8 @@ export interface UpdateInfo {
 }
 
 export function initAutoUpdater(mainWindow: BrowserWindow): void {
+  const autoUpdater = getAutoUpdater();
+
   autoUpdater.on("update-available", (info) => {
     const updateInfo: UpdateInfo = {
       available: true,
@@ -50,6 +61,7 @@ export function initAutoUpdater(mainWindow: BrowserWindow): void {
 }
 
 export async function checkForUpdates(): Promise<UpdateInfo> {
+  const autoUpdater = getAutoUpdater();
   const currentVersion = autoUpdater.currentVersion.version;
   try {
     const result = await autoUpdater.checkForUpdates();
@@ -78,9 +90,9 @@ export async function checkForUpdates(): Promise<UpdateInfo> {
 }
 
 export function downloadUpdate(): void {
-  autoUpdater.downloadUpdate();
+  getAutoUpdater().downloadUpdate();
 }
 
 export function installUpdate(): void {
-  autoUpdater.quitAndInstall();
+  getAutoUpdater().quitAndInstall();
 }

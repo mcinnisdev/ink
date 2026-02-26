@@ -92,6 +92,23 @@ export interface SearchResult {
   matchLength: number;
 }
 
+export interface FieldSchema {
+  key: string;
+  type: "string" | "text" | "number" | "boolean" | "date" | "reference";
+  required?: boolean;
+  label?: string;
+  default?: unknown;
+  /** For type:"reference" — the target collection directory name. */
+  collection?: string;
+}
+
+export interface ContentTypeSchema {
+  typeId: string;
+  label: string;
+  dir: string;
+  frontmatter: FieldSchema[];
+}
+
 export interface UpdateInfo {
   available: boolean;
   currentVersion: string;
@@ -177,6 +194,42 @@ export interface InkAPI {
     sendMessage: (messages: unknown[], context: ProjectContext) => Promise<unknown>;
     stopGeneration: (agentType?: "content" | "site") => Promise<void>;
     onStream: (callback: (event: AIStreamEvent) => void) => () => void;
+    generateSiteContent: (options: {
+      projectPath: string;
+      siteName: string;
+      siteUrl: string;
+      siteDescription: string;
+      contentTypes: string[];
+    }) => Promise<{ success: boolean; error?: string }>;
+  };
+  content: {
+    getSchema: (filePath: string) => Promise<ContentTypeSchema | null>;
+    listEntries: (collection: string) => Promise<Array<{
+      slug: string;
+      title: string;
+      filePath: string;
+    }>>;
+  };
+  templates: {
+    listComponents: () => Promise<Array<{
+      name: string;
+      label: string;
+      description: string;
+      category: string;
+      tier: number;
+      usage: string;
+      installed: boolean;
+    }>>;
+    listPageTemplates: () => Promise<Array<{
+      id: string;
+      label: string;
+      description: string;
+      category: string;
+      requires: string[];
+    }>>;
+    getSnippet: (name: string) => Promise<string | null>;
+    installComponent: (name: string) => Promise<{ success: boolean; error?: string }>;
+    createPage: (templateId: string, title: string) => Promise<{ success: boolean; filePath?: string; error?: string }>;
   };
   cli: {
     addContentType: (projectPath: string, typeId: string) => Promise<CliResult>;
@@ -312,6 +365,19 @@ const api: InkAPI = {
         ipcRenderer.removeListener("ai:stream", handler);
       };
     },
+    generateSiteContent: (options) =>
+      ipcRenderer.invoke("ai:generateSiteContent", options),
+  },
+  content: {
+    getSchema: (filePath) => ipcRenderer.invoke("content:getSchema", filePath),
+    listEntries: (collection) => ipcRenderer.invoke("content:listEntries", collection),
+  },
+  templates: {
+    listComponents: () => ipcRenderer.invoke("templates:listComponents"),
+    listPageTemplates: () => ipcRenderer.invoke("templates:listPageTemplates"),
+    getSnippet: (name) => ipcRenderer.invoke("templates:getSnippet", name),
+    installComponent: (name) => ipcRenderer.invoke("templates:installComponent", name),
+    createPage: (templateId, title) => ipcRenderer.invoke("templates:createPage", templateId, title),
   },
   cli: {
     addContentType: (projectPath, typeId) =>

@@ -745,3 +745,180 @@ async function streamOpenAI(
   emit(win, { type: "done", messageId, agentType });
   return { id: messageId, role: "assistant", content: fullContent, timestamp: Date.now() };
 }
+
+// --- Site Content Generation (non-streaming, for project wizard) ---
+
+export interface GenerateSiteContentOptions {
+  projectPath: string;
+  siteName: string;
+  siteUrl: string;
+  siteDescription: string;
+  contentTypes: string[];
+}
+
+const CONTENT_TYPE_INFO: Record<string, { dir: string; label: string }> = {
+  blog: { dir: "blog", label: "Blog Posts" },
+  services: { dir: "services", label: "Services" },
+  team: { dir: "employees", label: "Team Members" },
+  docs: { dir: "docs", label: "Documentation" },
+  features: { dir: "features", label: "Features" },
+  "service-areas": { dir: "service-areas", label: "Service Areas" },
+  portfolio: { dir: "portfolio", label: "Portfolio Projects" },
+  faq: { dir: "faq", label: "FAQ Entries" },
+};
+
+export async function generateSiteContent(
+  options: GenerateSiteContentOptions
+): Promise<{ success: boolean; error?: string }> {
+  const config = await loadAIConfig();
+  if (!config || !config.apiKey) {
+    return { success: false, error: "AI not configured" };
+  }
+
+  const typesDescription = options.contentTypes
+    .map((t) => {
+      const info = CONTENT_TYPE_INFO[t];
+      return info ? `- ${info.label} (content/${info.dir}/)` : `- ${t}`;
+    })
+    .join("\n");
+
+  const prompt = `You are setting up a brand new website. Here is what the site owner described:
+
+"${options.siteDescription}"
+
+Site name: "${options.siteName}"
+Site URL: ${options.siteUrl}
+
+The following content types have been scaffolded with placeholder/sample entries:
+${typesDescription}
+
+Your job:
+1. First, use list_files to see the project structure, then read_site_config to understand the current configuration.
+2. Update the site config with an appropriate tagline and description based on the business description.
+3. For each content type directory, read the existing sample files, then REWRITE them with real, professional content that matches the business description. Keep the same frontmatter structure but update all placeholder text.
+4. For content types that would benefit from more entries (like services, team, blog, FAQ, etc.), create 2-3 additional entries using create_page.
+5. Update content/pages/home.md with a compelling homepage that matches the business.
+6. If a contact page exists, update it with appropriate content.
+
+Guidelines:
+- Write professional, SEO-optimized content
+- Use realistic details based on what can be inferred from the description
+- Keep slugs and permalinks in kebab-case
+- Preserve the existing frontmatter field structure for each content type
+- Set published: true for all entries
+- For services, features, and team entries, use sequential order values (1, 2, 3...)
+- Do NOT create new content type directories or layouts — only populate existing ones`;
+
+  try {
+    if (config.provider === "anthropic") {
+      await runAnthropicGeneration(config, prompt, options.projectPath);
+    } else {
+      await runOpenAIGeneration(config, prompt, options.projectPath);
+    }
+    return { success: true };
+  } catch (err) {
+    return { success: false, error: (err as Error).message };
+  }
+}
+
+async function runAnthropicGeneration(
+  config: AIConfig,
+  prompt: string,
+  projectPath: string
+): Promise<void> {
+  const client = new Anthropic({ apiKey: config.apiKey });
+  const tools = getAnthropicTools("site");
+
+  let messages: Anthropic.MessageParam[] = [
+    { role: "user", content: prompt },
+  ];
+
+  let continueLoop = true;
+  while (continueLoop) {
+    const response = await client.messages.create({
+      model: config.model,
+      max_tokens: 4096,
+      messages,
+      tools,
+    });
+
+    const toolUseBlocks = response.content.filter(
+      (block): block is Anthropic.ContentBlock & { type: "tool_use" } =>
+        block.type === "tool_use"
+    );
+
+    if (toolUseBlocks.length === 0 || response.stop_reason !== "tool_use") {
+      continueLoop = false;
+    } else {
+      const toolResults: Anthropic.ToolResultBlockParam[] = [];
+      for (const block of toolUseBlocks) {
+        const toolCall: ToolCall = {
+          id: block.id,
+          name: block.name,
+          arguments: block.input as Record<string, unknown>,
+        };
+        const result = await executeTool(toolCall, projectPath);
+        toolResults.push({
+          type: "tool_result",
+          tool_use_id: block.id,
+          content: result.content,
+          is_error: result.isError,
+        });
+      }
+
+      messages = [
+        ...messages,
+        { role: "assistant" as const, content: response.content as unknown as string },
+        { role: "user" as const, content: toolResults as unknown as string },
+      ];
+    }
+  }
+}
+
+async function runOpenAIGeneration(
+  config: AIConfig,
+  prompt: string,
+  projectPath: string
+): Promise<void> {
+  const client = new OpenAI({ apiKey: config.apiKey });
+  const tools = getOpenAITools("site");
+
+  let messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
+    { role: "user", content: prompt },
+  ];
+
+  let continueLoop = true;
+  while (continueLoop) {
+    const response = await client.chat.completions.create({
+      model: config.model,
+      messages,
+      tools,
+    });
+
+    const choice = response.choices[0];
+    if (!choice) break;
+
+    const toolCalls = choice.message.tool_calls;
+    if (!toolCalls || toolCalls.length === 0 || choice.finish_reason !== "tool_calls") {
+      continueLoop = false;
+    } else {
+      const toolMessages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [];
+      for (const tc of toolCalls) {
+        const parsedArgs = JSON.parse(tc.function.arguments || "{}");
+        const toolCall: ToolCall = { id: tc.id, name: tc.function.name, arguments: parsedArgs };
+        const result = await executeTool(toolCall, projectPath);
+        toolMessages.push({
+          role: "tool",
+          tool_call_id: tc.id,
+          content: result.content,
+        });
+      }
+
+      messages = [
+        ...messages,
+        { role: "assistant", content: choice.message.content, tool_calls: toolCalls },
+        ...toolMessages,
+      ];
+    }
+  }
+}

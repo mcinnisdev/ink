@@ -32,19 +32,23 @@ function createWindow(): void {
     },
   });
 
-  // Content Security Policy
-  mainWindow.webContents.session.webRequest.onHeadersReceived(
-    (details, callback) => {
-      callback({
-        responseHeaders: {
-          ...details.responseHeaders,
-          "Content-Security-Policy": [
-            "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' file: data:; font-src 'self' data:; connect-src 'self' https://api.anthropic.com https://api.openai.com https://github.com https://api.github.com",
-          ],
-        },
-      });
-    }
-  );
+  // Content Security Policy — only enforce strict CSP in packaged builds.
+  // In dev mode, Vite injects inline scripts for React Fast Refresh that
+  // would be blocked by script-src 'self'.
+  if (app.isPackaged) {
+    mainWindow.webContents.session.webRequest.onHeadersReceived(
+      (details, callback) => {
+        callback({
+          responseHeaders: {
+            ...details.responseHeaders,
+            "Content-Security-Policy": [
+              "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' file: data:; font-src 'self' data:; connect-src 'self' https://api.anthropic.com https://api.openai.com https://github.com https://api.github.com",
+            ],
+          },
+        });
+      }
+    );
+  }
 
   // Open external links in default browser
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {

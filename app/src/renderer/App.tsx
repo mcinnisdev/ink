@@ -14,6 +14,7 @@ import PublishView from "./components/views/PublishView";
 import AIView from "./components/views/AIView";
 import SettingsView from "./components/views/SettingsView";
 import SearchView from "./components/views/SearchView";
+import GalleryView from "./components/gallery/GalleryView";
 import ToastContainer from "./components/layout/Toast";
 
 function ViewRouter() {
@@ -28,6 +29,8 @@ function ViewRouter() {
       return <SearchView />;
     case "theme":
       return <ThemeView />;
+    case "gallery":
+      return <GalleryView />;
     case "git":
       return <PublishView />;
     case "ai":

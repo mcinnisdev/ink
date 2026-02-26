@@ -32,6 +32,7 @@ import {
   saveAIConfig,
   sendMessage as aiSendMessage,
   stopGeneration,
+  generateSiteContent,
 } from "./services/ai";
 import {
   isGitRepo,
@@ -67,6 +68,14 @@ import {
   detectCssFramework,
 } from "./services/cli";
 import { assertWithinProject } from "./services/security";
+import { getSchemaForFile, listCollectionEntries } from "./services/content-types";
+import {
+  listComponents,
+  listPageTemplates,
+  getComponentSnippet,
+  installComponent,
+  createPageFromTemplate,
+} from "./services/templates";
 import { checkForUpdates, downloadUpdate, installUpdate } from "./services/updates";
 
 // Track the active project path for path validation
@@ -273,6 +282,10 @@ export function registerIpcHandlers(): void {
     return stopGeneration(agentType || "site");
   });
 
+  ipcMain.handle("ai:generateSiteContent", async (_event, options) => {
+    return generateSiteContent(options);
+  });
+
   // --- CLI ---
   ipcMain.handle("cli:addContentType", async (_event, projectPath: string, typeId: string) => {
     validatePath(projectPath);
@@ -317,6 +330,41 @@ export function registerIpcHandlers(): void {
   ipcMain.handle("cli:detectCssFramework", async (_event, projectPath: string) => {
     validatePath(projectPath);
     return detectCssFramework(projectPath);
+  });
+
+  // --- Content Schema ---
+  ipcMain.handle("content:getSchema", async (_event, filePath: string) => {
+    const projectPath = requireProject();
+    return getSchemaForFile(filePath, projectPath);
+  });
+
+  ipcMain.handle("content:listEntries", async (_event, collection: string) => {
+    const projectPath = requireProject();
+    return listCollectionEntries(collection, projectPath);
+  });
+
+  // --- Templates & Components ---
+  ipcMain.handle("templates:listComponents", async () => {
+    const projectPath = requireProject();
+    return listComponents(projectPath);
+  });
+
+  ipcMain.handle("templates:listPageTemplates", async () => {
+    return listPageTemplates();
+  });
+
+  ipcMain.handle("templates:getSnippet", async (_event, name: string) => {
+    return getComponentSnippet(name);
+  });
+
+  ipcMain.handle("templates:installComponent", async (_event, name: string) => {
+    const projectPath = requireProject();
+    return installComponent(projectPath, name);
+  });
+
+  ipcMain.handle("templates:createPage", async (_event, templateId: string, title: string) => {
+    const projectPath = requireProject();
+    return createPageFromTemplate(projectPath, templateId, title);
   });
 
   // --- Git ---

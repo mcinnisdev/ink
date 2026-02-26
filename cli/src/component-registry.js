@@ -8,6 +8,7 @@ export const COMPONENTS = {
   "contact-form": {
     label: "Contact Form",
     description: "Styled form macro with Formspree/Netlify support and client-side validation",
+    category: "cta",
     files: { njk: "contact-form.njk", css: "contact-form.css", js: "contact-form.js" },
     tier: 1,
     usage: `{% from "components/contact-form.njk" import contactForm %}
@@ -23,6 +24,7 @@ export const COMPONENTS = {
   "feature-grid": {
     label: "Feature Grid",
     description: "2-4 column grid with icon, title, and description for each feature",
+    category: "content",
     files: { njk: "feature-grid.njk", css: "feature-grid.css" },
     tier: 1,
     usage: `{% from "components/feature-grid.njk" import featureGrid %}
@@ -35,6 +37,7 @@ export const COMPONENTS = {
   testimonials: {
     label: "Testimonials",
     description: "Customer testimonial cards with optional star ratings and photos",
+    category: "social-proof",
     files: { njk: "testimonials.njk", css: "testimonials.css" },
     tier: 1,
     usage: `{% from "components/testimonials.njk" import testimonial, testimonialGrid %}
@@ -43,6 +46,7 @@ export const COMPONENTS = {
   "pricing-table": {
     label: "Pricing Table",
     description: "2-3 column pricing cards with featured plan highlight and feature lists",
+    category: "cta",
     files: { njk: "pricing-table.njk", css: "pricing-table.css" },
     tier: 1,
     usage: `{% from "components/pricing-table.njk" import pricingTable %}
@@ -54,6 +58,7 @@ export const COMPONENTS = {
   "stats-counter": {
     label: "Stats Counter",
     description: "Animated number counters that count up when scrolled into view",
+    category: "social-proof",
     files: { njk: "stats-counter.njk", css: "stats-counter.css", js: "stats-counter.js" },
     tier: 2,
     usage: `{% from "components/stats-counter.njk" import statsCounter %}
@@ -65,6 +70,7 @@ export const COMPONENTS = {
   "image-gallery": {
     label: "Image Gallery",
     description: "Responsive image grid with fullscreen lightbox overlay",
+    category: "media",
     files: { njk: "image-gallery.njk", css: "image-gallery.css", js: "image-gallery.js" },
     tier: 2,
     usage: `{% from "components/image-gallery.njk" import imageGallery %}
@@ -76,6 +82,7 @@ export const COMPONENTS = {
   tabs: {
     label: "Tabs",
     description: "Tabbed content panels with ARIA roles and keyboard navigation",
+    category: "content",
     files: { njk: "tabs.njk", css: "tabs.css", js: "tabs.js" },
     tier: 2,
     usage: `{% from "components/tabs.njk" import tabs %}
@@ -87,6 +94,7 @@ export const COMPONENTS = {
   "logo-cloud": {
     label: "Logo Cloud",
     description: "Row of partner or client logos with optional grayscale hover effect",
+    category: "social-proof",
     files: { njk: "logo-cloud.njk", css: "logo-cloud.css" },
     tier: 2,
     usage: `{% from "components/logo-cloud.njk" import logoCloud %}
@@ -97,6 +105,7 @@ export const COMPONENTS = {
   "newsletter-signup": {
     label: "Newsletter Signup",
     description: "Email capture form for Mailchimp, ConvertKit, or custom endpoints",
+    category: "cta",
     files: { njk: "newsletter-signup.njk", css: "newsletter-signup.css" },
     tier: 2,
     usage: `{% from "components/newsletter-signup.njk" import newsletterSignup %}
@@ -105,6 +114,7 @@ export const COMPONENTS = {
   timeline: {
     label: "Timeline",
     description: "Vertical timeline for company history, process steps, or milestones",
+    category: "content",
     files: { njk: "timeline.njk", css: "timeline.css" },
     tier: 3,
     usage: `{% from "components/timeline.njk" import timeline %}
@@ -116,6 +126,7 @@ export const COMPONENTS = {
   modal: {
     label: "Modal / Dialog",
     description: "Accessible dialog overlay with focus trap, escape-to-close, and scroll lock",
+    category: "content",
     files: { njk: "modal.njk", css: "modal.css", js: "modal.js" },
     tier: 3,
     usage: `{% from "components/modal.njk" import modal, modalTrigger %}
@@ -125,9 +136,17 @@ export const COMPONENTS = {
   "social-share": {
     label: "Social Share",
     description: "Share buttons for Twitter, Facebook, LinkedIn using Web Share API with fallbacks",
+    category: "social-proof",
     files: { njk: "social-share.njk", css: "social-share.css", js: "social-share.js" },
     tier: 3,
     usage: `{% from "components/social-share.njk" import socialShare %}
 {{ socialShare(title, page.url, site.url) }}`,
   },
+};
+
+export const COMPONENT_CATEGORIES = {
+  content: "Content",
+  cta: "CTA & Forms",
+  "social-proof": "Social Proof",
+  media: "Media",
 };

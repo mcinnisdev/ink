@@ -223,6 +223,24 @@ export default function MarkdownEditor({ value, onChange, mode = "markdown" }: P
     }
   }, [value]);
 
+  // Listen for insert-text events from Gallery
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const view = viewRef.current;
+      if (!view) return;
+      const text = (e as CustomEvent<string>).detail;
+      if (!text) return;
+      const cursor = view.state.selection.main.head;
+      view.dispatch({
+        changes: { from: cursor, to: cursor, insert: text },
+        selection: { anchor: cursor + text.length },
+      });
+      view.focus();
+    };
+    window.addEventListener("ink:insertText", handler);
+    return () => window.removeEventListener("ink:insertText", handler);
+  }, []);
+
   return (
     <div
       ref={containerRef}

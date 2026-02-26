@@ -10,6 +10,8 @@ export interface FileNode {
 
 export interface ParsedFile {
   frontmatter: Record<string, unknown>;
+  /** Original key order from the YAML frontmatter block. */
+  keyOrder: string[];
   body: string;
   raw: string;
 }
@@ -27,11 +29,12 @@ export interface TabData {
 
 function parseFrontmatter(raw: string): ParsedFile {
   const match = raw.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/);
-  if (!match) return { frontmatter: {}, body: raw, raw };
+  if (!match) return { frontmatter: {}, keyOrder: [], body: raw, raw };
 
   const yamlBlock = match[1];
   const body = match[2];
   const frontmatter: Record<string, unknown> = {};
+  const keyOrder: string[] = [];
 
   for (const line of yamlBlock.split("\n")) {
     const colonIdx = line.indexOf(":");
@@ -57,16 +60,35 @@ function parseFrontmatter(raw: string): ParsedFile {
     }
 
     frontmatter[key] = value;
+    keyOrder.push(key);
   }
 
-  return { frontmatter, body, raw };
+  return { frontmatter, keyOrder, body, raw };
 }
 
 function serializeFrontmatter(
   frontmatter: Record<string, unknown>,
-  body: string
+  body: string,
+  keyOrder?: string[]
 ): string {
-  const lines = Object.entries(frontmatter).map(([key, value]) => {
+  // Use preserved key order, then append any new keys at the end
+  const allKeys = new Set(Object.keys(frontmatter));
+  const orderedKeys: string[] = [];
+  if (keyOrder) {
+    for (const key of keyOrder) {
+      if (allKeys.has(key)) {
+        orderedKeys.push(key);
+        allKeys.delete(key);
+      }
+    }
+  }
+  // Append remaining keys (newly added fields)
+  for (const key of allKeys) {
+    orderedKeys.push(key);
+  }
+
+  const lines = orderedKeys.map((key) => {
+    const value = frontmatter[key];
     if (typeof value === "string") return `${key}: "${value}"`;
     return `${key}: ${value}`;
   });
@@ -137,7 +159,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
     // Only parse frontmatter for .md files
     const content = filePath.endsWith(".md")
       ? parseFrontmatter(raw)
-      : { frontmatter: {}, body: raw, raw };
+      : { frontmatter: {}, keyOrder: [], body: raw, raw };
     const fileName = relativePath.split("/").pop() || filePath;
 
     set({
@@ -185,7 +207,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       tabs: s.tabs.map((t) => {
         if (t.filePath !== filePath) return t;
         const newFm = { ...t.content.frontmatter, [key]: value };
-        const newRaw = serializeFrontmatter(newFm, t.content.body);
+        const newRaw = serializeFrontmatter(newFm, t.content.body, t.content.keyOrder);
         return {
           ...t,
           content: { ...t.content, frontmatter: newFm, raw: newRaw },
@@ -202,7 +224,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         if (t.filePath !== filePath) return t;
         // Only serialize frontmatter for .md files
         const hasFm = filePath.endsWith(".md") && Object.keys(t.content.frontmatter).length > 0;
-        const newRaw = hasFm ? serializeFrontmatter(t.content.frontmatter, body) : body;
+        const newRaw = hasFm ? serializeFrontmatter(t.content.frontmatter, body, t.content.keyOrder) : body;
         return {
           ...t,
           content: { ...t.content, body, raw: newRaw },

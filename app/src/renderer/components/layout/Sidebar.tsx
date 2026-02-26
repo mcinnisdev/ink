@@ -6,13 +6,14 @@ import {
   Globe,
   Sparkles,
   Settings,
+  LayoutGrid,
   type LucideIcon,
 } from "lucide-react";
 import { useUIStore } from "../../stores/ui";
 import { useProjectStore } from "../../stores/project";
 
 const navItems: Array<{
-  id: "content" | "media" | "search" | "theme" | "git" | "ai" | "settings";
+  id: "content" | "media" | "search" | "theme" | "gallery" | "git" | "ai" | "settings";
   label: string;
   icon: LucideIcon;
   devOnly: boolean;
@@ -20,6 +21,7 @@ const navItems: Array<{
   { id: "content", label: "Content", icon: FileText, devOnly: false },
   { id: "media", label: "Media", icon: Image, devOnly: false },
   { id: "search", label: "Search", icon: Search, devOnly: false },
+  { id: "gallery", label: "Gallery", icon: LayoutGrid, devOnly: false },
   { id: "theme", label: "Theme", icon: Palette, devOnly: false },
   { id: "git", label: "Publish", icon: Globe, devOnly: false },
   { id: "ai", label: "AI", icon: Sparkles, devOnly: false },
