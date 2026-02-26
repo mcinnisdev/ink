@@ -18,10 +18,10 @@ This monorepo contains:
 ## Quick Start
 
 ```bash
-npx ink-cli init my-site
+npx inksite init my-site
 cd my-site
 npm install
-npx ink-cli serve
+npx inksite serve
 ```
 
 ## What You Get

@@ -1,5 +1,5 @@
 {
-  "name": "ink-cli",
+  "name": "inksite",
   "version": "1.0.0",
   "description": "CLI for Ink — the Markdown-native CMS built on Eleventy",
   "type": "module",

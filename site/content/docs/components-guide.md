@@ -23,19 +23,19 @@ To use a component in any layout or page, import the macro and call it.
 Install a component by name:
 
 ```bash
-npx ink-cli add component contact-form
+npx inksite add component contact-form
 ```
 
 List all available components interactively:
 
 ```bash
-npx ink-cli add component
+npx inksite add component
 ```
 
 Remove a component you no longer need:
 
 ```bash
-npx ink-cli remove component contact-form
+npx inksite remove component contact-form
 ```
 
 ## Available Components
@@ -45,7 +45,7 @@ npx ink-cli remove component contact-form
 A styled, accessible contact form with name, email, phone, and message fields.
 
 ```bash
-npx ink-cli add component contact-form
+npx inksite add component contact-form
 ```
 
 ```html
@@ -59,7 +59,7 @@ The form submits via POST. Configure the action URL in the include or wire it up
 A responsive grid of feature cards, perfect for highlighting product or service benefits.
 
 ```bash
-npx ink-cli add component feature-grid
+npx inksite add component feature-grid
 ```
 
 ```html
@@ -73,7 +73,7 @@ Pulls items from the `features` collection automatically. Add feature entries wi
 A testimonial carousel or grid displaying client quotes with attribution.
 
 ```bash
-npx ink-cli add component testimonials
+npx inksite add component testimonials
 ```
 
 ```html
@@ -87,7 +87,7 @@ Testimonial data can be stored in a data file at `src/_data/testimonials.json` o
 A responsive pricing comparison table with tier highlighting.
 
 ```bash
-npx ink-cli add component pricing-table
+npx inksite add component pricing-table
 ```
 
 ```html
@@ -118,7 +118,7 @@ Define your pricing tiers in `src/_data/pricing.json`:
 Animated number counters for displaying key metrics (projects completed, clients served, etc.).
 
 ```bash
-npx ink-cli add component stats-counter
+npx inksite add component stats-counter
 ```
 
 ```html
@@ -132,7 +132,7 @@ This component includes JavaScript for the count-up animation that triggers when
 A responsive image gallery with lightbox support.
 
 ```bash
-npx ink-cli add component image-gallery
+npx inksite add component image-gallery
 ```
 
 ```html
@@ -146,7 +146,7 @@ Place images in the `media/` directory and reference them in your content or a d
 A tabbed content interface for organizing information into switchable panels.
 
 ```bash
-npx ink-cli add component tabs
+npx inksite add component tabs
 ```
 
 ```html
@@ -160,7 +160,7 @@ Tabs are built with accessible ARIA roles and keyboard navigation. The component
 A grid of partner or client logos, ideal for social proof sections.
 
 ```bash
-npx ink-cli add component logo-cloud
+npx inksite add component logo-cloud
 ```
 
 ```html
@@ -174,7 +174,7 @@ Store logo images in `media/logos/` and list them in a data file or pass them di
 An email signup form for mailing list integration.
 
 ```bash
-npx ink-cli add component newsletter-signup
+npx inksite add component newsletter-signup
 ```
 
 ```html
@@ -188,7 +188,7 @@ Configure the form action to point to your email service provider (Mailchimp, Co
 A vertical timeline for displaying company history, project milestones, or process steps.
 
 ```bash
-npx ink-cli add component timeline
+npx inksite add component timeline
 ```
 
 ```html
@@ -200,7 +200,7 @@ npx ink-cli add component timeline
 A reusable modal dialog with open/close controls and backdrop.
 
 ```bash
-npx ink-cli add component modal
+npx inksite add component modal
 ```
 
 ```html
@@ -214,7 +214,7 @@ Trigger the modal from any button or link using a `data-modal-target` attribute.
 Share buttons for Twitter/X, Facebook, LinkedIn, and email.
 
 ```bash
-npx ink-cli add component social-share
+npx inksite add component social-share
 ```
 
 ```html

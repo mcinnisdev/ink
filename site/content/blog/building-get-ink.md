@@ -17,7 +17,7 @@ There's no better way to test a tool than to use it for real work. So when it ca
 It started the same way any Ink project starts:
 
 ```bash
-npx ink-cli init site
+npx inksite init site
 ```
 
 The CLI walked us through the setup prompts -- site name, description, color palette, content types -- and within a minute we had a working scaffold with pages, blog posts, and components ready to customize.
@@ -41,7 +41,7 @@ The **CLI scaffolding** saved a surprising amount of time. Instead of copying bo
 
 Dogfooding revealed a few rough edges that we smoothed out along the way. We refined the default responsive breakpoints after testing on real devices. We improved the component documentation after catching ourselves looking up our own API. And we simplified the frontmatter schemas after realizing some fields were rarely used.
 
-Every improvement we made went straight back into the starter template. If you run `npx ink-cli init` today, you're getting the same foundation that powers this site.
+Every improvement we made went straight back into the starter template. If you run `npx inksite init` today, you're getting the same foundation that powers this site.
 
 ## The Takeaway
 

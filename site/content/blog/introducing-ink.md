@@ -25,7 +25,7 @@ Ink ships as a CLI tool that scaffolds a complete, production-ready website in s
 - **8 content types** -- Blog posts, pages, projects, team members, FAQs, testimonials, services, and employees. Each with its own frontmatter schema and archive page.
 - **12 components** -- Hero sections, feature grids, CTAs, testimonial carousels, pricing tables, and more. All built with semantic HTML and scoped CSS.
 - **Design tokens** -- A single CSS file with custom properties for colors, typography, spacing, and layout. Change your entire theme by editing a handful of variables.
-- **CLI scaffolding** -- Run `npx ink-cli init` and answer a few prompts. Your site is ready to edit and deploy in under a minute.
+- **CLI scaffolding** -- Run `npx inksite init` and answer a few prompts. Your site is ready to edit and deploy in under a minute.
 - **SEO and feeds** -- Every page gets proper meta tags, Open Graph data, and structured markup. RSS and sitemap are generated automatically.
 - **Responsive design** -- Mobile-first layouts that work across devices without any extra configuration.
 
@@ -48,7 +48,7 @@ This is just the beginning. We're working on a desktop app with a visual editor,
 Getting started takes one command:
 
 ```bash
-npx ink-cli init my-site
+npx inksite init my-site
 ```
 
 Check out the [documentation](/docs/) to learn more, browse the [features](/features/) to see what's included, or jump straight into the [getting started guide](/docs/getting-started/).

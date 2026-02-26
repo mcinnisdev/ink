@@ -23,7 +23,7 @@ If you need Node.js, download it from [nodejs.org](https://nodejs.org) or use a 
 The fastest way to start is with `ink init`. You can run it directly with `npx` -- no global install required:
 
 ```bash
-npx ink-cli init my-site
+npx inksite init my-site
 ```
 
 The interactive wizard will ask you for:
@@ -52,7 +52,7 @@ npm install
 Launch the Eleventy development server with live reload:
 
 ```bash
-npx ink-cli serve
+npx inksite serve
 ```
 
 Your site is now running at **http://localhost:8080**. Every time you save a file, the browser will automatically refresh.
@@ -62,7 +62,7 @@ Your site is now running at **http://localhost:8080**. Every time you save a fil
 When you're ready to deploy, generate the static output:
 
 ```bash
-npx ink-cli build
+npx inksite build
 ```
 
 This creates a `_site/` directory containing your fully built static site, ready to upload to any hosting provider.
@@ -102,8 +102,8 @@ my-site/
 If you want to see your site populated with realistic placeholder content, use the `generate` command:
 
 ```bash
-npx ink-cli generate blog 5
-npx ink-cli generate services 4
+npx inksite generate blog 5
+npx inksite generate services 4
 ```
 
 This creates the specified number of sample entries so you can preview layouts and components immediately.
@@ -113,7 +113,7 @@ This creates the specified number of sample entries so you can preview layouts a
 If you use Ink frequently, install it globally so you can skip the `npx` prefix:
 
 ```bash
-npm install -g ink-cli
+npm install -g inksite
 ```
 
 Then you can run commands directly:

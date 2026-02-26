@@ -61,7 +61,7 @@ You can check out my work at [mcinnis.dev](https://mcinnis.dev) or send me an em
 And if you just want to kick the tires on Ink itself, it's open source and free:
 
 ```bash
-npx ink-cli init my-site
+npx inksite init my-site
 ```
 
 Thanks for reading. Now if you'll excuse me, I have another CMS to go work on.
