@@ -66,7 +66,7 @@ export async function init(args) {
     const starterDir = findStarterDir(tailwind);
     if (!starterDir) {
       console.error("  Could not find the Ink starter template.");
-      console.error("  Make sure ink-cli is installed properly.\n");
+      console.error("  Make sure inksite is installed properly.\n");
       process.exit(1);
     }
 
@@ -203,6 +203,16 @@ function scaffoldContentType(projectDir, type, typeId) {
     const layoutPath = path.join(layoutDir, type.layout);
     if (!fs.existsSync(layoutPath)) {
       fs.writeFileSync(layoutPath, type.layoutTemplate);
+    }
+  }
+
+  // Additional layouts (e.g., faq-archive.njk)
+  if (type.additionalLayouts) {
+    for (const extra of type.additionalLayouts) {
+      const extraPath = path.join(layoutDir, extra.filename);
+      if (!fs.existsSync(extraPath)) {
+        fs.writeFileSync(extraPath, extra.content);
+      }
     }
   }
 
