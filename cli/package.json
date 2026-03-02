@@ -1,6 +1,6 @@
 {
   "name": "inksite",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "CLI for Ink — the Markdown-native CMS built on Eleventy",
   "type": "module",
   "bin": {
@@ -8,13 +8,16 @@
   },
   "files": [
     "src/",
-    "templates/"
+    "templates/",
+    "starter/",
+    "starter-tailwind/"
   ],
   "engines": {
     "node": ">=18.0.0"
   },
   "scripts": {
-    "dev": "node src/index.js"
+    "dev": "node src/index.js",
+    "prepack": "node scripts/prepack.js"
   },
   "keywords": [
     "ink",
