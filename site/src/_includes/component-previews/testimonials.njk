@@ -1,0 +1,27 @@
+{% macro testimonial(quote, author, role, photo, rating) %}
+<blockquote class="testimonial">
+  {% if rating %}
+  <div class="testimonial__rating" aria-label="{{ rating }} out of 5 stars">
+    {% for i in range(0, rating) %}<span class="testimonial__star" aria-hidden="true">&#9733;</span>{% endfor %}
+  </div>
+  {% endif %}
+  <p class="testimonial__quote">{{ quote }}</p>
+  <footer class="testimonial__author">
+    {% if photo %}
+    <img class="testimonial__photo" src="{{ photo }}" alt="{{ author }}" loading="lazy" width="48" height="48">
+    {% endif %}
+    <div>
+      <cite class="testimonial__name">{{ author }}</cite>
+      {% if role %}<span class="testimonial__role">{{ role }}</span>{% endif %}
+    </div>
+  </footer>
+</blockquote>
+{% endmacro %}
+
+{% macro testimonialGrid(items) %}
+<div class="testimonial-grid">
+  {% for item in items %}
+  {{ testimonial(item.quote, item.author, item.role, item.photo, item.rating) }}
+  {% endfor %}
+</div>
+{% endmacro %}

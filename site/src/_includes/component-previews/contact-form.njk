@@ -1,0 +1,34 @@
+{% macro contactForm(action, method, fields, submitText, id) %}
+<form class="form" id="{{ id or 'contact-form' }}" action="{{ action or '#' }}" method="{{ method or 'POST' }}" novalidate>
+  {% for field in fields %}
+  <div class="form__group">
+    <label class="form__label" for="field-{{ field.name }}">
+      {{ field.label }}{% if field.required %} <span class="form__required" aria-label="required">*</span>{% endif %}
+    </label>
+    {% if field.type == "textarea" %}
+    <textarea class="form__input form__textarea" id="field-{{ field.name }}" name="{{ field.name }}"
+      {% if field.required %}required{% endif %}
+      {% if field.placeholder %}placeholder="{{ field.placeholder }}"{% endif %}
+      rows="{{ field.rows or 5 }}"></textarea>
+    {% elif field.type == "select" %}
+    <select class="form__input form__select" id="field-{{ field.name }}" name="{{ field.name }}"
+      {% if field.required %}required{% endif %}>
+      <option value="">Select...</option>
+      {% for opt in field.options %}
+      <option value="{{ opt.value or opt }}">{{ opt.label or opt }}</option>
+      {% endfor %}
+    </select>
+    {% else %}
+    <input class="form__input" type="{{ field.type or 'text' }}" id="field-{{ field.name }}" name="{{ field.name }}"
+      {% if field.required %}required{% endif %}
+      {% if field.placeholder %}placeholder="{{ field.placeholder }}"{% endif %}>
+    {% endif %}
+    {% if field.help %}<span class="form__help">{{ field.help }}</span>{% endif %}
+  </div>
+  {% endfor %}
+  <div class="form__group">
+    <button class="btn btn--primary" type="submit">{{ submitText or "Send Message" }}</button>
+  </div>
+  <div class="form__status" aria-live="polite" hidden></div>
+</form>
+{% endmacro %}
