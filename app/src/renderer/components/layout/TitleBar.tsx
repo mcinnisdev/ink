@@ -3,7 +3,7 @@ import { Code2, Pencil, Keyboard, Sun, Moon } from "lucide-react";
 import { useProjectStore } from "../../stores/project";
 import { useUIStore } from "../../stores/ui";
 import ShortcutsDialog from "./ShortcutsDialog";
-import inkLogo from "../../assets/ink-logo.svg";
+import inkLogo from "../../assets/ink-logo.png";
 
 export default function TitleBar() {
   const current = useProjectStore((s) => s.current);

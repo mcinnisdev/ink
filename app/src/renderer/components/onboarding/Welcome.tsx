@@ -1,6 +1,6 @@
 import { useProjectStore } from "../../stores/project";
 import { useUIStore } from "../../stores/ui";
-import inkLogo from "../../assets/ink-logo.svg";
+import inkLogo from "../../assets/ink-logo.png";
 
 export default function Welcome() {
   const recentProjects = useProjectStore((s) => s.recentProjects);
