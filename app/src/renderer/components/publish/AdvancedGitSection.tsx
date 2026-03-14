@@ -2,14 +2,12 @@ import { useState, useCallback } from "react";
 import {
   ChevronRight,
   ChevronDown,
-  GitBranch,
-  GitCommit,
   Check,
   ArrowUpCircle,
-  ArrowDownCircle,
   Link,
   Loader2,
   RefreshCw,
+  Clock,
 } from "lucide-react";
 import { useProjectStore } from "../../stores/project";
 import { useGitStore } from "../../stores/git";
@@ -90,7 +88,7 @@ export default function AdvancedGitSection() {
         ) : (
           <ChevronDown className="w-3.5 h-3.5" />
         )}
-        Advanced Git Controls
+        Version History
         <span className="ml-auto flex items-center gap-2">
           {totalChanges > 0 && (
             <span className="text-amber-400 text-[10px]">
@@ -114,22 +112,11 @@ export default function AdvancedGitSection() {
 
       {!collapsed && (
         <div className="px-4 pb-4 space-y-4 border-t border-ink-700/50 pt-3">
-          {/* Branch info */}
+          {/* Status summary */}
           <div className="flex items-center gap-3 text-xs">
-            <span className="flex items-center gap-1.5 px-2 py-1 rounded bg-ink-800 text-ink-300">
-              <GitBranch className="w-3 h-3" />
-              {gitStatus.branch}
-            </span>
-            {gitStatus.ahead > 0 && (
-              <span className="flex items-center gap-1 text-green-400">
-                <ArrowUpCircle className="w-3 h-3" />
-                {gitStatus.ahead} ahead
-              </span>
-            )}
             {gitStatus.behind > 0 && (
-              <span className="flex items-center gap-1 text-red-400">
-                <ArrowDownCircle className="w-3 h-3" />
-                {gitStatus.behind} behind
+              <span className="flex items-center gap-1 text-amber-400">
+                Your site is out of sync — re-publish to fix
               </span>
             )}
             {totalChanges === 0 &&
@@ -137,7 +124,7 @@ export default function AdvancedGitSection() {
               gitStatus.behind === 0 && (
                 <span className="flex items-center gap-1 text-green-400">
                   <Check className="w-3 h-3" />
-                  Up to date
+                  All changes published
                 </span>
               )}
           </div>
@@ -146,7 +133,7 @@ export default function AdvancedGitSection() {
           {totalChanges > 0 && (
             <div className="bg-ink-900/50 rounded-lg border border-ink-700/50 p-3">
               <p className="text-xs font-medium text-ink-300 mb-2">
-                Changed Files
+                Unsaved Changes
               </p>
               <div className="max-h-40 overflow-y-auto space-y-0.5">
                 {gitStatus.staged.map((f) => (
@@ -157,7 +144,7 @@ export default function AdvancedGitSection() {
                     <span className="w-1.5 h-1.5 rounded-full bg-green-400 flex-shrink-0" />
                     <span className="text-ink-300 truncate font-mono">{f}</span>
                     <span className="text-green-400 text-[10px] ml-auto flex-shrink-0">
-                      staged
+                      ready
                     </span>
                   </div>
                 ))}
@@ -169,7 +156,7 @@ export default function AdvancedGitSection() {
                     <span className="w-1.5 h-1.5 rounded-full bg-amber-400 flex-shrink-0" />
                     <span className="text-ink-300 truncate font-mono">{f}</span>
                     <span className="text-amber-400 text-[10px] ml-auto flex-shrink-0">
-                      modified
+                      changed
                     </span>
                   </div>
                 ))}
@@ -199,7 +186,7 @@ export default function AdvancedGitSection() {
                 onKeyDown={(e) =>
                   e.key === "Enter" && handleStageAndCommit()
                 }
-                placeholder="Commit message..."
+                placeholder="Describe what you changed (optional)"
                 className="flex-1 bg-ink-900 border border-ink-600 rounded-lg px-3 py-1.5 text-xs text-ink-50 placeholder-ink-500 focus:border-accent focus:outline-none"
               />
               <button
@@ -208,7 +195,7 @@ export default function AdvancedGitSection() {
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-accent hover:bg-accent-hover text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Check className="w-3.5 h-3.5" />
-                Commit All
+                Save Snapshot
               </button>
             </div>
           )}
@@ -218,7 +205,7 @@ export default function AdvancedGitSection() {
             <div className="flex items-center justify-between mb-1.5">
               <p className="text-xs font-medium text-ink-400 flex items-center gap-1.5">
                 <Link className="w-3 h-3" />
-                Remote
+                Connected Repository
               </p>
               {remote && !editingRemote && (
                 <button
@@ -284,12 +271,10 @@ export default function AdvancedGitSection() {
                 <ArrowUpCircle className="w-3.5 h-3.5" />
               )}
               {pushing
-                ? "Pushing..."
+                ? "Syncing..."
                 : gitStatus.ahead > 0
-                ? `Push ${gitStatus.ahead} commit${
-                    gitStatus.ahead !== 1 ? "s" : ""
-                  }`
-                : "Nothing to push"}
+                ? "Sync Now"
+                : "Up to date"}
             </button>
           )}
 
@@ -297,7 +282,7 @@ export default function AdvancedGitSection() {
           {gitLog.length > 0 && (
             <div className="bg-ink-900/50 rounded-lg border border-ink-700/50 p-3">
               <p className="text-xs font-medium text-ink-300 mb-2">
-                Recent Commits
+                Recent Saves
               </p>
               <div className="space-y-1.5">
                 {gitLog.slice(0, 5).map((entry) => (
@@ -305,7 +290,7 @@ export default function AdvancedGitSection() {
                     key={entry.hash}
                     className="flex items-start gap-2 text-xs"
                   >
-                    <GitCommit className="w-3 h-3 text-ink-500 mt-0.5 flex-shrink-0" />
+                    <Clock className="w-3 h-3 text-ink-500 mt-0.5 flex-shrink-0" />
                     <div className="min-w-0 flex-1">
                       <p className="text-ink-300 truncate">{entry.message}</p>
                       <p className="text-ink-600 text-[10px]">

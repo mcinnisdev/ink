@@ -2,26 +2,29 @@ import { Check, X, Loader2, RotateCcw } from "lucide-react";
 import { usePublishStore, type PublishStep } from "../../stores/publish";
 import { useProjectStore } from "../../stores/project";
 
-const STEPS: { key: PublishStep; label: string }[] = [
-  { key: "building", label: "Build site" },
-  { key: "staging", label: "Stage changes" },
-  { key: "committing", label: "Commit" },
-  { key: "pushing", label: "Push to GitHub" },
+// Visual steps — staging and committing are internal and collapsed into "Packaging"
+const VISUAL_STEPS: { label: string; internalKeys: PublishStep[] }[] = [
+  { label: "Preparing your site", internalKeys: ["building"] },
+  { label: "Packaging your changes", internalKeys: ["staging", "committing"] },
+  { label: "Saving to the web", internalKeys: ["pushing"] },
 ];
 
-function getStepStatus(
-  stepKey: PublishStep,
+const INTERNAL_ORDER: PublishStep[] = ["building", "staging", "committing", "pushing"];
+
+function getVisualStepStatus(
+  internalKeys: PublishStep[],
   currentStep: PublishStep,
   isError: boolean
 ): "pending" | "active" | "done" | "error" {
-  const stepOrder = STEPS.map((s) => s.key);
-  const currentIdx = stepOrder.indexOf(currentStep);
-  const stepIdx = stepOrder.indexOf(stepKey);
-
   if (currentStep === "done") return "done";
-  if (isError && currentStep === stepKey) return "error";
-  if (stepIdx < currentIdx) return "done";
-  if (stepIdx === currentIdx) return "active";
+
+  const currentIdx = INTERNAL_ORDER.indexOf(currentStep);
+  const stepFirstIdx = INTERNAL_ORDER.indexOf(internalKeys[0]);
+  const stepLastIdx = INTERNAL_ORDER.indexOf(internalKeys[internalKeys.length - 1]);
+
+  if (isError && internalKeys.includes(currentStep)) return "error";
+  if (currentIdx > stepLastIdx) return "done";
+  if (currentIdx >= stepFirstIdx && currentIdx <= stepLastIdx) return "active";
   return "pending";
 }
 
@@ -44,11 +47,11 @@ export default function PublishProgress() {
   return (
     <div className="bg-ink-800/50 rounded-lg border border-ink-700/50 p-5">
       <div className="space-y-3">
-        {STEPS.map((s, i) => {
-          const status = getStepStatus(s.key, step, isError);
+        {VISUAL_STEPS.map((s, i) => {
+          const status = getVisualStepStatus(s.internalKeys, step, isError);
 
           return (
-            <div key={s.key} className="flex items-center gap-3">
+            <div key={s.label} className="flex items-center gap-3">
               {/* Icon */}
               <div
                 className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 ${
@@ -123,7 +126,7 @@ export default function PublishProgress() {
       {isDone && (
         <div className="mt-4 rounded-lg bg-green-900/20 border border-green-800/50 p-3 text-center">
           <p className="text-xs text-green-300 font-medium">
-            Site published successfully!
+            Your site is live! Changes may take a minute to appear.
           </p>
         </div>
       )}

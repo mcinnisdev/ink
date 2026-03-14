@@ -9,6 +9,21 @@ export type PublishStep =
   | "done"
   | "error";
 
+function translateError(raw: string): string {
+  const s = raw.toLowerCase();
+  if (s.includes("rejected") || s.includes("non-fast-forward") || s.includes("fetch first"))
+    return "Publishing failed because your site was updated elsewhere. Click Retry to sync and try again.";
+  if (s.includes("authentication failed") || s.includes("401") || s.includes("403"))
+    return "Your account connection expired. Please disconnect and reconnect your account.";
+  if (s.includes("enoent") || s.includes("not installed") || s.includes("git is not installed"))
+    return "Git is not installed on your computer. Download it from git-scm.com.";
+  if (s.includes("timed out") || s.includes("timeout"))
+    return "Connection timed out. Check your internet connection and try again.";
+  if (s.includes("no remote") || s.includes("remote configured"))
+    return "Your site isn't connected to an online repository. Go back and set up your repository first.";
+  return `Something went wrong. Details: ${raw}`;
+}
+
 interface PublishStore {
   step: PublishStep;
   error: string;
@@ -29,7 +44,7 @@ export const usePublishStore = create<PublishStore>((set) => ({
       set({ step: "building", error: "" });
       const buildResult = await window.ink.eleventy.build(projectPath);
       if (!buildResult.success) {
-        set({ step: "error", error: `Build failed: ${buildResult.output}` });
+        set({ step: "error", error: `Your site couldn't be prepared for publishing. Details: ${buildResult.output}` });
         return;
       }
 
@@ -71,7 +86,7 @@ export const usePublishStore = create<PublishStore>((set) => ({
       if (!pushResult.success) {
         set({
           step: "error",
-          error: pushResult.error || "Failed to push",
+          error: translateError(pushResult.error || "Failed to push"),
         });
         return;
       }
@@ -79,7 +94,7 @@ export const usePublishStore = create<PublishStore>((set) => ({
       set({ step: "done", lastPublished: new Date().toISOString() });
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
-      set({ step: "error", error: message });
+      set({ step: "error", error: translateError(message) });
     }
   },
 

@@ -53,7 +53,7 @@ export default function GitHubConnectionCard() {
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-ink-400 hover:text-red-400 hover:bg-red-900/20 transition-colors"
           >
             <LogOut className="w-3.5 h-3.5" />
-            Disconnect
+            Disconnect Account
           </button>
         </div>
       </div>
@@ -71,12 +71,12 @@ export default function GitHubConnectionCard() {
         {deviceFlowPhase === "requesting_code" ? (
           <div className="flex items-center justify-center gap-2 text-ink-400">
             <Loader2 className="w-4 h-4 animate-spin" />
-            <span className="text-sm">Connecting to GitHub...</span>
+            <span className="text-sm">Connecting...</span>
           </div>
         ) : (
           <div className="text-center">
             <p className="text-sm text-ink-300 mb-3">
-              Enter this code on GitHub to connect your account:
+              A browser window has opened. Enter this code to connect:
             </p>
             <div className="flex items-center justify-center gap-2 mb-4">
               <code className="text-2xl font-bold text-ink-50 tracking-widest bg-ink-900 px-4 py-2 rounded-lg border border-ink-600">
@@ -99,7 +99,7 @@ export default function GitHubConnectionCard() {
             </button>
             <div className="flex items-center justify-center gap-2 mt-4 text-ink-500 text-xs">
               <Loader2 className="w-3 h-3 animate-spin" />
-              Waiting for authorization...
+              Waiting for you to approve...
             </div>
           </div>
         )}
@@ -128,17 +128,17 @@ export default function GitHubConnectionCard() {
     <div className="bg-ink-800/50 rounded-lg border border-ink-700/50 p-6 text-center">
       <Github className="w-8 h-8 text-ink-500 mx-auto mb-3" />
       <p className="text-sm text-ink-300 font-medium mb-1">
-        Connect to GitHub
+        Set Up Publishing
       </p>
       <p className="text-xs text-ink-500 mb-4">
-        Push your site to GitHub and deploy with one click
+        Connect your account to save and publish your site online
       </p>
       <button
         onClick={connect}
         className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-medium bg-ink-100 text-ink-900 hover:bg-ink-200 transition-colors"
       >
         <Github className="w-3.5 h-3.5" />
-        Connect GitHub Account
+        Connect Account
       </button>
     </div>
   );

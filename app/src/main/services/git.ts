@@ -231,18 +231,56 @@ export async function gitPushAuthenticated(
   // Use http.extraHeader to pass the token for this single push command.
   // The token is never stored in .git/config, remote URL, or credential store.
   const encodedAuth = Buffer.from(`x-access-token:${token}`).toString("base64");
-  const result = await runGit(
-    [
-      "-c",
-      `http.extraHeader=Authorization: Basic ${encodedAuth}`,
-      "push",
-      "-u",
-      "origin",
-      branch,
-    ],
-    cwd
-  );
 
-  if (!result.success) return { success: false, error: result.stderr };
+  const doPush = () =>
+    runGit(
+      [
+        "-c",
+        `http.extraHeader=Authorization: Basic ${encodedAuth}`,
+        "push",
+        "--force-with-lease",
+        "-u",
+        "origin",
+        branch,
+      ],
+      cwd
+    );
+
+  const result = await doPush();
+
+  if (!result.success) {
+    // If rejected because the remote has new commits (e.g. a GitHub Pages deployment
+    // commit written back to the branch), fetch and retry once before giving up.
+    const isRejected =
+      result.stderr.includes("rejected") ||
+      result.stderr.includes("non-fast-forward") ||
+      result.stderr.includes("fetch first") ||
+      result.stderr.includes("stale info");
+
+    if (isRejected) {
+      const fetchResult = await runGit(
+        [
+          "-c",
+          `http.extraHeader=Authorization: Basic ${encodedAuth}`,
+          "fetch",
+          "--no-tags",
+          "origin",
+        ],
+        cwd
+      );
+
+      if (fetchResult.success) {
+        // Merge the fetched remote branch so local is up to date
+        await runGit(["merge", "--no-edit", `origin/${branch}`], cwd);
+        // Retry the push
+        const retryResult = await doPush();
+        if (!retryResult.success) return { success: false, error: retryResult.stderr };
+        return { success: true };
+      }
+    }
+
+    return { success: false, error: result.stderr };
+  }
+
   return { success: true };
 }

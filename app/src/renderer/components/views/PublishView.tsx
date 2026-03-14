@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { Globe } from "lucide-react";
 import { useProjectStore } from "../../stores/project";
 import { useGitStore } from "../../stores/git";
@@ -23,6 +23,8 @@ export default function PublishView() {
   const loadAuth = useGitHubStore((s) => s.loadAuth);
 
   const publishStep = usePublishStore((s) => s.step);
+  const reset = usePublishStore((s) => s.reset);
+  const autoResetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Load git status and github auth on mount
   useEffect(() => {
@@ -34,9 +36,17 @@ export default function PublishView() {
     if (!authLoaded) loadAuth();
   }, [authLoaded, loadAuth]);
 
+  // Auto-reset to idle 3 seconds after a successful publish
+  useEffect(() => {
+    if (publishStep === "done") {
+      autoResetTimer.current = setTimeout(() => reset(), 3000);
+    }
+    return () => {
+      if (autoResetTimer.current) clearTimeout(autoResetTimer.current);
+    };
+  }, [publishStep, reset]);
+
   const hasRemote = !!remote;
-  const isPublishing =
-    publishStep !== "idle" && publishStep !== "done" && publishStep !== "error";
   const showProgress = publishStep !== "idle";
 
   return (
@@ -48,17 +58,22 @@ export default function PublishView() {
           Publish
         </h2>
         <p className="text-xs text-ink-500 mt-0.5">
-          Connect to GitHub and publish your site with one click
+          Save and publish your site to the web
         </p>
       </div>
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto p-6">
         <div className="max-w-lg mx-auto space-y-4">
-          {/* Step 1: GitHub Connection */}
+          {/* Step 1: Account Connection */}
+          {!connected && (
+            <p className="text-xs text-ink-500">
+              Publishing saves your site to the web so visitors can see it.
+            </p>
+          )}
           <section>
             <h3 className="text-xs font-semibold text-ink-400 uppercase tracking-wider mb-2">
-              {connected ? "GitHub Account" : "Step 1 — Connect GitHub"}
+              {connected ? "Connected Account" : "Step 1 — Connect Your Account"}
             </h3>
             <GitHubConnectionCard />
           </section>
@@ -67,7 +82,7 @@ export default function PublishView() {
           {connected && !hasRemote && (
             <section>
               <h3 className="text-xs font-semibold text-ink-400 uppercase tracking-wider mb-2">
-                Step 2 — Set Up Repository
+                Step 2 — Choose Where to Save
               </h3>
               <RepoSetupCard />
             </section>
@@ -76,9 +91,6 @@ export default function PublishView() {
           {/* One-Click Publish (show if connected + remote configured) */}
           {connected && hasRemote && (
             <section>
-              <h3 className="text-xs font-semibold text-ink-400 uppercase tracking-wider mb-2">
-                Publish
-              </h3>
               {showProgress ? <PublishProgress /> : <OneClickPublishCard />}
             </section>
           )}

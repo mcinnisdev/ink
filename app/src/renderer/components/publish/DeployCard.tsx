@@ -62,7 +62,7 @@ export default function DeployCard() {
     <div className="bg-ink-800/50 rounded-lg border border-ink-700/50 p-4">
       <h4 className="text-xs font-semibold text-ink-300 mb-3 flex items-center gap-1.5">
         <Globe className="w-3.5 h-3.5" />
-        Deploy
+        Make Your Site Live
       </h4>
 
       {/* GitHub Pages */}
@@ -73,7 +73,7 @@ export default function DeployCard() {
               <Check className="w-4 h-4 text-green-400 flex-shrink-0" />
               <div className="min-w-0 flex-1">
                 <p className="text-xs text-green-300 font-medium">
-                  GitHub Pages is live
+                  Your site is live
                 </p>
                 <button
                   onClick={() => window.ink.shell.openExternal(pagesUrl)}
@@ -94,7 +94,7 @@ export default function DeployCard() {
               ) : (
                 <Globe className="w-3.5 h-3.5" />
               )}
-              Enable GitHub Pages
+              Turn On Free Hosting
             </button>
           )}
         </div>

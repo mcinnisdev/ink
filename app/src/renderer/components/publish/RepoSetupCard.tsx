@@ -135,7 +135,7 @@ export default function RepoSetupCard() {
           }`}
         >
           <Plus className="w-3.5 h-3.5" />
-          Create New
+          Start Fresh
         </button>
         <button
           onClick={() => setActiveTab("existing")}
@@ -146,7 +146,7 @@ export default function RepoSetupCard() {
           }`}
         >
           <Link className="w-3.5 h-3.5" />
-          Connect Existing
+          Use an Existing One
         </button>
       </div>
 
@@ -155,7 +155,7 @@ export default function RepoSetupCard() {
           <div className="space-y-3">
             <div>
               <label className="block text-xs font-medium text-ink-400 mb-1">
-                Repository Name
+                Site Name (used for the web address)
               </label>
               <input
                 type="text"
@@ -176,7 +176,7 @@ export default function RepoSetupCard() {
                 }`}
               >
                 <Lock className="w-3 h-3" />
-                Private
+                Private (only you can see it)
               </button>
               <button
                 onClick={() => setIsPrivate(false)}
@@ -187,7 +187,7 @@ export default function RepoSetupCard() {
                 }`}
               >
                 <Globe className="w-3 h-3" />
-                Public
+                Public (anyone can see the source)
               </button>
             </div>
 
@@ -201,7 +201,7 @@ export default function RepoSetupCard() {
               ) : (
                 <FolderGit2 className="w-4 h-4" />
               )}
-              {creatingRepo ? "Creating..." : "Create Repository"}
+              {creatingRepo ? "Setting up..." : "Create Online Home"}
             </button>
           </div>
         ) : (
@@ -211,7 +211,7 @@ export default function RepoSetupCard() {
                 onClick={() => setShowDropdown(!showDropdown)}
                 className="w-full flex items-center justify-between bg-ink-900 border border-ink-600 rounded-lg px-3 py-2 text-sm text-ink-400 hover:border-ink-500 transition-colors"
               >
-                <span>Select a repository...</span>
+                <span>Choose an existing repository...</span>
                 {loadingRepos ? (
                   <Loader2 className="w-3.5 h-3.5 animate-spin" />
                 ) : (
