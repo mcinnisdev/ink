@@ -1,0 +1,110 @@
+[
+  {
+    "id": "contact-form",
+    "label": "Contact Form",
+    "description": "Styled form with email and message fields. Works with Formspree and Netlify Forms out of the box, with accessible client-side validation.",
+    "category": "interaction",
+    "icon": "mail",
+    "cli_command": "ink add contact-form",
+    "use_cases": ["Contact pages", "Lead capture", "Support requests"]
+  },
+  {
+    "id": "feature-grid",
+    "label": "Feature Grid",
+    "description": "A responsive grid of feature cards, each with an icon, heading, and description. Great for highlighting what makes your product or service stand out.",
+    "category": "marketing",
+    "icon": "layout-grid",
+    "cli_command": "ink add feature-grid",
+    "use_cases": ["Home pages", "Product pages", "Landing pages"]
+  },
+  {
+    "id": "image-gallery",
+    "label": "Image Gallery",
+    "description": "A masonry-style photo gallery with lightbox support. Click any thumbnail to view the full image with next/previous navigation.",
+    "category": "content",
+    "icon": "images",
+    "cli_command": "ink add image-gallery",
+    "use_cases": ["Portfolio pages", "Photo galleries", "Product showcases"]
+  },
+  {
+    "id": "logo-cloud",
+    "label": "Logo Cloud",
+    "description": "A grid of client or partner logos with optional links. Builds trust by showing who you work with.",
+    "category": "marketing",
+    "icon": "building-2",
+    "cli_command": "ink add logo-cloud",
+    "use_cases": ["Home pages", "About pages", "Partnership pages"]
+  },
+  {
+    "id": "modal",
+    "label": "Modal",
+    "description": "An accessible dialog component triggered by a button. Traps focus, responds to Escape, and works without JavaScript for progressive enhancement.",
+    "category": "interaction",
+    "icon": "panel-top",
+    "cli_command": "ink add modal",
+    "use_cases": ["Image previews", "Confirmation dialogs", "Video embeds"]
+  },
+  {
+    "id": "newsletter-signup",
+    "label": "Newsletter Signup",
+    "description": "An email capture form that integrates with Mailchimp, ConvertKit, or any service that accepts a POST with an email field.",
+    "category": "marketing",
+    "icon": "send",
+    "cli_command": "ink add newsletter-signup",
+    "use_cases": ["Blog sidebars", "Footer sections", "Landing pages"]
+  },
+  {
+    "id": "pricing-table",
+    "label": "Pricing Table",
+    "description": "A side-by-side comparison of pricing tiers, each with a feature list and call-to-action button. Includes a highlighted recommended plan.",
+    "category": "marketing",
+    "icon": "credit-card",
+    "cli_command": "ink add pricing-table",
+    "use_cases": ["Pricing pages", "Service pages", "Landing pages"]
+  },
+  {
+    "id": "social-share",
+    "label": "Social Share",
+    "description": "Sharing buttons for Twitter/X, Facebook, LinkedIn, and email, plus a copy-link button. Works without a CDN or third-party scripts.",
+    "category": "content",
+    "icon": "share-2",
+    "cli_command": "ink add social-share",
+    "use_cases": ["Blog posts", "Articles", "Event pages"]
+  },
+  {
+    "id": "stats-counter",
+    "label": "Stats Counter",
+    "description": "Animated number counters that tick up when they scroll into view. Perfect for showing metrics, milestones, or business highlights.",
+    "category": "marketing",
+    "icon": "bar-chart-2",
+    "cli_command": "ink add stats-counter",
+    "use_cases": ["Home pages", "About pages", "Case studies"]
+  },
+  {
+    "id": "tabs",
+    "label": "Tabs",
+    "description": "An accessible tabbed content switcher with ARIA roles and keyboard navigation. Organises related content without separate pages.",
+    "category": "content",
+    "icon": "layout-panel-top",
+    "cli_command": "ink add tabs",
+    "use_cases": ["Product pages", "Documentation", "FAQs"]
+  },
+  {
+    "id": "testimonials",
+    "label": "Testimonials",
+    "description": "A grid of customer or client quotes with name, title, and optional avatar. Adds social proof to any page.",
+    "category": "marketing",
+    "icon": "quote",
+    "cli_command": "ink add testimonials",
+    "use_cases": ["Home pages", "Service pages", "Case studies"]
+  },
+  {
+    "id": "timeline",
+    "label": "Timeline",
+    "description": "A vertical timeline of events or milestones, each with a date, heading, and description. Great for company history or project roadmaps.",
+    "category": "content",
+    "icon": "git-commit-horizontal",
+    "cli_command": "ink add timeline",
+    "use_cases": ["About pages", "Case studies", "Roadmaps"]
+  }
+]
